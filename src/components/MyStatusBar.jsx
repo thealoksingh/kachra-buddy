@@ -4,10 +4,10 @@ import { Colors } from '../styles/commonStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 const MyStatusBar = () => {
   return (
-    <SafeAreaView style={{backgroundColor: Colors.primaryColor}}>
+    <SafeAreaView style={{backgroundColor: Colors.primary}}>
       <StatusBar
         translucent={false}
-        backgroundColor={Colors.primaryColor}
+        backgroundColor={Colors.primary}
         barStyle={'light-content'}
       />
     </SafeAreaView>

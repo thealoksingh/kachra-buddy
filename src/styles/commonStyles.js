@@ -9,6 +9,7 @@ export const Colors = {
   blackColor: "#000000",
   whiteColor: "#FFFFFF",
   grayColor: "#828282",
+  extraLightGrayColor: "#E0E0E0",
   lightBlackColor: "#333333",
   redColor: "#FF0606",
   lightGreenColor: "#90EE90",
@@ -104,7 +105,7 @@ export const commonStyles = {
     alignItems: "center",
   },
   button: {
-    backgroundColor: Colors.primaryColor,
+    backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 8,
@@ -112,7 +113,7 @@ export const commonStyles = {
   },
   outlinedButton: {
     backgroundColor: Colors.whiteColor,
-    borderColor: Colors.primaryColor,
+    borderColor: Colors.primary,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -120,7 +121,7 @@ export const commonStyles = {
     padding: Sizes.fixPadding * 1,
   },
   outlinedButtonText: {
-    color: Colors.primaryColor,
+    color: Colors.primary,
     fontSize: 14,
     fontWeight: "bold",
   },
@@ -139,6 +140,274 @@ export const commonStyles = {
     height: 45,
   },
 };
+
+
+export const Fonts = {
+  whiteColor16Regular: {
+    color: Colors.whiteColor,
+    fontSize: 12.0,
+    fontFamily: appFonts.regular,
+    includeFontPadding: false,
+  },
+
+  whiteColor14Regular: {
+    color: Colors.whiteColor,
+    fontSize: 14.0,
+    fontFamily: appFonts.regular,
+    includeFontPadding: false,
+  },
+
+  whiteColor10Medium: {
+    color: Colors.whiteColor,
+    fontSize: 10.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  whiteColor12Medium: {
+    color: Colors.whiteColor,
+    fontSize: 12.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  whiteColor16Medium: {
+    color: Colors.whiteColor,
+    fontSize: 16.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  whiteColor14Medium: {
+    color: Colors.whiteColor,
+    fontSize: 14.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  whiteColor14SemiBold: {
+    color: Colors.whiteColor,
+    fontSize: 14.0,
+    fontFamily: appFonts.semiBold,
+    includeFontPadding: false,
+  },
+
+  whiteColor16SemiBold: {
+    color: Colors.whiteColor,
+    fontSize: 16.0,
+    fontFamily: appFonts.semiBold,
+    includeFontPadding: false,
+  },
+
+  whiteColor18SemiBold: {
+    color: Colors.whiteColor,
+    fontSize: 18.0,
+    fontFamily: appFonts.semiBold,
+    includeFontPadding: false,
+  },
+
+  whiteColor34SemiBold: {
+    color: Colors.whiteColor,
+    fontSize: 34.0,
+    fontFamily: appFonts.semiBold,
+    includeFontPadding: false,
+  },
+
+  blackColor12Regular: {
+    color: Colors.blackColor,
+    fontSize: 12.0,
+    fontFamily: appFonts.regular,
+    includeFontPadding: false,
+  },
+
+  blackColor10Medium: {
+    color: Colors.blackColor,
+    fontSize: 10.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  blackColor16Medium: {
+    color: Colors.blackColor,
+    fontSize: 16.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  blackColor12Medium: {
+    color: Colors.blackColor,
+    fontSize: 12.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  blackColor14Medium: {
+    color: Colors.blackColor,
+    fontSize: 14.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  blackColor12SemiBold: {
+    color: Colors.blackColor,
+    fontSize: 12.0,
+    fontFamily: appFonts.semiBold,
+    includeFontPadding: false,
+  },
+
+  blackColor12Bold: {
+    color: Colors.blackColor,
+    fontSize: 12.0,
+    fontFamily: appFonts.bold,
+    fontWeight: "700",
+    includeFontPadding: false,
+  },
+
+  blackColor14SemiBold: {
+    color: Colors.blackColor,
+    fontSize: 14.0,
+    fontFamily: appFonts.semiBold,
+    fontWeight: "500",
+    includeFontPadding: false,
+  },
+
+  blackColor14Bold: {
+    color: Colors.blackColor,
+    fontSize: 14.0,
+    fontFamily: appFonts.bold,
+    fontWeight: "700",
+    includeFontPadding: false,
+  },
+
+  blackColor16SemiBold: {
+    color: Colors.blackColor,
+    fontSize: 16.0,
+    fontFamily: appFonts.semiBold,
+    includeFontPadding: false,
+  },
+
+  blackColor16Bold: {
+    color: Colors.blackColor,
+    fontSize: 16.0,
+    fontFamily: appFonts.bold,
+    fontWeight: "700",
+    includeFontPadding: false,
+  },
+
+  blackColor22SemiBold: {
+    color: Colors.blackColor,
+    fontSize: 22.0,
+    fontFamily: appFonts.semiBold,
+    includeFontPadding: false,
+  },
+
+  grayColor10Regular: {
+    color: Colors.grayColor,
+    fontSize: 10.0,
+    fontFamily: appFonts.regular,
+    includeFontPadding: false,
+  },
+
+  grayColor12Regular: {
+    color: Colors.grayColor,
+    fontSize: 12.0,
+    fontFamily: appFonts.regular,
+    includeFontPadding: false,
+  },
+
+  grayColor12SemiBold: {
+    color: Colors.grayColor,
+    fontSize: 12.0,
+    fontFamily: appFonts.semiBold,
+    fontWeight: "800",
+    includeFontPadding: false,
+  },
+
+  grayColor14Regular: {
+    color: Colors.grayColor,
+    fontSize: 14.0,
+    fontFamily: appFonts.regular,
+    includeFontPadding: false,
+  },
+
+  grayColor10Medium: {
+    color: Colors.grayColor,
+    fontSize: 10.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  grayColor11Medium: {
+    color: Colors.grayColor,
+    fontSize: 11.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  grayColor12Medium: {
+    color: Colors.grayColor,
+    fontSize: 12.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  grayColor14Medium: {
+    color: Colors.grayColor,
+    fontSize: 14.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  grayColor14SemiBold: {
+    color: Colors.grayColor,
+    fontSize: 14.0,
+    fontFamily: appFonts.semiBold,
+    includeFontPadding: false,
+  },
+
+  primary12Medium: {
+    color: Colors.primary,
+    fontSize: 12.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  primary14Medium: {
+    color: Colors.primary,
+    fontSize: 14.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+
+  primary12SemiBold: {
+    color: Colors.primary,
+    fontSize: 12.0,
+    fontFamily: appFonts.semiBold,
+    includeFontPadding: false,
+  },
+
+  primary14SemiBold: {
+    color: Colors.primary,
+    fontSize: 14.0,
+    fontFamily: appFonts.semiBold,
+    includeFontPadding: false,
+  },
+
+  primary18SemiBold: {
+    color: Colors.primary,
+    fontSize: 18.0,
+    fontFamily: appFonts.semiBold,
+    includeFontPadding: false,
+  },
+
+  redColor14Medium: {
+    color: Colors.redColor,
+    fontSize: 14.0,
+    fontFamily: appFonts.medium,
+    includeFontPadding: false,
+  },
+};
+
 
 export const screenWidth = Dimensions.get("window").width;
 

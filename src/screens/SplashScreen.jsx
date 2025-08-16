@@ -5,7 +5,7 @@ export default function SplashScreen({ navigation }) {
   useEffect(() => {
     // Show splash for 2 seconds, then navigate to Login
     const timer = setTimeout(() => {
-      navigation.replace('onboarding'); // replace prevents going back to splash
+      navigation.replace('login'); // replace prevents going back to splash
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -25,7 +25,7 @@ export default function SplashScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.primary, // splash bg color
+    backgroundColor: Colors.whiteColor, // splash bg color
     justifyContent: 'center',
     alignItems: 'center',
   },
