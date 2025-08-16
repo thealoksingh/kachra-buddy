@@ -1,21 +1,28 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import MyStatusBar from "../../components/MyStatusBar";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Linking,
+} from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import MyStatusBar from '../../components/MyStatusBar';
 import {
   AuthInput,
   ButtonWithLoader,
   OtpFields,
-} from "../../components/commonComponents";
-import { Colors } from "../../styles/commonStyles";
-import { useNavigation } from "@react-navigation/native";
+} from '../../components/commonComponents';
+import { Colors } from '../../styles/commonStyles';
+import { useNavigation } from '@react-navigation/native';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const [phone, setPhone] = useState("");
-  const [name, setName] = useState("");
+  const [phone, setPhone] = useState('');
+  const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [otpInput, setOtpInput] = useState("");
+  const [otpInput, setOtpInput] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -36,11 +43,11 @@ const LoginScreen = () => {
       setLoading(false);
       setIsVerified(true);
 
-      const userActive = false; 
+      const userActive = false;
       setIsActive(userActive);
 
       if (userActive) {
-        navigation.replace("home"); // directly go to home
+        navigation.replace('home'); // directly go to home
       }
     }, 1500);
   };
@@ -50,7 +57,7 @@ const LoginScreen = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      navigation.replace("home"); // after signup success
+      navigation.replace('home'); // after signup success
     }, 1500);
   };
 
@@ -61,8 +68,8 @@ const LoginScreen = () => {
       {/* Logo Section */}
       <View style={styles.logoContainer}>
         <Image
-          source={require("../../../assets/images/logo.png")}
-          style={[styles.logo, { tintColor: "white" }]}
+          source={require('../../../assets/images/logo.png')}
+          style={[styles.logo, { tintColor: 'white' }]}
           resizeMode="contain"
         />
       </View>
@@ -71,12 +78,12 @@ const LoginScreen = () => {
       <View style={styles.formContainer}>
         <Text style={styles.title}>
           {!otpSent
-            ? "Sign In"
+            ? 'Sign In'
             : !isVerified
-            ? "Enter OTP"
+            ? 'Enter OTP'
             : !isActive
-            ? "Signup"
-            : ""}
+            ? 'Sign Up'
+            : ''}
         </Text>
 
         {/* Phone Input */}
@@ -129,6 +136,20 @@ const LoginScreen = () => {
             method={handleSignup}
           />
         ) : null}
+
+        <View style={{ marginTop: 20, paddingHorizontal: 20 }}>
+          <Text style={{ textAlign: 'center', fontSize: 14, color: '#444' }}>
+            By continuing, you agree to our{' '}
+          </Text>
+          <Text
+            style={{ color: '#1E90FF', fontWeight: 'bold' ,textAlign: 'center'}}
+            onPress={() =>
+              Linking.openURL('https://www.termsandconditionsgenerator.com/')
+            }
+          >
+            Terms & Conditions
+          </Text>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -144,8 +165,8 @@ const styles = StyleSheet.create({
   logoContainer: {
     backgroundColor: Colors.primary,
     paddingVertical: 40,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     flex: 1,
   },
   logo: {
@@ -163,7 +184,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: '700',
     color: Colors.blackColor,
     marginBottom: 20,
   },
