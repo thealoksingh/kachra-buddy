@@ -5,7 +5,7 @@ export default function SplashScreen({ navigation }) {
   useEffect(() => {
     // Show splash for 2 seconds, then navigate to Login
     const timer = setTimeout(() => {
-      navigation.replace('userBottomNavBar'); 
+      navigation.replace('home'); 
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -15,7 +15,8 @@ export default function SplashScreen({ navigation }) {
     <View style={styles.container}>
       <Image 
         source={require('../../assets/images/logo.png')}
-        style={styles.logo} 
+        style={styles.logo}
+        resizeMode="contain" 
       />
       {/* <Text style={styles.text}>Kachra Buddy</Text> */}
     </View>
@@ -30,8 +31,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 300,
-    height: 300,
+    width: 220,
+    height: 130,
     marginBottom: 20,
 
   },
