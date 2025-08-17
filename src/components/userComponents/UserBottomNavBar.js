@@ -1,37 +1,32 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Colors, Fonts, Sizes, commonStyles } from "../styles/commonStyles";
-import { View, StyleSheet, Text, BackHandler, Platform } from "react-native";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Colors, Fonts, Sizes, commonStyles } from '../../styles/commonStyles';
+import { View, StyleSheet, Text, BackHandler, Platform } from 'react-native';
 
-import { useCallback, useState } from "react";
-import { useFocusEffect } from "@react-navigation/native";
-import HomeScreen from "../screens/user/HomeScreen";
-import BookingScreen from "../screens/user/BookingScreen";
-import ProfileScreen from "../screens/user/ProfileScreen";
+import { useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import HomeScreen from '../../screens/user/HomeScreen';
+import BookingScreen from '../../screens/user/BookingScreen';
+import ProfileScreen from '../../screens/user/ProfileScreen';
 
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-
-
-
-
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const Tab = createBottomTabNavigator();
 
 const UserBottomNavBar = ({ navigation }) => {
- const [backClickCount, setBackClickCount] = useState(0);
+  const [backClickCount, setBackClickCount] = useState(0);
 
-  const backAction = () => {
-  };
+  const backAction = () => {};
 
   useFocusEffect(
     useCallback(() => {
       const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction
+        'hardwareBackPress',
+        backAction,
       );
 
       return () => backHandler.remove();
-    }, [backClickCount])
+    }, [backClickCount]),
   );
 
   function _spring() {
@@ -49,13 +44,13 @@ const UserBottomNavBar = ({ navigation }) => {
           tabBarInactiveTintColor: Colors.lightGrayColor,
           tabBarHideOnKeyboard: true,
           headerShown: false,
-          tabBarShowLabel: true, 
+          tabBarShowLabel: true,
           tabBarLabelStyle: {
-            fontSize: 10, 
-            marginTop: 4, 
-            fontWeight: '400', 
+            fontSize: 10,
+            marginTop: 4,
+            fontWeight: '400',
           },
-          tabBarIconStyle: { alignSelf: "center" }, 
+          tabBarIconStyle: { alignSelf: 'center' },
           tabBarStyle: styles.tabBarStyle,
         }}
       >
@@ -66,23 +61,15 @@ const UserBottomNavBar = ({ navigation }) => {
             tabBarIcon: ({ focused }) =>
               focused ? (
                 // <View style={styles.selectedTabCircleStyle}>
-                  <MaterialIcons
-                    name="home"
-                    size={26}
-                    color={Colors.primary}
-                  />
-                // </View>
+                <MaterialIcons name="home" size={26} color={Colors.primary} />
               ) : (
-                <MaterialIcons
-                  name="home"
-                  size={26}
-                  color={Colors.grayColor}
-                />
+                // </View>
+                <MaterialIcons name="home" size={26} color={Colors.grayColor} />
               ),
-            tabBarLabel: 'Home', 
+            tabBarLabel: 'Home',
           }}
         />
-      
+
         <Tab.Screen
           name="Booking"
           component={BookingScreen}
@@ -90,20 +77,20 @@ const UserBottomNavBar = ({ navigation }) => {
             tabBarIcon: ({ focused }) =>
               focused ? (
                 // <View style={styles.selectedTabCircleStyle}>
-                  <MaterialIcons
-                    name="favorite"
-                    size={24}
-                      color={Colors.primary}
-                  />
-                // </View>
-              ) : (
                 <MaterialIcons
                   name="favorite"
                   size={24}
-                    color={Colors.grayColor}
+                  color={Colors.primary}
+                />
+              ) : (
+                // </View>
+                <MaterialIcons
+                  name="event-available"
+                  size={24}
+                  color={Colors.grayColor}
                 />
               ),
-            tabBarLabel: 'Favorite', 
+            tabBarLabel: 'Bookings',
           }}
         />
         <Tab.Screen
@@ -113,20 +100,16 @@ const UserBottomNavBar = ({ navigation }) => {
             tabBarIcon: ({ focused }) =>
               focused ? (
                 // <View style={styles.selectedTabCircleStyle}>
-                  <MaterialIcons
-                    name="person"
-                    size={25}
-                      color={Colors.primary}
-                  />
-                // </View>
+                <MaterialIcons name="person" size={25} color={Colors.primary} />
               ) : (
+                // </View>
                 <MaterialIcons
                   name="person"
                   size={25}
-                 color={Colors.grayColor}
+                  color={Colors.grayColor}
                 />
               ),
-            tabBarLabel: 'Profile', 
+            tabBarLabel: 'Profile',
           }}
         />
       </Tab.Navigator>
@@ -147,34 +130,33 @@ const UserBottomNavBar = ({ navigation }) => {
 
 export default UserBottomNavBar;
 
-
 const styles = StyleSheet.create({
   exitInfoWrapStyle: {
     backgroundColor: Colors.lightBlackColor,
-    position: "absolute",
+    position: 'absolute',
     bottom: 30,
-    alignSelf: "center",
+    alignSelf: 'center',
     borderRadius: Sizes.fixPadding * 2.0,
     paddingHorizontal: Sizes.fixPadding + 5.0,
     paddingVertical: Sizes.fixPadding,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   selectedTabCircleStyle: {
     width: 35.0,
     height: 35.0,
     borderRadius: 25.0,
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tabBarStyle: {
     backgroundColor: Colors.bodyBackColor,
     ...commonStyles.shadow,
     borderTopColor: Colors.extraLightGrayColor,
     borderTopWidth: 1.0,
-    height: Platform.OS == "ios" ? 100.0 : 70.0,
-    paddingTop:10,
-   paddingBottom: Platform.OS === "ios" ? 20 : 10, 
+    height: Platform.OS == 'ios' ? 100.0 : 70.0,
+    paddingTop: 10,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
   },
 });

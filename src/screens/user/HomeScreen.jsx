@@ -7,26 +7,35 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import { appFonts, Colors, textStyles } from '../../styles/commonStyles';
+import {
+  appFonts,
+  Colors,
+  screenWidth,
+  textStyles,
+} from '../../styles/commonStyles';
 import MyStatusBar from '../../components/MyStatusBar';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
-import MovingIcons from '../../components/MovingIcons';
+import MovingIcons from '../../components/userComponents/MovingIcons';
 import shoeIcon from '../../../assets/icons/shoes.png';
 import metalIcon from '../../../assets/icons/metal.png';
-import AdSlider from '../../components/AdSlider';
+import AdSlider from '../../components/userComponents/AdSlider';
+import MiniProductCard from '../../components/userComponents/MiniProductCard';
+import MiniProductScrollSection from '../../components/userComponents/MiniProductScrollSection';
+import { useNavigation } from '@react-navigation/native';
+import {products,addsData} from '../../utils/dummyData';
 
-const icons = [
+export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
   {
     id: '2',
     path: require('../../../assets/icons/plastic.png'),
-    label: 'Metal',
+    label: 'Plastic',
   },
   {
     id: '3',
-    path: require('../../../assets/icons/plastic.png'),
-    label: 'Plastic',
+    path: require('../../../assets/icons/metal.png'),
+    label: 'Metal',
   },
   { id: '4', path: require('../../../assets/icons/books.png'), label: 'Paper' },
   {
@@ -34,33 +43,27 @@ const icons = [
     path: require('../../../assets/icons/electronic.png'),
     label: 'Electronics',
   },
-  { id: '6', path: require('../../../assets/icons/tank.png'), label: 'Water Tank' },
-  { id: '7', path: require('../../../assets/icons/tyre.png'), label: 'Glass' },
+  {
+    id: '6',
+    path: require('../../../assets/icons/tank.png'),
+    label: 'Water Tank',
+  },
+  { id: '7', path: require('../../../assets/icons/tyre.png'), label: 'Tyre' },
   {
     id: '8',
     path: require('../../../assets/icons/battery.png'),
     label: 'Battery',
   },
+  {
+    id: '9',
+    path: require('../../../assets/icons/recycle.png'),
+    label: 'Garbage',
+  },
+  { id: '10', path: require('../../../assets/icons/box.png'), label: 'Carton' },
 ];
 
-const addsData = [
-  {
-    url: 'https://st3.depositphotos.com/1561359/13520/v/1600/depositphotos_135200286-stock-illustration-black-running-shoes-ad.jpg',
-    height: 180,
-    width: '100%',
-  },
-  {
-    url: 'https://webneel.com/daily/sites/default/files/images/daily/02-2016/16-nike-shoe-print-ads-design.jpg',
-    height: 180,
-    width: '100%',
-  },
-  {
-    url: 'https://plus.unsplash.com/premium_photo-1669644856868-6613f6683346?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    height: 200,
-    width: '100%',
-  },
-];
 export default function HomeScreen() {
+  const navigation = useNavigation();
   return (
     <LinearGradient
       colors={[Colors.primary, Colors.whiteColor]}
@@ -75,7 +78,10 @@ export default function HomeScreen() {
             }}
             style={styles.profileImage}
           />
+          <View>
           <Text style={styles.userName}>Alok Singh</Text>
+          <Text style={{...textStyles.extraSmall,color:Colors.whiteColor}}>Sinhgad College of Engineering</Text>
+          </View>
         </View>
         <TouchableOpacity style={{ position: 'relative' }}>
           <Ionicons name="cart-outline" size={28} color={Colors.whiteColor} />
@@ -92,15 +98,14 @@ export default function HomeScreen() {
       </View>
 
       {/* Search bar */}
-      <TouchableOpacity style={styles.searchBar}>
+      <TouchableOpacity onPress={()=>navigation.navigate("searchScreen")} style={styles.searchBar}>
         <Ionicons name="search-outline" size={20} color="#999" />
         <Text style={styles.searchText}>Search here...</Text>
       </TouchableOpacity>
 
       <ScrollView style={styles.mainSection}>
-        {/* ✅ Horizontal scroll of icons */}
         <MovingIcons icons={icons} />
-        <AdSlider data={addsData} />
+        <AdSlider data={addsData} height={180} />
 
         <View
           style={{
@@ -114,11 +119,62 @@ export default function HomeScreen() {
           <Text style={{ color: Colors.blackColor, ...textStyles.subHeading }}>
             Best Deals
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>navigation.navigate("searchScreen")}>
             <Text style={{ color: Colors.primary, ...textStyles.subHeading }}>
               See All
             </Text>
           </TouchableOpacity>
+        </View>
+
+        <MiniProductScrollSection products={products} />
+        <View style={{ marginVertical: 20 }}>
+          <AdSlider data={addsData} height={90} />
+        </View>
+
+        <View style={styles.scrapVehicleCard}>
+          {/* Left Side */}
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>
+              Sell Old Vehicle
+            </Text>
+            <Text style={{ fontSize: 14, color: '#666', marginBottom: 15 }}>
+              Turn your old stuff into cash today.
+            </Text>
+             <TouchableOpacity activeOpacity={0.7} style={styles.sellnowButton}>
+              <Text style={{ color: 'white', fontWeight: '600' }}>
+                Sell Now
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <Image
+            source={require('../../../assets/images/scrapVehicle.png')}
+            style={{
+              width: 150,
+              height: 150,
+              resizeMode: 'contain',
+              marginLeft: 10,
+            }}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 20,
+          }}
+        >
+          <Image
+            source={require('../../../assets/images/logo.png')}
+             style={{
+              width: 120,
+              height: 120,
+              resizeMode: 'contain',
+              marginLeft: 10,
+              opacity: 0.2,
+            }}
+          />
         </View>
       </ScrollView>
     </LinearGradient>
@@ -147,8 +203,8 @@ const styles = StyleSheet.create({
   },
 
   userName: {
-    fontSize: 16,
-    fontFamily: appFonts.bold,
+    fontSize: 14,
+    fontFamily: appFonts.semiBold,
     color: Colors.whiteColor,
   },
   searchBar: {
@@ -185,5 +241,30 @@ const styles = StyleSheet.create({
     minWidth: 20,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  scrapVehicleCard: {
+    width: screenWidth - 60,
+    height: 180,
+    backgroundColor: Colors.whiteColor,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    margin: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  sellnowButton: {
+    backgroundColor: Colors.secondary,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
   },
 });

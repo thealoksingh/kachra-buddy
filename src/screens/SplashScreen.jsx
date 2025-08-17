@@ -5,7 +5,7 @@ export default function SplashScreen({ navigation }) {
   useEffect(() => {
     // Show splash for 2 seconds, then navigate to Login
     const timer = setTimeout(() => {
-      navigation.replace('home'); 
+      navigation.replace('userBottomNavBar'); 
     }, 3000);
 
     return () => clearTimeout(timer);

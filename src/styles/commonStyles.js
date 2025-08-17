@@ -48,7 +48,7 @@ export const textStyles = StyleSheet.create({
   },
   subHeading: {
     fontFamily: appFonts.semiBold,
-    fontSize: fontSizes.lg,
+    fontSize: fontSizes.md,
   },
   body: {
     fontFamily: appFonts.regular,

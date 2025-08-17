@@ -10,7 +10,7 @@ import {
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const AdSlider = ({ data }) => {
+const AdSlider = ({ data ,height }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef(null);
   const indexRef = useRef(currentIndex);
@@ -29,7 +29,7 @@ const AdSlider = ({ data }) => {
         animated: true,
       });
       setCurrentIndex(nextIndex);
-    }, 3000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);
@@ -55,7 +55,7 @@ const AdSlider = ({ data }) => {
           <View
             style={[
               styles.adBox,
-              { height: item.height, width: screenWidth - 60 }, 
+              { height: height, width: screenWidth - 60 }, 
             ]}
           >
             <Image

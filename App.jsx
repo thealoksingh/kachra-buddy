@@ -7,12 +7,13 @@ import LoginScreen from './src/screens/authentication/LoginScreen';
 import SplashScreen from './src/screens/SplashScreen';
 import OnboardingScreen from './src/screens/onboarding/OnboardingScreen';
 import SignupScreen from './src/screens/authentication/SignupScreen';
-import UserBottomNavBar from './src/components/UserBottomNavBar';
+import UserBottomNavBar from './src/components/userComponents/UserBottomNavBar';
 
 // Importing screens
 import Cart from './src/screens/user/Cart';
 import BookingScreen from './src/screens/user/BookingScreen';
 import ProfileScreen from './src/screens/user/ProfileScreen';
+import SearchScreen from './src/screens/user/SearchScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,8 +29,7 @@ function RootStack() {
       <Stack.Screen name="cart" component={Cart} />
       <Stack.Screen name="booking" component={BookingScreen} />
       <Stack.Screen name="profile" component={ProfileScreen} />
-      
-
+      <Stack.Screen name="searchScreen" component={SearchScreen} />
     </Stack.Navigator>
   );
 }
