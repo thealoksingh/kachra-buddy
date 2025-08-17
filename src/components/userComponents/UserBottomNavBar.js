@@ -78,7 +78,7 @@ const UserBottomNavBar = ({ navigation }) => {
               focused ? (
                 // <View style={styles.selectedTabCircleStyle}>
                 <MaterialIcons
-                  name="favorite"
+                  name="event-available"
                   size={24}
                   color={Colors.primary}
                 />
