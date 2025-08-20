@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   View,
   Text,
@@ -6,19 +6,29 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-} from "react-native";
-import { Colors, Fonts, Sizes, commonStyles, screenWidth } from "../styles/commonStyles";
-import OTPTextView from "react-native-otp-textinput";
+  Image
+
+} from 'react-native';
+import {
+  Colors,
+  Fonts,
+  Sizes,
+  commonStyles,
+  screenWidth,
+} from '../styles/commonStyles';
+import OTPTextView from 'react-native-otp-textinput';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+// ...existing code...
 export function AuthInput({ label, value, setter, placeholder, type }) {
   const keyboardType =
-    type === "number"
-      ? "numeric"
-      : type === "email"
-      ? "email-address"
-      : "default";
+    type === 'number'
+      ? 'numeric'
+      : type === 'email'
+      ? 'email-address'
+      : 'default';
 
-  const handleChangeText = (text) => {
-    if (type === "email") {
+  const handleChangeText = text => {
+    if (type === 'email') {
       setter(text.toLowerCase());
     } else {
       setter(text);
@@ -35,7 +45,7 @@ export function AuthInput({ label, value, setter, placeholder, type }) {
         keyboardType={keyboardType}
         value={value}
         onChangeText={handleChangeText}
-        maxLength={type === "number" ? 10 : 50}
+        maxLength={type === 'number' ? 10 : 50}
       />
     </View>
   );
@@ -43,7 +53,7 @@ export function AuthInput({ label, value, setter, placeholder, type }) {
 
 export function ButtonWithLoader({ name, loadingName, isLoading, method }) {
   return isLoading ? (
-    <View style={{ ...commonStyles.button, flexDirection: "row", gap: 10 }}>
+    <View style={{ ...commonStyles.button, flexDirection: 'row', gap: 10 }}>
       <ActivityIndicator size="small" color={Colors.whiteColor} />
       <Text style={{ ...commonStyles.buttonText }}>{loadingName}</Text>
     </View>
@@ -57,7 +67,7 @@ export function ButtonWithLoader({ name, loadingName, isLoading, method }) {
     </TouchableOpacity>
   );
 }
-export function OtpFields({otpInput, setOtpInput}) {
+export function OtpFields({ otpInput, setOtpInput }) {
   return (
     <OTPTextView
       containerStyle={{
@@ -73,6 +83,45 @@ export function OtpFields({otpInput, setOtpInput}) {
     />
   );
 }
+
+export function CommonAppBar({ label, navigation }) {
+  return (
+    <View style={styles.appBar}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => navigation?.goBack()}
+      >
+        <Ionicons name="arrow-back" size={24} color="black" />
+      </TouchableOpacity>
+      <Text style={styles.title}>{label}</Text>
+      <View style={{ width: 20 }} />
+    </View>
+  );
+}
+
+export function FaddedIcon({}) {
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 20,
+      }}
+    >
+      <Image
+        source={require('../../assets/images/logo.png')}
+        style={{
+          width: 120,
+          height: 120,
+          resizeMode: 'contain',
+          marginLeft: 10,
+          opacity: 0.2,
+        }}
+      />
+    </View>
+  );
+}
 const styles = StyleSheet.create({
   inputContainer: {
     marginBottom: 16,
@@ -81,16 +130,16 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     ...Fonts.blackColor14SemiBold,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   input: {
     paddingVertical: 10,
     ...Fonts.blackColor12Medium,
   },
-   textFieldStyle: {
+  textFieldStyle: {
     width: screenWidth / 9,
     height: 45,
-    textAlign: "center",
+    textAlign: 'center',
     borderRadius: Sizes.fixPadding - 5.0,
     backgroundColor: Colors.whiteColor,
     borderColor: Colors.primaryColor,
@@ -98,5 +147,14 @@ const styles = StyleSheet.create({
     ...Fonts.blackColor16SemiBold,
     ...commonStyles.shadow,
     marginHorizontal: Sizes.fixPadding / 2,
+  },
+  appBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: Colors.bodyBackColor,
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0eb',
   },
 });

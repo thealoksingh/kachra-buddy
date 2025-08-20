@@ -14,6 +14,8 @@ import Cart from './src/screens/user/Cart';
 import BookingScreen from './src/screens/user/BookingScreen';
 import ProfileScreen from './src/screens/user/ProfileScreen';
 import SearchScreen from './src/screens/user/SearchScreen';
+import BookingDetailScreen from './src/screens/user/BookingDetailScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +30,7 @@ function RootStack() {
       <Stack.Screen name="home" component={HomeScreen} />
       <Stack.Screen name="cart" component={Cart} />
       <Stack.Screen name="booking" component={BookingScreen} />
+      <Stack.Screen name="bookingDetailScreen" component={BookingDetailScreen} />
       <Stack.Screen name="profile" component={ProfileScreen} />
       <Stack.Screen name="searchScreen" component={SearchScreen} />
     </Stack.Navigator>

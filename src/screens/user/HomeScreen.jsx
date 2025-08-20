@@ -17,13 +17,11 @@ import MyStatusBar from '../../components/MyStatusBar';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import MovingIcons from '../../components/userComponents/MovingIcons';
-import shoeIcon from '../../../assets/icons/shoes.png';
-import metalIcon from '../../../assets/icons/metal.png';
 import AdSlider from '../../components/userComponents/AdSlider';
-import MiniProductCard from '../../components/userComponents/MiniProductCard';
 import MiniProductScrollSection from '../../components/userComponents/MiniProductScrollSection';
 import { useNavigation } from '@react-navigation/native';
 import {products,addsData} from '../../utils/dummyData';
+import { FaddedIcon } from '../../components/commonComponents';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -83,10 +81,9 @@ export default function HomeScreen() {
           <Text style={{...textStyles.extraSmall,color:Colors.whiteColor}}>Sinhgad College of Engineering</Text>
           </View>
         </View>
-        <TouchableOpacity style={{ position: 'relative' }}>
+        <TouchableOpacity onPress={()=>navigation.navigate("cart")} style={{ position: 'relative' }}>
           <Ionicons name="cart-outline" size={28} color={Colors.whiteColor} />
 
-          {/* Badge */}
           <View style={styles.badge}>
             <Text
               style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
@@ -157,25 +154,7 @@ export default function HomeScreen() {
             }}
           />
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 20,
-          }}
-        >
-          <Image
-            source={require('../../../assets/images/logo.png')}
-             style={{
-              width: 120,
-              height: 120,
-              resizeMode: 'contain',
-              marginLeft: 10,
-              opacity: 0.2,
-            }}
-          />
-        </View>
+       <FaddedIcon/>
       </ScrollView>
     </LinearGradient>
   );
