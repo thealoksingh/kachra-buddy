@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { Colors, Fonts, Sizes, commonStyles, screenWidth } from "../styles/commonStyles";
 import OTPTextView from "react-native-otp-textinput";
+import Ionicons from "react-native-vector-icons/Ionicons";
+// ...existing code...
 export function AuthInput({ label, value, setter, placeholder, type }) {
   const keyboardType =
     type === "number"
@@ -73,6 +75,21 @@ export function OtpFields({otpInput, setOtpInput}) {
     />
   );
 }
+
+export function CommonAppBar({label, navigation}) {
+  return (
+    <View style={styles.appBar}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => navigation?.goBack()}
+      >
+        <Ionicons name="arrow-back" size={24} color="black" />
+      </TouchableOpacity>
+      <Text style={styles.title}>{label}</Text>
+      <View style={{ width: 20 }} />
+    </View>
+  );
+}
 const styles = StyleSheet.create({
   inputContainer: {
     marginBottom: 16,
@@ -98,5 +115,14 @@ const styles = StyleSheet.create({
     ...Fonts.blackColor16SemiBold,
     ...commonStyles.shadow,
     marginHorizontal: Sizes.fixPadding / 2,
+  },
+    appBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: Colors.bodyBackColor,
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0eb",
   },
 });
