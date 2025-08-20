@@ -74,15 +74,14 @@ const styles = StyleSheet.create({
     gap: 10,
     width: screenWidth - 20,
     height: 180,
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor:Colors.whiteColor,
+    borderRadius: 8,
     marginTop: 10,
     position: 'relative',
-    shadowColor: '#000',
+    shadowColor: '#424141ff',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
-
     elevation: 4,
   },
   deleteBtn: {
@@ -95,7 +94,7 @@ const styles = StyleSheet.create({
   image: {
     height: '100%',
     width: 120,
-    borderRadius: 10,
+    borderRadius: 8,
   },
   title: {
     ...textStyles.subHeading,
@@ -125,10 +124,10 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 8,
+    borderRadius: 4,
     paddingHorizontal: 10,
     height: 38,
-    width: 80,
+    width: 120,
     backgroundColor: '#fafafa',
   },
 });

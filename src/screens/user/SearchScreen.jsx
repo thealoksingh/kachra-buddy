@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
   StyleSheet,
@@ -24,6 +25,8 @@ const SearchScreen = () => {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [loading, setLoading] = useState(false);
   const filteredProducts = products;
+  const navigation = useNavigation(); 
+
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor, padding: 10 }}>
@@ -98,7 +101,7 @@ const SearchScreen = () => {
             name="Sell Now"
             loadingName="Processing..."
             isLoading={loading}
-            method={()=>{}}
+            method={()=>{navigation.navigate("cart")}}
           />
       </View>
     </View>
