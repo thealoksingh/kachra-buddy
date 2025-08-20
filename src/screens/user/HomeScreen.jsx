@@ -21,6 +21,7 @@ import AdSlider from '../../components/userComponents/AdSlider';
 import MiniProductScrollSection from '../../components/userComponents/MiniProductScrollSection';
 import { useNavigation } from '@react-navigation/native';
 import {products,addsData} from '../../utils/dummyData';
+import { FaddedIcon } from '../../components/commonComponents';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -153,25 +154,7 @@ export default function HomeScreen() {
             }}
           />
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 20,
-          }}
-        >
-          <Image
-            source={require('../../../assets/images/logo.png')}
-             style={{
-              width: 120,
-              height: 120,
-              resizeMode: 'contain',
-              marginLeft: 10,
-              opacity: 0.2,
-            }}
-          />
-        </View>
+       <FaddedIcon/>
       </ScrollView>
     </LinearGradient>
   );

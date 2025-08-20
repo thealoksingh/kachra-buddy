@@ -1,27 +1,44 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import SwipableTabs from '../../components/SwipableTabs'
-import Cart from './Cart'
-import { CommonAppBar } from '../../components/commonComponents';
+import { StyleSheet, Text, View, ScrollView ,Image} from 'react-native';
+import React from 'react';
+import SwipableTabs from '../../components/SwipableTabs';
+import { CommonAppBar, FaddedIcon } from '../../components/commonComponents';
 import { useNavigation } from '@react-navigation/native';
 import { Colors } from '../../styles/commonStyles';
-const BookingScreen = () => {
-    const navigation = useNavigation();
-   
+import BookingCard from '../../components/userComponents/BookingCard';
+
+const PreviousBookings = () => {
   return (
-    <View style={{flex: 1,backgroundColor:Colors.whiteColor}}>
-       <CommonAppBar navigation={navigation} label={'Bookings'} />
+    <ScrollView>
+      <BookingCard />
+      <BookingCard />
+     <FaddedIcon/>
+    </ScrollView>
+  );
+};
+const OngoingBookings = () => {
+  return (
+    <ScrollView>
+      <BookingCard />
+      <BookingCard />
+     <FaddedIcon/>
+    </ScrollView>
+  );
+};
+
+const BookingScreen = () => {
+  const navigation = useNavigation();
+
+  return (
+    <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
+      <CommonAppBar navigation={navigation} label={'Bookings'} />
       <SwipableTabs
         titles={['Ongoing Bookings', 'Previous Bookings']}
-        components={[
-          <View><Text>Hello Journey</Text></View>,
-          <View><Text>Hello Order</Text></View>
-        ]}
+        components={[<OngoingBookings />, <PreviousBookings />]}
       />
     </View>
-  )
-}
+  );
+};
 
-export default BookingScreen
+export default BookingScreen;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});
