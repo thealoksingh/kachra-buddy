@@ -10,7 +10,7 @@ import {
 } from '../../styles/commonStyles';
 
 const BookingCard = ({
-  address = '123 Main Street, New York, NY',
+  address = 'F101 wing F Gurukul apr vadgao bk pune 411041',
   status = 'pending',
   pickupStatus = 'Pending',
   driverStatus = 'Allocated',

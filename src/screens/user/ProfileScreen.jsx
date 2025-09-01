@@ -8,30 +8,30 @@ import {
   TouchableOpacity,
   Platform,
   Modal,
-} from "react-native";
-import React, { useState } from "react";
+} from 'react-native';
+import React, { useState } from 'react';
 import {
   Colors,
   Fonts,
   Sizes,
   commonStyles,
   screenWidth,
-} from "../../styles/commonStyles";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+} from '../../styles/commonStyles';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-import Icon from "react-native-vector-icons/MaterialIcons";
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import MyStatusBar from '../../components/MyStatusBar';
 // import { fullImageContainer } from "../../components/commonComponents";
 // import { showFullImageFunction } from "../../utils/commonMethods";
 
-const image = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGdpcmx8ZW58MHx8MHx8fDA%3D";
+const image =
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGdpcmx8ZW58MHx8MHx8fDA%3D';
 const ProfileScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [showLogoutSheet, setshowLogoutSheet] = useState(false);
   const [avatar, setAvatar] = useState(image);
-    const navigation = useNavigation();
-
+  const navigation = useNavigation();
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
@@ -50,16 +50,18 @@ const ProfileScreen = () => {
         </ScrollView>
       </ScrollView>
       {logoutSheet()}
-     
     </View>
   );
 
   function profileInfoWithOptions() {
     return (
       <View style={styles.profileInfoWithOptionsWrapStyle}>
-        <TouchableOpacity onPress={() => {
-        //  showFullImageFunction(image,setSelectedImage,setModalVisible);
-        }} style={{ alignItems: "center" }}>
+        <TouchableOpacity
+          onPress={() => {
+            //  showFullImageFunction(image,setSelectedImage,setModalVisible);
+          }}
+          style={{ alignItems: 'center' }}
+        >
           {avatar ? (
             <Image source={{ uri: avatar }} style={styles.userImageStyle} />
           ) : (
@@ -71,7 +73,7 @@ const ProfileScreen = () => {
 
         <View
           style={{
-            alignItems: "center",
+            alignItems: 'center',
             marginTop: Sizes.fixPadding,
             marginBottom: Sizes.fixPadding,
           }}
@@ -81,32 +83,31 @@ const ProfileScreen = () => {
         </View>
         <View>
           {profileOption({
-            option: "Edit Profile",
-            iconName: "person",
-            onPress: () => navigation.navigate("home"),
-          })}
-         
-
-          {profileOption({
-            option: "Terms & Conditions",
-            iconName: "list-alt",
-            onPress: () => navigation.navigate("home"),
+            option: 'Edit Profile',
+            iconName: 'person',
+            onPress: () => navigation.navigate('home'),
           })}
 
           {profileOption({
-            option: "Privacy Policy",
-            iconName: "privacy-tip",
-            onPress: () => navigation.navigate("home"),
+            option: 'Terms & Conditions',
+            iconName: 'list-alt',
+            onPress: () => navigation.navigate('home'),
           })}
-                  {profileOption({
-            option: "Raised Tickets",
-            iconName: "confirmation-number",
-            onPress: () => navigation.navigate("home"),
+
+          {profileOption({
+            option: 'Privacy Policy',
+            iconName: 'privacy-tip',
+            onPress: () => navigation.navigate('home'),
+          })}
+          {profileOption({
+            option: 'Raised Tickets',
+            iconName: 'confirmation-number',
+            onPress: () => navigation.navigate('home'),
           })}
 
           {logoutInfo()}
         </View>
-         {/* {fullImageContainer(modalVisible,setModalVisible ,selectedImage)} */}
+        {/* {fullImageContainer(modalVisible,setModalVisible ,selectedImage)} */}
       </View>
     );
   }
@@ -159,11 +160,7 @@ const ProfileScreen = () => {
       >
         <View style={{ ...commonStyles.rowAlignCenter, flex: 1 }}>
           <View style={styles.optionIconWrapper}>
-            <MaterialIcons
-              name={iconName}
-              size={24}
-              color={Colors.primary}
-            />
+            <MaterialIcons name={iconName} size={24} color={Colors.primary} />
           </View>
           <Text
             numberOfLines={1}
@@ -196,8 +193,8 @@ const ProfileScreen = () => {
         <View
           style={{
             flex: 1,
-            backgroundColor: "rgba(0, 0, 0, 0.25)",
-            justifyContent: "flex-end",
+            backgroundColor: 'rgba(0, 0, 0, 0.25)',
+            justifyContent: 'flex-end',
           }}
         >
           <View
@@ -211,7 +208,7 @@ const ProfileScreen = () => {
             {/* <Text style={styles.logoutTextStyle}>Logout</Text> */}
             <Text
               style={{
-                textAlign: "center",
+                textAlign: 'center',
                 ...Fonts.blackColor14Medium,
                 marginBottom: Sizes.fixPadding * 4,
                 marginHorizontal: Sizes.fixPadding * 2.0,
@@ -240,7 +237,7 @@ const ProfileScreen = () => {
                 onPress={() => {
                   setshowLogoutSheet(false);
                   console.log(
-                    "User logged out successfully in profileScreen and navigating to Signin"
+                    'User logged out successfully in profileScreen and navigating to Signin',
                   );
                 }}
                 style={{
@@ -277,11 +274,11 @@ const styles = StyleSheet.create({
     borderColor: Colors.extraLightGrayColor,
     borderWidth: 2.0,
     backgroundColor: Colors.whiteColor,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   profileInfoWithOptionsWrapStyle: {
-    backgroundColor: Colors.whiteColor,
+    backgroundColor: Colors.bodyBackColor,
     ...commonStyles.shadow,
     borderRadius: Sizes.fixPadding * 2.0,
     marginTop: Sizes.fixPadding * 5.0,
@@ -292,19 +289,19 @@ const styles = StyleSheet.create({
     width: 46.0,
     height: 46.0,
     borderRadius: 23.0,
-    backgroundColor: "rgba(87, 88, 88, 0.1)",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: 'rgba(87, 88, 88, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sheetButtonStyle: {
     flex: 1,
     ...commonStyles.shadow,
-    borderTopWidth: Platform.OS == "ios" ? 0 : 1.0,
+    borderTopWidth: Platform.OS == 'ios' ? 0 : 1.0,
     paddingHorizontal: Sizes.fixPadding,
     paddingVertical:
-      Platform.OS == "ios" ? Sizes.fixPadding + 3.0 : Sizes.fixPadding,
-    alignItems: "center",
-    justifyContent: "center",
+      Platform.OS == 'ios' ? Sizes.fixPadding + 3.0 : Sizes.fixPadding,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cancelButtonStyle: {
     backgroundColor: Colors.whiteColor,
@@ -316,5 +313,4 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderBottomRightRadius: Sizes.fixPadding - 5.0,
   },
-
 });

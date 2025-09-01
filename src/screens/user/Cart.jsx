@@ -95,11 +95,11 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   label: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#555",
   },
   value: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#111",
   },
 });
