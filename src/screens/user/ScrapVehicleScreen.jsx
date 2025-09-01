@@ -6,7 +6,7 @@ import {
   Image,
   FlatList,
   Dimensions,
-  ActivityIndicator,
+  ActivityIndicator,ScrollView
 } from 'react-native';
 import React, { useState } from 'react';
 import {
@@ -17,6 +17,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Colors } from '../../styles/commonStyles';
 import Video from 'react-native-video';
+
 
 const { width } = Dimensions.get('window');
 
@@ -88,7 +89,7 @@ const ScrapVehicleScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
       <CommonAppBar navigation={navigation} label="Scrap Your Old Vehicles" />
-
+      <ScrollView>
       <View style={styles.scrapVehicleCard}>
         <View style={{ flex: 1 }}>
           <Text style={styles.title}>Sell Old Vehicle</Text>
@@ -185,6 +186,7 @@ const ScrapVehicleScreen = () => {
           }}
         />
       </View>
+      </ScrollView>
     </View>
   );
 };
