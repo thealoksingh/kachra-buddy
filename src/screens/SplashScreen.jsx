@@ -3,8 +3,7 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import {Colors  } from '../styles/commonStyles';
 export default function SplashScreen({ navigation }) {
   useEffect(() => {
-    // Show splash for 2 seconds, then navigate to Login
-    const timer = setTimeout(() => {
+     const timer = setTimeout(() => {
       navigation.replace('userBottomNavBar'); 
     }, 3000);
 

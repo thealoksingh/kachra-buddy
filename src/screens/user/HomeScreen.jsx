@@ -137,7 +137,7 @@ export default function HomeScreen() {
             <Text style={{ fontSize: 14, color: '#666', marginBottom: 15 }}>
               Turn your old stuff into cash today.
             </Text>
-             <TouchableOpacity activeOpacity={0.7} style={styles.sellnowButton}>
+             <TouchableOpacity onPress={()=>navigation.navigate("scrapVehicleScreen")} activeOpacity={0.7} style={styles.sellnowButton}>
               <Text style={{ color: 'white', fontWeight: '600' }}>
                 Sell Now
               </Text>
@@ -206,7 +206,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
     marginTop: 20,
-    padding: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 18,
   },
 
   badge: {

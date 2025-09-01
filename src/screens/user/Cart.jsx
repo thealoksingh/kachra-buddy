@@ -49,7 +49,7 @@ const Cart = () => {
             setLoading(true);
             setTimeout(() => {
               setLoading(false);
-              navigation.navigate('Checkout'); // change as per your flow
+              navigation.navigate('checkoutScreen'); 
             }, 1500);
           }}
         />

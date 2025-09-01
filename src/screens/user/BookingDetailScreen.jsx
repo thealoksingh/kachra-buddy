@@ -65,7 +65,7 @@ const BookingDetailScreen = () => {
       <CommonAppBar navigation={navigation} label="Booking Details" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Smooth Carousel */}
+       
         <FlatList
           ref={flatListRef}
           data={images}
