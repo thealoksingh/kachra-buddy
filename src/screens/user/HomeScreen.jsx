@@ -14,6 +14,8 @@ import {
   textStyles,
 } from '../../styles/commonStyles';
 import MyStatusBar from '../../components/MyStatusBar';
+import {LottieAlert} from '../../components/lottie/LottieAlert';
+import {DottedBlackLoader, DottedWhiteLoader} from "../../components/lottie/loaderView"
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import MovingIcons from '../../components/userComponents/MovingIcons';
@@ -156,6 +158,17 @@ export default function HomeScreen() {
         </View>
        <FaddedIcon/>
       </ScrollView>
+      
+  {/* {true && (
+  <LottieAlert
+    type="warning"
+    message="Payment Successful 🎉"
+    loop={false}
+    onClose={() => {}}
+    autoClose = {true}
+  />
+)} */}
+
     </LinearGradient>
   );
 }
