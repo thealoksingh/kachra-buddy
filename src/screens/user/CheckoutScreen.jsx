@@ -11,10 +11,13 @@ import {
 import ImagePreviewModal from '../../components/ImagePreviewModal';
 import { useImagePicker } from '../../components/useImagePicker';
 import ImagePickerSheet from '../../components/ImagePickerSheet';
+import { LottieAlert } from '../../components/lottie/LottieAlert';
 
 const CheckoutScreen = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
+  const [failureAlertVisible, setFailureAlertVisible] = useState(false);
+  const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
   const [name, setName] = useState(null);
   const [mobNumber, setMobNUmber] = useState(null);
   const [address, setAddress] = useState(null);
@@ -184,6 +187,28 @@ const CheckoutScreen = () => {
         onCamera={() => pickImage('camera')}
         onGallery={() => pickImage('gallery')}
       />
+      {succesAlertVisible && (
+        <LottieAlert
+          type="success"
+          message="Order Cancelled Successfuly"
+          loop={false}
+          onClose={() => {
+            setSuccessAlertVisible(false);
+          }}
+          autoClose={true}
+        />
+      )}
+      {failureAlertVisible && (
+        <LottieAlert
+          type="failure"
+          message="Order Cancellation Failed ,Try Again "
+          loop={false}
+          onClose={() => {
+            setFailureAlertVisible(false);
+          }}
+          autoClose={true}
+        />
+      )}
     </View>
   );
 };
