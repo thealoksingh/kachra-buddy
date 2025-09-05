@@ -11,13 +11,15 @@ import {
   TextInput,
   FlatList,
   Keyboard,
+  Linking,
 } from 'react-native';
 
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import Geolocation from 'react-native-geolocation-service';
+import Geolocation from '@react-native-community/geolocation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Key from '../../constants/key';
 import { Colors } from '../../styles/commonStyles';
+
 
 const AUTOCOMPLETE_URL =
   'https://maps.googleapis.com/maps/api/place/autocomplete/json';
@@ -45,18 +47,30 @@ const LocationPickerScreen = ({ navigation, route }) => {
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
       try {
+        // Check if permission is already granted
+        const hasPermission = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+        
+        if (hasPermission) {
+          console.log('[perm] already granted');
+          return true;
+        }
+        
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
             title: 'Location Permission',
-            message: 'App needs access to your location',
-            buttonPositive: 'OK',
+            message: 'App needs access to your location to show nearby services',
+            buttonPositive: 'Allow',
+            buttonNegative: 'Deny',
           },
         );
         console.log('[perm] granted:', granted);
+        
         return granted === PermissionsAndroid.RESULTS.GRANTED;
       } catch (err) {
-        console.warn(err);
+        console.warn('[perm] error:', err);
         return false;
       }
     }
@@ -72,40 +86,58 @@ const LocationPickerScreen = ({ navigation, route }) => {
     }
 
     Geolocation.getCurrentPosition(
-      position => {
-        console.log('[loc] position:', position);
+        (position) => {
+          console.log('[loc] position:', position);
+          const { latitude, longitude } = position.coords;
+          const newRegion = {
+            latitude,
+            longitude,
+            latitudeDelta: 0.03,
+            longitudeDelta: 0.03,
+          };
 
-        const { latitude, longitude } = position.coords;
-        const newRegion = {
-          latitude,
-          longitude,
-          latitudeDelta: 0.03,
-          longitudeDelta: 0.03,
-        };
+          setRegion(newRegion);
+          setCurrentLocation({ latitude, longitude });
+          setSelectedLocation({ latitude, longitude });
+          setAddress('Current Location');
 
-        setRegion(newRegion);
-        setCurrentLocation({ latitude, longitude });
-        setSelectedLocation({ latitude, longitude });
-        setAddress('Current Location');
-
-        try {
-          mapRef.current?.animateCamera({ center: newRegion, zoom: 15 });
-        } catch (e) {
-          console.log('[map] animateCamera error:', e);
+          mapRef.current?.animateToRegion(newRegion, 1000);
+        },
+        (error) => {
+          console.log('[loc] error code:', error.code);
+          console.log('[loc] error message:', error.message);
+          console.log('[loc] full error:', error);
+          
+          if (error.code === 1) {
+            Alert.alert(
+              'Permission Required',
+              'Location permission is needed. Please go to Settings > Apps > Your App > Permissions and enable Location.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Open Settings', onPress: () => Linking.openSettings() }
+              ]
+            );
+          } else if (error.code === 2) {
+            Alert.alert(
+              'Enable GPS', 
+              'GPS is turned off. Please enable Location/GPS in your device settings.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Open Settings', onPress: () => Linking.openSettings() }
+              ]
+            );
+          } else if (error.code === 3) {
+            Alert.alert('Timeout', 'Location request timed out. Please try again.');
+          } else {
+            Alert.alert('Location Error', 'Could not get current location');
+          }
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 10000,
+          maximumAge: 60000,
         }
-      },
-      error => {
-        console.log('[loc] error:', error.code, error.message);
-        Alert.alert('Error', 'Could not fetch location');
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 20000,
-        maximumAge: 10000,
-        forceRequestLocation: true,
-        showLocationDialog: true,
-      },
-    );
+      );
   };
 
   const fetchAddressFromCoordinates = async (lat, lng) => {
@@ -157,7 +189,7 @@ const LocationPickerScreen = ({ navigation, route }) => {
         `${AUTOCOMPLETE_URL}?key=${mapkey}` +
         `&input=${encodeURIComponent(text)}` +
         `&language=en` +
-        `&components=country:in`; // limit to India; remove if not needed
+        `&components=country:in`; 
       const res = await fetch(url);
       const data = await res.json();
       console.log(
@@ -321,25 +353,28 @@ const LocationPickerScreen = ({ navigation, route }) => {
       >
         <Ionicons name="locate-outline" size={22} color={Colors.blackColor} />
       </TouchableOpacity>
-      {address&&(<View
-        style={{
-          position: 'absolute',
-          bottom: 110,
-          left: 16,
-          right: 16,
-          minHeight:80,
-          padding:10,
-          backgroundColor: Colors.whiteColor,
-          borderRadius: 12,
-          elevation: 3,
-          shadowColor: '#000',
-          shadowOpacity: 0.08,
-          shadowRadius: 6,
-        }}
-      >
-        <Text><Text style={{fontWeight:"700"}}>Address:</Text> {address}</Text>
-       
-      </View>)}
+      {address && (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 110,
+            left: 16,
+            right: 16,
+            minHeight: 80,
+            padding: 10,
+            backgroundColor: Colors.whiteColor,
+            borderRadius: 12,
+            elevation: 3,
+            shadowColor: '#000',
+            shadowOpacity: 0.08,
+            shadowRadius: 6,
+          }}
+        >
+          <Text>
+            <Text style={{ fontWeight: '700' }}>Address:</Text> {address}
+          </Text>
+        </View>
+      )}
       <TouchableOpacity
         style={styles.bottomBtn}
         onPress={handleSubmit}

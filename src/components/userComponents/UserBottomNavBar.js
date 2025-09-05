@@ -10,6 +10,7 @@ import ProfileScreen from '../../screens/user/ProfileScreen';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import LocationPickerScreen from '../../screens/map/LocationPickerScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -57,6 +58,7 @@ const UserBottomNavBar = ({ navigation }) => {
         <Tab.Screen
           name="Home"
           component={HomeScreen}
+          //  component={LocationPickerScreen}
           options={{
             tabBarIcon: ({ focused }) =>
               focused ? (

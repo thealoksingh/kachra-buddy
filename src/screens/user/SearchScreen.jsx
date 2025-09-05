@@ -14,6 +14,7 @@ import { Colors, textStyles } from '../../styles/commonStyles';
 import { products } from '../../utils/dummyData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ButtonWithLoader } from '../../components/commonComponents';
+import MyStatusBar from '../../components/MyStatusBar';
 
 const filters = ['All', 'plastic', 'rubber', 'glass', 'aluminium', 'metal'];
 
@@ -38,7 +39,7 @@ const SearchScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor, padding: 10 }}>
-
+     <MyStatusBar />
       <View style={styles.searchContainer}>
         <MaterialIcons
           name="search"
