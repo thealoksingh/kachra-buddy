@@ -21,7 +21,7 @@ function ActiveStack() {
       <Stack.Screen name="Booking" component={BookingScreen} />
       <Stack.Screen name="BookingDetail" component={BookingDetailScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
-      <Stack.Screen name="Search" component={SearchScreen} />
+      <Stack.Screen name="searchScreen" component={SearchScreen} />
       <Stack.Screen name="Checkout" component={CheckoutScreen} />
     </Stack.Navigator>
   );

@@ -96,8 +96,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Search bar */}
-      <TouchableOpacity onPress={()=>navigation.navigate("searchScreen")} style={styles.searchBar}>
+        <TouchableOpacity onPress={()=>navigation.navigate("searchScreen")} style={styles.searchBar}>
         <Ionicons name="search-outline" size={20} color="#999" />
         <Text style={styles.searchText}>Search here...</Text>
       </TouchableOpacity>
@@ -131,7 +130,6 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.scrapVehicleCard}>
-          {/* Left Side */}
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>
               Sell Old Vehicle
