@@ -14,15 +14,15 @@ const Stack = createNativeStackNavigator();
 function ActiveStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="UserBottomNavBar" component={UserBottomNavBar} />
-      <Stack.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="Cart" component={Cart} />
-      <Stack.Screen name="ScrapVehicle" component={ScrapVehicleScreen} />
-      <Stack.Screen name="Booking" component={BookingScreen} />
-      <Stack.Screen name="BookingDetail" component={BookingDetailScreen} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="userBottomNavBar" component={UserBottomNavBar} />
+      <Stack.Screen name="homeScreen" component={HomeScreen} />
+      <Stack.Screen name="cart" component={Cart} />
+      <Stack.Screen name="scrapVehicleScreen" component={ScrapVehicleScreen} />
+      <Stack.Screen name="bookingScreen" component={BookingScreen} />
+      <Stack.Screen name="bookingDetailScreen" component={BookingDetailScreen} />
+      <Stack.Screen name="profileScreen" component={ProfileScreen} />
       <Stack.Screen name="searchScreen" component={SearchScreen} />
-      <Stack.Screen name="Checkout" component={CheckoutScreen} />
+      <Stack.Screen name="checkoutScreen" component={CheckoutScreen} />
     </Stack.Navigator>
   );
 }

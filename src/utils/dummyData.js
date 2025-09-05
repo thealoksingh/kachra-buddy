@@ -66,3 +66,47 @@ export const addsData = [
 
 
 
+export const bookings = [
+  {
+    id: '1',
+    address: 'F101 wing F Gurukul apr vadgao bk pune 411041',
+    status: 'pending',
+    pickupStatus: 'Pending',
+    driverStatus: 'Allocated',
+    pickupDateTime: '20 Aug 2025, 10:30 AM',
+    items: 5,
+    expectedPrice: '₹1,250',
+    images: [
+      'https://images.unsplash.com/photo-1562077981-4d7eafd44932?q=80&w=1170&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1562077981-4d7eafd44932?q=80&w=1170&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1562077981-4d7eafd44932?q=80&w=1170&auto=format&fit=crop',
+    ],
+  },
+  {
+    id: '2',
+    address: 'A-204 Green Homes, Baner Pune',
+    status: 'completed',
+    pickupStatus: 'Completed',
+    driverStatus: 'Ramesh',
+    pickupDateTime: '10 Aug 2025, 02:15 PM',
+    items: 3,
+    expectedPrice: '₹800',
+    images: [
+      'https://images.unsplash.com/photo-1562077981-4d7eafd44932?q=80&w=1170&auto=format&fit=crop',
+    ],
+  },
+  {
+    id: '3',
+    address: 'C-501, Skyline Towers, Hinjewadi Pune',
+    status: 'cancelled',
+    pickupStatus: 'Cancelled',
+    driverStatus: 'N/A',
+    pickupDateTime: '05 Aug 2025, 11:00 AM',
+    items: 7,
+    expectedPrice: '₹2,000',
+    images: [
+      'https://images.unsplash.com/photo-1562077981-4d7eafd44932?q=80&w=1170&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1562077981-4d7eafd44932?q=80&w=1170&auto=format&fit=crop',
+    ],
+  },
+];
