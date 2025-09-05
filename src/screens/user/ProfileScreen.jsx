@@ -18,17 +18,15 @@ import {
   screenWidth,
 } from '../../styles/commonStyles';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MyStatusBar from '../../components/MyStatusBar';
-// import { fullImageContainer } from "../../components/commonComponents";
-// import { showFullImageFunction } from "../../utils/commonMethods";
+import ImagePreviewModal from '../../components/ImagePreviewModal';
 
 const image =
   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGdpcmx8ZW58MHx8MHx8fDA%3D';
 const ProfileScreen = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
   const [showLogoutSheet, setshowLogoutSheet] = useState(false);
   const [avatar, setAvatar] = useState(image);
   const navigation = useNavigation();
@@ -37,8 +35,7 @@ const ProfileScreen = () => {
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
       <MyStatusBar />
       <ScrollView style={{ flex: 1 }}>
-        {/* {header()} */}
-        <ScrollView
+           <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             marginTop: 50,
@@ -50,6 +47,13 @@ const ProfileScreen = () => {
         </ScrollView>
       </ScrollView>
       {logoutSheet()}
+       {previewImage && (
+        <ImagePreviewModal
+          image={previewImage}
+          visibility={fullImageModalVisible}
+          setVisibility={setFullImageModalVisible}
+        />
+      )}
     </View>
   );
 
@@ -58,7 +62,8 @@ const ProfileScreen = () => {
       <View style={styles.profileInfoWithOptionsWrapStyle}>
         <TouchableOpacity
           onPress={() => {
-            //  showFullImageFunction(image,setSelectedImage,setModalVisible);
+            setPreviewImage(image);
+            setFullImageModalVisible(true);
           }}
           style={{ alignItems: 'center' }}
         >
@@ -85,29 +90,29 @@ const ProfileScreen = () => {
           {profileOption({
             option: 'Edit Profile',
             iconName: 'person',
-            onPress: () => navigation.navigate('home'),
+            onPress: () => navigation.navigate('editProfileScreen'),
           })}
 
           {profileOption({
             option: 'Terms & Conditions',
             iconName: 'list-alt',
-            onPress: () => navigation.navigate('home'),
+            onPress: () => navigation.navigate('editProfileScreen'),
           })}
 
           {profileOption({
             option: 'Privacy Policy',
             iconName: 'privacy-tip',
-            onPress: () => navigation.navigate('home'),
+            onPress: () => navigation.navigate('editProfileScreen'),
           })}
           {profileOption({
             option: 'Raised Tickets',
             iconName: 'confirmation-number',
-            onPress: () => navigation.navigate('home'),
+            onPress: () => navigation.navigate('editProfileScreen'),
           })}
 
           {logoutInfo()}
         </View>
-        {/* {fullImageContainer(modalVisible,setModalVisible ,selectedImage)} */}
+      
       </View>
     );
   }

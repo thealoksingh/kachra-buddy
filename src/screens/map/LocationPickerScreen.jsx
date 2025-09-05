@@ -1,0 +1,464 @@
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  Text,
+  Platform,
+  PermissionsAndroid,
+  TextInput,
+  FlatList,
+  Keyboard,
+} from 'react-native';
+
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import Geolocation from 'react-native-geolocation-service';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Key from '../../constants/key';
+import { Colors } from '../../styles/commonStyles';
+
+const AUTOCOMPLETE_URL =
+  'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+const DETAILS_URL = 'https://maps.googleapis.com/maps/api/place/details/json';
+
+const LocationPickerScreen = ({ navigation, route }) => {
+  const mapkey = Key?.mapApiKey;
+
+  const mapRef = useRef(null);
+  const [region, setRegion] = useState({
+    latitude: 28.6139,
+    longitude: 77.209,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  });
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [address, setAddress] = useState('');
+
+  const [query, setQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Permission',
+            message: 'App needs access to your location',
+            buttonPositive: 'OK',
+          },
+        );
+        console.log('[perm] granted:', granted);
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const getUserLocation = async () => {
+    console.log('[loc] fetching user location...');
+    const hasPermission = await requestLocationPermission();
+    if (!hasPermission) {
+      Alert.alert('Permission Denied', 'Cannot access location');
+      return;
+    }
+
+    Geolocation.getCurrentPosition(
+      position => {
+        console.log('[loc] position:', position);
+
+        const { latitude, longitude } = position.coords;
+        const newRegion = {
+          latitude,
+          longitude,
+          latitudeDelta: 0.03,
+          longitudeDelta: 0.03,
+        };
+
+        setRegion(newRegion);
+        setCurrentLocation({ latitude, longitude });
+        setSelectedLocation({ latitude, longitude });
+        setAddress('Current Location');
+
+        try {
+          mapRef.current?.animateCamera({ center: newRegion, zoom: 15 });
+        } catch (e) {
+          console.log('[map] animateCamera error:', e);
+        }
+      },
+      error => {
+        console.log('[loc] error:', error.code, error.message);
+        Alert.alert('Error', 'Could not fetch location');
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 20000,
+        maximumAge: 10000,
+        forceRequestLocation: true,
+        showLocationDialog: true,
+      },
+    );
+  };
+
+  const fetchAddressFromCoordinates = async (lat, lng) => {
+    console.log('[geo] reverse geocode for:', lat, lng);
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${mapkey}`,
+      );
+      const data = await res.json();
+      console.log('[geo] reverse geocode response:', data?.status);
+      if (data?.results?.length > 0) {
+        setAddress(data.results[0].formatted_address);
+      } else {
+        setAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+      }
+    } catch (error) {
+      console.log('[geo] reverse geocode error:', error);
+      setAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMapPress = async event => {
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+    console.log('[map] pressed at:', latitude, longitude);
+    setSelectedLocation({ latitude, longitude });
+    await fetchAddressFromCoordinates(latitude, longitude);
+  };
+
+  const debounce = (fn, delay = 350) => {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), delay);
+    };
+  };
+
+  const runPlacesAutocomplete = async text => {
+    if (!text?.trim()) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      setIsSearching(true);
+      console.log('[places] query:', text);
+      const url =
+        `${AUTOCOMPLETE_URL}?key=${mapkey}` +
+        `&input=${encodeURIComponent(text)}` +
+        `&language=en` +
+        `&components=country:in`; // limit to India; remove if not needed
+      const res = await fetch(url);
+      const data = await res.json();
+      console.log(
+        '[places] status:',
+        data?.status,
+        'predictions:',
+        data?.predictions?.length,
+      );
+      if (data?.status === 'OK') {
+        setSuggestions(data.predictions || []);
+      } else {
+        setSuggestions([]);
+      }
+    } catch (e) {
+      console.log('[places] error:', e);
+      setSuggestions([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const debouncedAutocomplete = useCallback(
+    debounce(runPlacesAutocomplete, 400),
+    [],
+  );
+
+  const onChangeQuery = text => {
+    setQuery(text);
+    debouncedAutocomplete(text);
+  };
+
+  const handleSuggestionPress = async item => {
+    try {
+      console.log('[places] pick:', item?.description, item?.place_id);
+      Keyboard.dismiss();
+      setSuggestions([]);
+      setQuery(item?.description || '');
+
+      const url =
+        `${DETAILS_URL}?key=${mapkey}` +
+        `&place_id=${item.place_id}` +
+        `&fields=formatted_address,geometry`;
+      const res = await fetch(url);
+      const data = await res.json();
+      console.log('[details] status:', data?.status);
+      if (data?.status === 'OK') {
+        const loc = data.result.geometry?.location;
+        const formatted = data.result.formatted_address || item.description;
+        if (loc?.lat && loc?.lng) {
+          const newRegion = {
+            latitude: loc.lat,
+            longitude: loc.lng,
+            latitudeDelta: 0.03,
+            longitudeDelta: 0.03,
+          };
+          setRegion(newRegion);
+          setSelectedLocation({ latitude: loc.lat, longitude: loc.lng });
+          setAddress(formatted);
+          try {
+            mapRef.current?.animateCamera({ center: newRegion, zoom: 15 });
+          } catch (e) {
+            console.log('[map] animateCamera error:', e);
+          }
+        }
+      }
+    } catch (e) {
+      console.log('[details] error:', e);
+    }
+  };
+
+  const handleSubmit = () => {
+    console.log(
+      '[submit] selectedLocation:',
+      selectedLocation,
+      'address:',
+      address,
+    );
+    if (!selectedLocation || !address) {
+      Alert.alert('No Location Selected', 'Please select a location first.');
+      return;
+    }
+    route.params?.onLocationSelected?.(address, selectedLocation);
+
+    navigation.goBack();
+  };
+
+  const renderSuggestion = ({ item }) => (
+    <TouchableOpacity
+      style={styles.suggestionItem}
+      onPress={() => handleSuggestionPress(item)}
+    >
+      <Ionicons name="location-outline" size={18} color={Colors.grayColor} />
+      <Text style={styles.suggestionText} numberOfLines={1}>
+        {item.description}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={styles.searchContainer}>
+        <Ionicons name="search-outline" size={20} color={Colors.grayColor} />
+        <TextInput
+          value={query}
+          onChangeText={onChangeQuery}
+          placeholder="Search location..."
+          placeholderTextColor={Colors.grayColor}
+          style={styles.searchInput}
+          returnKeyType="search"
+        />
+        {query?.length > 0 && (
+          <TouchableOpacity
+            onPress={() => {
+              setQuery('');
+              setSuggestions([]);
+            }}
+          >
+            <Ionicons name="close-circle" size={18} color={Colors.grayColor} />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {(suggestions.length > 0 || isSearching) && (
+        <View style={styles.suggestionsContainer}>
+          {isSearching ? (
+            <View style={styles.suggestionLoading}>
+              <ActivityIndicator size="small" color={Colors.primary} />
+              <Text style={styles.loadingText}>Searching…</Text>
+            </View>
+          ) : (
+            <FlatList
+              keyboardShouldPersistTaps="handled"
+              data={suggestions}
+              keyExtractor={it => it.place_id}
+              renderItem={renderSuggestion}
+              ItemSeparatorComponent={() => <View style={styles.separator} />}
+            />
+          )}
+        </View>
+      )}
+
+      <MapView
+        ref={mapRef}
+        provider={PROVIDER_GOOGLE}
+        style={{ flex: 1 }}
+        region={region}
+        onPress={handleMapPress}
+        showsUserLocation={!!currentLocation}
+        onMapReady={() => console.log('[map] ready')}
+      >
+        {selectedLocation && <Marker coordinate={selectedLocation} />}
+        {currentLocation && (
+          <Marker coordinate={currentLocation} pinColor={Colors.primary} />
+        )}
+      </MapView>
+
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={getUserLocation}
+        activeOpacity={0.8}
+      >
+        <Ionicons name="locate-outline" size={22} color={Colors.blackColor} />
+      </TouchableOpacity>
+      {address&&(<View
+        style={{
+          position: 'absolute',
+          bottom: 110,
+          left: 16,
+          right: 16,
+          minHeight:80,
+          padding:10,
+          backgroundColor: Colors.whiteColor,
+          borderRadius: 12,
+          elevation: 3,
+          shadowColor: '#000',
+          shadowOpacity: 0.08,
+          shadowRadius: 6,
+        }}
+      >
+        <Text><Text style={{fontWeight:"700"}}>Address:</Text> {address}</Text>
+       
+      </View>)}
+      <TouchableOpacity
+        style={styles.bottomBtn}
+        onPress={handleSubmit}
+        activeOpacity={0.9}
+      >
+        <Text style={styles.bottomBtnText}>Select Location</Text>
+      </TouchableOpacity>
+
+      {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      )}
+    </View>
+  );
+};
+
+export default LocationPickerScreen;
+
+const styles = StyleSheet.create({
+  searchContainer: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    right: 16,
+    zIndex: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.whiteColor,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+  },
+  searchInput: {
+    flex: 1,
+    marginHorizontal: 8,
+    paddingVertical: Platform.OS === 'ios' ? 8 : 0,
+    color: Colors.blackColor,
+  },
+  suggestionsContainer: {
+    position: 'absolute',
+    top: 66,
+    left: 16,
+    right: 16,
+    backgroundColor: Colors.whiteColor,
+    borderRadius: 12,
+    zIndex: 10,
+    maxHeight: 240,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    overflow: 'hidden',
+  },
+  suggestionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  suggestionText: {
+    marginLeft: 8,
+    flex: 1,
+    color: Colors.lightBlackColor,
+  },
+  suggestionLoading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+  },
+  loadingText: {
+    marginLeft: 8,
+    color: Colors.grayColor,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: Colors.extraLightGrayColor,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 250,
+    right: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.whiteColor,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+  },
+  bottomBtn: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: Colors.primary,
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  bottomBtnText: {
+    color: Colors.whiteColor,
+    fontWeight: '700',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.08)',
+  },
+});

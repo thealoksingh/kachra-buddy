@@ -8,7 +8,8 @@ import BookingScreen from '../screens/user/BookingScreen';
 import BookingDetailScreen from '../screens/user/BookingDetailScreen';
 import SearchScreen from '../screens/user/SearchScreen';
 import CheckoutScreen from '../screens/user/CheckoutScreen';
-
+import LocationPickerScreen from '../screens/map/LocationPickerScreen';
+import EditProfileScreen from "../screens/user/EditProfileScreen"
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
@@ -23,6 +24,8 @@ function ActiveStack() {
       <Stack.Screen name="profileScreen" component={ProfileScreen} />
       <Stack.Screen name="searchScreen" component={SearchScreen} />
       <Stack.Screen name="checkoutScreen" component={CheckoutScreen} />
+      <Stack.Screen name="locationPickerScreen" component={LocationPickerScreen} />
+      <Stack.Screen name="editProfileScreen" component={EditProfileScreen} />
     </Stack.Navigator>
   );
 }

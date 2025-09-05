@@ -182,7 +182,7 @@ const ScrapVehicleScreen = () => {
             setTimeout(() => {
               setLoading(false);
               navigation.navigate('checkoutScreen');
-            }, 1000);
+            }, 500);
           }}
         />
       </View>

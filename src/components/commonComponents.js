@@ -129,6 +129,22 @@ export function InputBox({value, setter, placeholder, label, optional, type}) {
     </>
   );
 }
+export function TextArea({ value, setter, placeholder, label, optional }) {
+  return (
+    <>
+      {commonLabel(label, optional)}
+      <TextInput
+        style={styles.textAreaInput}
+        placeholder={placeholder}
+        placeholderTextColor="gray"
+        value={value}
+        onChangeText={setter}
+        multiline={true} 
+        textAlignVertical="top" 
+      />
+    </>
+  );
+}
 export function FaddedIcon({}) {
   return (
     <View
@@ -210,5 +226,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     marginBottom: 15,
     height: 45,
+  },  textAreaInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 12,
+    backgroundColor: "#f5f5f5",
+    marginBottom: 15,
+    height: 100, 
   },
 });
