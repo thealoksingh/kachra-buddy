@@ -8,6 +8,7 @@ import SplashScreen from './src/screens/SplashScreen';
 import { AuthStack } from './src/roleStack/AuthStack';
 import { UserStack } from './src/roleStack/UserStack';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Colors } from './src/styles/commonStyles';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +40,6 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: 'white', 
+    backgroundColor:Colors.primary, 
   },
 });
