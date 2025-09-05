@@ -2,13 +2,13 @@ import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { Colors, textStyles, commonStyles, screenWidth } from '../../styles/commonStyles';
 
-const LargeProductCard = ({ title, price, image, type ,description}) => {
+const LargeProductCard = ({ product, isInCart = false, onToggleCart }) => {
   return (
     <View style={styles.card}>
-      <Image
+        <Image
         source={
-          image
-            ? { uri: image }
+          product?.image
+            ? { uri: product.image }
             : {
                 uri: 'https://t3.ftcdn.net/jpg/03/76/97/16/360_F_376971659_OSsR8oqHDuyoovcqqi2KNcHRKKVA9QqO.jpg',
               }
@@ -17,20 +17,37 @@ const LargeProductCard = ({ title, price, image, type ,description}) => {
         resizeMode="cover"
       />
 
-      <Text style={styles.title} numberOfLines={1}>
-        {title || 'Product Title'}
-      </Text>
-      <Text style={styles.description} numberOfLines={2}>
-        {description || 'This is a sample product description that provides details about the product.'}
+        <Text style={styles.title} numberOfLines={1}>
+        {product?.title || 'Product Title'}
       </Text>
 
-      <Text style={styles.price}>
-        {type === 'countable' ? `₹ ${price} / piece` : `₹ ${price} / kg`}
+       <Text style={styles.description} numberOfLines={2}>
+        Material : {product?.material}
       </Text>
 
-      <TouchableOpacity activeOpacity={0.7} style={styles.cartButton}>
-        <Text style={styles.cartButtonText}>Add to Cart</Text>
-      </TouchableOpacity>
+       <Text style={styles.price}>
+        {product?.type === 'countable'
+          ? `₹ ${product?.price} / piece`
+          : `₹ ${product?.price} / kg`}
+      </Text>
+
+        {isInCart ? (
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={[styles.cartButton, { backgroundColor: Colors.secondary }]}
+          onPress={() => onToggleCart?.(product)}
+        >
+          <Text style={styles.cartButtonText}>Remove Item</Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.cartButton}
+          onPress={() => onToggleCart?.(product)}
+        >
+          <Text style={styles.cartButtonText}>Add to Cart</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -53,34 +70,35 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 120,
     borderRadius: 8,
-    marginBottom: 1,
+    marginBottom: 6,
   },
   title: {
     ...textStyles.subHeading,
     color: Colors.blackColor,
     textAlign: 'center',
   },
-   description: {
+  description: {
     ...textStyles.extraSmall,
     color: Colors.blackColor,
     textAlign: 'center',
+    marginTop: 2,
   },
   price: {
     ...textStyles.small,
     color: Colors.blackColor,
     fontWeight: 'bold',
-    marginTop: 2,
-    marginBottom: 5,
+    marginTop: 4,
+    marginBottom: 8,
   },
   cartButton: {
     backgroundColor: Colors.primary,
     borderRadius: 4,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
   },
   cartButtonText: {
     color: Colors.whiteColor,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 'bold',
   },
 });

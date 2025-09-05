@@ -1,38 +1,25 @@
+// App.js
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import HomeScreen from './src/screens/user/HomeScreen';
-import LoginScreen from './src/screens/authentication/LoginScreen';
 import SplashScreen from './src/screens/SplashScreen';
-import OnboardingScreen from './src/screens/onboarding/OnboardingScreen';
-import SignupScreen from './src/screens/authentication/SignupScreen';
-import UserBottomNavBar from './src/components/userComponents/UserBottomNavBar';
-
-// Importing screens
-import Cart from './src/screens/user/Cart';
-import BookingScreen from './src/screens/user/BookingScreen';
-import ProfileScreen from './src/screens/user/ProfileScreen';
-import SearchScreen from './src/screens/user/SearchScreen';
-import BookingDetailScreen from './src/screens/user/BookingDetailScreen';
-
+import { AuthStack } from './src/roleStack/AuthStack';
+import { UserStack } from './src/roleStack/UserStack';
 
 const Stack = createNativeStackNavigator();
 
 function RootStack() {
+  const user = { name: 'alok', status: 'Active' };
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="splash" component={SplashScreen} />
-      <Stack.Screen name="userBottomNavBar" component={UserBottomNavBar} />
-      <Stack.Screen name="onboarding" component={OnboardingScreen} />
-      <Stack.Screen name="login" component={LoginScreen} />
-      <Stack.Screen name="signup" component={SignupScreen} />
-      <Stack.Screen name="home" component={HomeScreen} />
-      <Stack.Screen name="cart" component={Cart} />
-      <Stack.Screen name="booking" component={BookingScreen} />
-      <Stack.Screen name="bookingDetailScreen" component={BookingDetailScreen} />
-      <Stack.Screen name="profile" component={ProfileScreen} />
-      <Stack.Screen name="searchScreen" component={SearchScreen} />
+      <Stack.Screen name="auth" component={AuthStack} />
+      <Stack.Screen
+        name="user"
+        component={UserStack}
+        initialParams={{ user }}
+      />
     </Stack.Navigator>
   );
 }

@@ -49,7 +49,7 @@ const Cart = () => {
             setLoading(true);
             setTimeout(() => {
               setLoading(false);
-              navigation.navigate('Checkout'); // change as per your flow
+              navigation.navigate('checkoutScreen'); 
             }, 1500);
           }}
         />
@@ -95,11 +95,11 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   label: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#555",
   },
   value: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#111",
   },
 });

@@ -98,7 +98,37 @@ export function CommonAppBar({ label, navigation }) {
     </View>
   );
 }
+export function commonLabel(label, optional) {
+  return (
+    <Text style={styles.sectionLabel}>
+      {label}
+      {optional ? (
+        <Text style={styles.optional}> (Optional)</Text>
+      ) : (
+        <Text style={styles.label}>*</Text>
+      )}
+    </Text>
+  );
 
+}
+
+export function InputBox({value, setter, placeholder, label, optional, type}) {
+  return (
+    <>
+      {commonLabel(label, optional)}
+      <TextInput
+        style={styles.boxInput}
+        placeholder={placeholder}
+        placeholderTextColor="gray"
+        value={value}
+        onChangeText={(text) => {
+          setter(text);
+        }}
+        keyboardType={type}
+      />
+    </>
+  );
+}
 export function FaddedIcon({}) {
   return (
     <View
@@ -156,5 +186,29 @@ const styles = StyleSheet.create({
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0eb',
+  }, sectionLabel: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: Colors.primary,
+    marginBottom: 5,
+  },
+  label: {
+    fontSize: 12,
+    color: "#F4721E",
+    marginBottom: 5,
+  },
+  optional: {
+    fontSize: 12,
+    fontWeight: "normal",
+    color: "#888",
+  },boxInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 12,
+    backgroundColor: "#f5f5f5",
+    marginBottom: 15,
+    height: 45,
   },
 });

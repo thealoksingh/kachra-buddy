@@ -9,21 +9,19 @@ import {
   textStyles,
 } from '../../styles/commonStyles';
 
-const BookingCard = ({
-  address = '123 Main Street, New York, NY',
-  status = 'pending',
-  pickupStatus = 'Pending',
-  driverStatus = 'Allocated',
-  pickupDateTime = '20 Aug 2025, 10:30 AM',
-  items = 5,
-  expectedPrice = '₹1,250',
-  images = [
-    'https://images.unsplash.com/photo-1562077981-4d7eafd44932?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://images.unsplash.com/photo-1562077981-4d7eafd44932?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://images.unsplash.com/photo-1562077981-4d7eafd44932?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  ],
-}) => {
+const BookingCard = ({ booking }) => {
   const navigation = useNavigation();
+  const {
+    address,
+    status,
+    pickupStatus,
+    driverStatus,
+    pickupDateTime,
+    items,
+    expectedPrice,
+    images,
+  } = booking;
+
   const maxVisible = 3;
   const visibleImages = images.slice(0, maxVisible);
   const extraCount = images.length - maxVisible;

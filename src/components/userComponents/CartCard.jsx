@@ -9,12 +9,10 @@ const CartCard = ({ price, type, description, deleteMethod }) => {
 
   return (
     <View style={styles.card}>
-      {/* Delete Button */}
-      <TouchableOpacity style={styles.deleteBtn} onPress={deleteMethod}>
-        <MaterialIcons name="delete" size={22} color="#d9534f" />
+       <TouchableOpacity style={styles.deleteBtn} onPress={deleteMethod}>
+        <MaterialIcons name="delete" size={20} color={Colors.secondary} />
       </TouchableOpacity>
 
-      {/* Image Section */}
       <Image
         source={{
           uri: 'https://images.unsplash.com/photo-1722695510527-cc033e43be1b?q=80&w=1170&auto=format&fit=crop',
@@ -73,7 +71,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     width: screenWidth - 20,
-    height: 180,
+    height: 150,
     backgroundColor:Colors.whiteColor,
     borderRadius: 8,
     marginTop: 10,
@@ -97,18 +95,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   title: {
-    ...textStyles.subHeading,
+    ...textStyles.smallBold,
     color: '#222',
   },
   desc: {
-    ...textStyles.small,
+    ...textStyles.extraSmall,
     color: Colors.grayColor,
     marginVertical: 4,
   },
   rate: {
-    fontSize: 14,
+    fontSize: 12,
     color: Colors.primaryColor,
-    marginVertical: 6,
+    marginVertical: 1,
     fontWeight: '500',
   },
   inputRow: {
@@ -117,7 +115,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   label: {
-    fontSize: 14,
+    fontSize: 12,
     marginRight: 8,
     color: '#333',
   },
@@ -127,7 +125,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingHorizontal: 10,
     height: 38,
-    width: 120,
+    flex: 1,
     backgroundColor: '#fafafa',
   },
 });

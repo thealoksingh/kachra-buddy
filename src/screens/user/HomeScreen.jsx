@@ -14,6 +14,8 @@ import {
   textStyles,
 } from '../../styles/commonStyles';
 import MyStatusBar from '../../components/MyStatusBar';
+import {LottieAlert} from '../../components/lottie/LottieAlert';
+import {DottedBlackLoader, DottedWhiteLoader} from "../../components/lottie/loaderView"
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import MovingIcons from '../../components/userComponents/MovingIcons';
@@ -94,8 +96,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Search bar */}
-      <TouchableOpacity onPress={()=>navigation.navigate("searchScreen")} style={styles.searchBar}>
+        <TouchableOpacity onPress={()=>navigation.navigate("searchScreen")} style={styles.searchBar}>
         <Ionicons name="search-outline" size={20} color="#999" />
         <Text style={styles.searchText}>Search here...</Text>
       </TouchableOpacity>
@@ -129,7 +130,6 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.scrapVehicleCard}>
-          {/* Left Side */}
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>
               Sell Old Vehicle
@@ -137,7 +137,7 @@ export default function HomeScreen() {
             <Text style={{ fontSize: 14, color: '#666', marginBottom: 15 }}>
               Turn your old stuff into cash today.
             </Text>
-             <TouchableOpacity activeOpacity={0.7} style={styles.sellnowButton}>
+             <TouchableOpacity onPress={()=>navigation.navigate("scrapVehicleScreen")} activeOpacity={0.7} style={styles.sellnowButton}>
               <Text style={{ color: 'white', fontWeight: '600' }}>
                 Sell Now
               </Text>
@@ -156,6 +156,17 @@ export default function HomeScreen() {
         </View>
        <FaddedIcon/>
       </ScrollView>
+      
+  {/* {true && (
+  <LottieAlert
+    type="warning"
+    message="Payment Successful 🎉"
+    loop={false}
+    onClose={() => {}}
+    autoClose = {true}
+  />
+)} */}
+
     </LinearGradient>
   );
 }
@@ -206,7 +217,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
     marginTop: 20,
-    padding: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 18,
   },
 
   badge: {

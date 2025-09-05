@@ -52,7 +52,7 @@ const OnboardingScreen = ({ navigation }) => {
     if (currentIndex < onboardingData.length - 1) {
       slidesRef.current.scrollToIndex({ index: currentIndex + 1 });
     } else {
-      navigation.replace('userBottomNavBar');
+      navigation.replace('login');
     }
   };
 
