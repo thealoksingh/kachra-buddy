@@ -6,11 +6,14 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  Modal,
   ScrollView,
   Dimensions,
 } from 'react-native';
-import { CommonAppBar, FaddedIcon } from '../../components/commonComponents';
+import {
+  CommonAppBar,
+  FaddedIcon,
+} from '../../components/commonComponents';
+import ImagePreviewModal from "../../components/ImagePreviewModal"
 import { Colors, commonStyles, textStyles } from '../../styles/commonStyles';
 import { useNavigation } from '@react-navigation/native';
 
@@ -23,13 +26,11 @@ const BookingDetailScreen = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const flatListRef = useRef();
 
-  // User uploaded images
   const images = [
     'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   ];
 
-  // Example items in this booking
   const items = [
     {
       id: 1,
@@ -65,7 +66,6 @@ const BookingDetailScreen = () => {
       <CommonAppBar navigation={navigation} label="Booking Details" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-       
         <FlatList
           ref={flatListRef}
           data={images}
@@ -200,27 +200,17 @@ const BookingDetailScreen = () => {
 
         <FaddedIcon />
         <View style={{ height: 80 }} />
-      </ScrollView>
-
-      <Modal visible={previewVisible} transparent>
-        <View style={styles.previewContainer}>
-          <Image source={{ uri: previewImage }} style={styles.previewImage} />
-          <TouchableOpacity
-            style={styles.closeBtn}
-            onPress={() => setPreviewVisible(false)}
-          >
-            <Text
-              style={{
-                color: Colors.blackColor,
-                fontSize: 16,
-                fontWeight: '700',
-              }}
-            >
-              ✕
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+        <ImagePreviewModal
+        image={previewImage}
+        visibility={previewVisible}
+        setVisibility={setPreviewVisible}
+      />
+        </ScrollView>
+       <ImagePreviewModal
+       image={previewImage}
+        visibility={previewVisible}
+        setVisibility={setPreviewVisible}
+       />
     </View>
   );
 };
@@ -329,20 +319,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  previewImage: {
-    width: '90%',
-    height: '70%',
-    resizeMode: 'contain',
-  },
-  closeBtn: {
-    marginTop: 20,
-    height: 50,
-    width: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.whiteColor,
-    borderRadius: 25,
-  },
+
   headingSection: {
     borderTopWidth: 1,
     borderBottomWidth: 1,
