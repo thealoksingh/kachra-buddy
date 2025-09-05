@@ -1,20 +1,23 @@
 export const products = [
   {
     title: 'Recycled Shoes',
+    material:"plastic",
     price: 500,
     image:
       'https://media.istockphoto.com/id/2189452303/photo/hydraulic-material-handler-sorting-scrap-tires.webp?a=1&b=1&s=612x612&w=0&k=20&c=IbWe6aeT7CZEYa8sOZ014POuv1ZX79WR_WerCo4Rlu8=',
     type: 'countable',
   },
   {
-    title: 'Eco Bottle',
+    title: 'Plastic Bottle',
+    material:"plastic",
     price: 200,
     image:
       'https://media.istockphoto.com/id/2189452303/photo/hydraulic-material-handler-sorting-scrap-tires.webp?a=1&b=1&s=612x612&w=0&k=20&c=IbWe6aeT7CZEYa8sOZ014POuv1ZX79WR_WerCo4Rlu8=',
     type: 'nonCountable',
   },
   {
-    title: 'Organic T-shirt',
+    title: 'Tyre',
+    material:"rubber",
     price: 800,
     image:
       'https://media.istockphoto.com/id/2189452303/photo/hydraulic-material-handler-sorting-scrap-tires.webp?a=1&b=1&s=612x612&w=0&k=20&c=IbWe6aeT7CZEYa8sOZ014POuv1ZX79WR_WerCo4Rlu8=',
@@ -22,13 +25,23 @@ export const products = [
   },
   {
     title: 'Bamboo Sunglasses',
+    material:"glass",
     price: 1200,
     image:
       'https://media.istockphoto.com/id/2189452303/photo/hydraulic-material-handler-sorting-scrap-tires.webp?a=1&b=1&s=612x612&w=0&k=20&c=IbWe6aeT7CZEYa8sOZ014POuv1ZX79WR_WerCo4Rlu8=',
     type: 'countable',
   },
   {
-    title: 'Jute Bag',
+    title: 'utensils',
+    material:"aluminium",
+    price: 350,
+    image:
+      'https://media.istockphoto.com/id/2189452303/photo/hydraulic-material-handler-sorting-scrap-tires.webp?a=1&b=1&s=612x612&w=0&k=20&c=IbWe6aeT7CZEYa8sOZ014POuv1ZX79WR_WerCo4Rlu8=',
+    type: 'countable',
+  },
+   {
+    title: 'Metal Drum',
+    material:"metal",
     price: 350,
     image:
       'https://media.istockphoto.com/id/2189452303/photo/hydraulic-material-handler-sorting-scrap-tires.webp?a=1&b=1&s=612x612&w=0&k=20&c=IbWe6aeT7CZEYa8sOZ014POuv1ZX79WR_WerCo4Rlu8=',

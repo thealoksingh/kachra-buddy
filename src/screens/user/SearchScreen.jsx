@@ -10,26 +10,35 @@ import {
   FlatList,
 } from 'react-native';
 import LargeProductCard from '../../components/userComponents/LargeProductCard';
-import { Colors ,textStyles} from '../../styles/commonStyles';
+import { Colors, textStyles } from '../../styles/commonStyles';
 import { products } from '../../utils/dummyData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ButtonWithLoader } from '../../components/commonComponents';
 
-// If RN CLI (remove the Expo import and use this):
-// import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-
-const filters = ['All', 'Shoes', 'Clothes', 'Bags', 'Accessories'];
+const filters = ['All', 'plastic', 'rubber', 'glass', 'aluminium', 'metal'];
 
 const SearchScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [loading, setLoading] = useState(false);
-  const filteredProducts = products;
-  const navigation = useNavigation(); 
+  const navigation = useNavigation();
 
+ 
+  const filteredProducts = products.filter(item => {
+    const textMatch =
+      item.title.toLowerCase().includes(searchText.toLowerCase()) ||
+      item.type.toLowerCase().includes(searchText.toLowerCase());
+
+    const filterMatch =
+      selectedFilter === 'All' ||
+      item.material.toLowerCase() === selectedFilter.toLowerCase();
+
+    return textMatch && filterMatch;
+  });
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor, padding: 10 }}>
+
       <View style={styles.searchContainer}>
         <MaterialIcons
           name="search"
@@ -90,19 +99,42 @@ const SearchScreen = () => {
           </View>
         )}
         style={{ flex: 1 }}
+        ListEmptyComponent={
+          <Text style={{ textAlign: 'center', marginTop: 20, color: '#888' }}>
+            No products found
+          </Text>
+        }
       />
-      <View style={{height:100 ,borderTopLeftRadius:8,borderTopRightRadius:8 ,overflow:"hidden" }}>
-        <View style={{height:40}}>
-        <View style={{height:20 ,backgroundColor:Colors.extraLightGrayColor}}>
-        <Text style={{textAlign:"center",...textStyles.small}}>Total Selected Items to Sell : 10</Text>
+
+      {/* 🔹 Bottom Section */}
+      <View
+        style={{
+          height: 100,
+          borderTopLeftRadius: 8,
+          borderTopRightRadius: 8,
+          overflow: 'hidden',
+        }}
+      >
+        <View style={{ height: 40 }}>
+          <View
+            style={{
+              height: 20,
+              backgroundColor: Colors.extraLightGrayColor,
+            }}
+          >
+            <Text style={{ textAlign: 'center', ...textStyles.small }}>
+              Total Selected Items to Sell : 9
+            </Text>
+          </View>
         </View>
-        </View>
-       <ButtonWithLoader
-            name="Sell Now"
-            loadingName="Processing..."
-            isLoading={loading}
-            method={()=>{navigation.navigate("cart")}}
-          />
+        <ButtonWithLoader
+          name="Sell Now"
+          loadingName="Processing..."
+          isLoading={loading}
+          method={() => {
+            navigation.navigate('cart');
+          }}
+        />
       </View>
     </View>
   );
@@ -118,7 +150,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 12,
     height: 45,
-
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -126,14 +157,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     elevation: 3,
   },
-
   searchInput: {
     flex: 1,
     fontSize: 14,
     color: '#333',
   },
   filterButton: {
-    marginHorizontal: 2 ,
+    marginHorizontal: 2,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 20,
@@ -143,13 +173,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   filterText: {
     fontSize: 12,
     color: '#555',
     textAlign: 'center',
   },
-
   cardWrap: {
     width: '48%',
     marginBottom: 12,
