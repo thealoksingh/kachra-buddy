@@ -5,7 +5,7 @@ export default function SplashScreen({ navigation }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       // For now,
-      navigation.replace("auth");
+      navigation.replace("driver");
 
       // Later:
       // if (token && role === "user") navigation.replace("user");

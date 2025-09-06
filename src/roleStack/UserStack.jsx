@@ -10,6 +10,7 @@ import SearchScreen from '../screens/user/SearchScreen';
 import CheckoutScreen from '../screens/user/CheckoutScreen';
 import LocationPickerScreen from '../screens/map/LocationPickerScreen';
 import EditProfileScreen from "../screens/user/EditProfileScreen"
+import ErrorScreen from '../screens/ErrorScreen';
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
@@ -33,7 +34,7 @@ function ActiveStack() {
 function InactiveStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="errorScreen" component={ErrorScreen} />
     </Stack.Navigator>
   );
 }

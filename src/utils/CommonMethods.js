@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import Key from '../constants/key';
+import { Linking } from "react-native";
 
 export const trimText = (text, maxLength) => {
   if (typeof text !== "string") return "";
@@ -15,6 +16,17 @@ export const fetchImageForCity = async ({ city }) => {
   if (data && data?.urls) {
     return data?.urls?.regular;
   }
+};
+export const openGoogleMaps = (lat, lng) => {
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+  Linking.openURL(url).catch(err => console.error("Failed to open maps:", err));
+};
+
+
+export const callUser = (phoneNumber) => {
+  Linking.openURL(`tel:${phoneNumber}`).catch(err =>
+    console.error("Failed to make call:", err)
+  );
 };
 
 // export const fetchAddress = async (latitude, longitude) => {

@@ -7,6 +7,7 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import SplashScreen from './src/screens/SplashScreen';
 import { AuthStack } from './src/roleStack/AuthStack';
 import { UserStack } from './src/roleStack/UserStack';
+import {DriverStack} from './src/roleStack/DriverStack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from './src/styles/commonStyles';
 import store from "./src/store/store";
@@ -22,6 +23,11 @@ function RootStack() {
       <Stack.Screen
         name="user"
         component={UserStack}
+        initialParams={{ user }}
+      />
+      <Stack.Screen
+        name="driver"
+        component={DriverStack}
         initialParams={{ user }}
       />
     </Stack.Navigator>
