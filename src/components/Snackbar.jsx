@@ -19,7 +19,7 @@ export const Snackbar = () => {
 
   if (!message) return null;
 
-  const bgColor = type === 'error' ? '#FF5722' : '#4caf50';
+  const bgColor = type === 'error' ? '#FF5722' : '#1db3a2ff';
 
   return (
     <View style={[styles.snackbarContainer, { top: Platform.OS === 'android' ? 40 : 60 }]}>
