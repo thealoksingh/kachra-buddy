@@ -9,6 +9,7 @@ import DriverEditProfileScreen from '../screens/driver/DriverEditProfileScreen';
 import DriverHome from '../screens/driver/DriverHome';
 import FinalPickupScreen from '../screens/driver/FinalPickupScreen';
 import HelpScreen from '../screens/HelpScreen';
+import RaisedTickets from "../screens/RaisedTickets"
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
@@ -21,6 +22,8 @@ function ActiveStack() {
       <Stack.Screen name="driverEditProfileScreen" component={DriverEditProfileScreen} />
        <Stack.Screen name="finalPickupScreen" component={FinalPickupScreen} />
       <Stack.Screen name="helpScreen" component={HelpScreen} />
+      <Stack.Screen name="raisedTickets" component={RaisedTickets} />
+
 
     </Stack.Navigator>
   );

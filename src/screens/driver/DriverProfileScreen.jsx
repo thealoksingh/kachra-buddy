@@ -107,7 +107,7 @@ const DriverProfileScreen = () => {
           {profileOption({
             option: 'Raised Tickets',
             iconName: 'confirmation-number',
-            onPress: () => navigation.navigate('driverEditProfileScreen'),
+            onPress: () => navigation.navigate('raisedTickets'),
           })}
 
           {logoutInfo()}
