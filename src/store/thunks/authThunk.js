@@ -24,6 +24,7 @@ export const verifyOtp = createAsyncThunk(
       const response = await verifyOtpAPI(data);
       return response?.data;
     } catch (error) {
+      console.log(error.response);
       return handleAxiosError(error, thunkAPI);
     }
   }

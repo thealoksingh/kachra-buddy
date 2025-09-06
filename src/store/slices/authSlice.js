@@ -24,34 +24,21 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Sign In
-      .addCase(signIn.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(signIn.fulfilled, (state, action) => {
-        state.loading = false;
-        console.log("User = ", action.payload);
-        state.user = action?.payload?.data;
-      })
-      .addCase(signIn.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action?.payload?.message;
-      })
+      // .addCase(signIn.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = null;
+      // })
+      // .addCase(signIn.fulfilled, (state, action) => {
+      //   state.loading = false;
+      //   console.log("User = ", action.payload);
+      //   state.user = action?.payload?.data;
+      // })
+      // .addCase(signIn.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error = action?.payload?.message;
+      // })
 
-      // register
-      .addCase(register.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(register.fulfilled, (state, action) => {
-        state.loading = false;
-        console.log("User = ", action.payload);
-        state.user = action?.payload?.data;
-      })
-      .addCase(register.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload.message;
-      });
+    
     }
 });
 

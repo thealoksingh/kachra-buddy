@@ -5,8 +5,9 @@ import {
   Image,
   TouchableOpacity,
   Linking,
+  BackHandler,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MyStatusBar from '../../components/MyStatusBar';
 import {
@@ -16,40 +17,142 @@ import {
 } from '../../components/commonComponents';
 import { Colors } from '../../styles/commonStyles';
 import { useNavigation } from '@react-navigation/native';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
+import { useDispatch } from 'react-redux';
+import { sendOtp, verifyOtp } from '../../store/thunks/authThunk';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
+  // const otpResponse =userRef(null);
   const [loading, setLoading] = useState(false);
   const [otpInput, setOtpInput] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  const dispatch = useDispatch();
 
-  // step 1: send otp
-  const handleOtpSend = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setOtpSent(true);
-    }, 1500);
+  const resetStates = () => {
+    setOtpInput('');
+    setOtpSent(false);
+    setIsVerified(false);
+    setIsActive(false);
   };
 
-  // step 2: verify otp
-  const handleVerifyOtp = () => {
+  useEffect(() => {
+    const backAction = () => {
+      resetStates(); 
+  
+      return true; 
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove(); 
+  }, []);
+
+
+  // step 1: send otp
+
+  const validateForm = data => {
+    const { contactNumber } = data;
+    if (!contactNumber) {
+      return 'Phone number is required';
+    }
+    if (contactNumber.length !== 10) {
+      return 'Phone number must be 10 digits';
+    }
+    return null;
+  };
+
+  const handleOtpSend = async () => {
+    const data = {
+      contactNumber: phone,
+    };
+    const validationError = validateForm(data);
+    console.log('handle otp send called', data);
+
+    if (validationError) {
+      console.log('error catched', validationError);
+      await dispatch(
+        showSnackbar({ message: validationError, type: 'error', time: 5000 }),
+      );
+      return;
+    }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setIsVerified(true);
+    try {
+      console.log('sending data', data);
 
-      const userActive = false;
-      setIsActive(userActive);
+      const response = await dispatch(sendOtp(data));
+      console.log('response ', response?.payload);
 
-      if (userActive) {
-        navigation.replace('home'); // directly go to home
+      if (sendOtp.fulfilled.match(response)) {
+        setOtpSent(true);
+        console.log('');
+        await dispatch(
+          showSnackbar({
+            message: response?.payload?.message,
+            type: 'success',
+            time: 5000,
+          }),
+        );
+      } else {
+        await dispatch(
+          showSnackbar({
+            message: response?.payload?.message,
+            type: 'error',
+            time: 5000,
+          }),
+        );
       }
-    }, 1500);
+    } catch (e) {
+      await dispatch(
+        showSnackbar({ message: validationError, type: 'error', time: 3000 }),
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  // step 2: verify otp
+  const handleVerifyOtp = async () => {
+    const data = {
+      contactNumber: phone,
+      otp: otpInput,
+    };
+    setLoading(true);
+    try {
+      const response = await dispatch(verifyOtp(data));
+
+      if (verifyOtp.fulfilled.match(response)) {
+        setIsVerified(true);
+        console.log('response ', response?.payload?.data?.status);
+        await dispatch(
+          showSnackbar({
+            message: response?.payload?.message,
+            type: 'success',
+            time: 5000,
+          }),
+        );
+      } else {
+        await dispatch(
+          showSnackbar({
+            message: response?.payload?.message,
+            type: 'error',
+            time: 5000,
+          }),
+        );
+      }
+    } catch (e) {
+      await dispatch(
+        showSnackbar({ message: validationError, type: 'error', time: 3000 }),
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   // step 3: signup new user
@@ -142,7 +245,11 @@ const LoginScreen = () => {
             By continuing, you agree to our{' '}
           </Text>
           <Text
-            style={{ color: '#1E90FF', fontWeight: 'bold' ,textAlign: 'center'}}
+            style={{
+              color: '#1E90FF',
+              fontWeight: 'bold',
+              textAlign: 'center',
+            }}
             onPress={() =>
               Linking.openURL('https://www.termsandconditionsgenerator.com/')
             }
