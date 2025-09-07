@@ -96,7 +96,7 @@ const EditProfileScreen = () => {
         fullName: name || user?.fullName,
         contactNumber: mobNumber || user?.contactNumber,
         role: user?.role,
-        status: user?.status
+        status: user?.status  
       };
 
       const response = await dispatch(updateUser(data));
