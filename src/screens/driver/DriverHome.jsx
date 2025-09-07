@@ -95,7 +95,7 @@ export default function DriverHome() {
           </View>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => navigation.navigate('cart')}
+          onPress={() => navigation.navigate('notificationScreen')}
           style={{ position: 'relative' }}
         >
           <Ionicons

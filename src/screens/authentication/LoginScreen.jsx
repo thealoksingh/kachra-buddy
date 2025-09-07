@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Linking,
   BackHandler,
+  ScrollView
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,6 +23,7 @@ import { useDispatch } from 'react-redux';
 import { sendOtp, verifyOtp } from '../../store/thunks/authThunk';
 import { completeProfile, completeUserProfile } from '../../store/thunks/userThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -132,6 +134,7 @@ const LoginScreen = () => {
       if (verifyOtp.fulfilled.match(response)) {
         setIsVerified(true);
         const status =  response?.payload?.data?.status;
+        const role = response?.payload?.data?.role;
         await AsyncStorage.setItem(
           "user_id",
           String(response?.payload?.data?.id)
@@ -140,12 +143,13 @@ const LoginScreen = () => {
 
           const user_id = await AsyncStorage.getItem("user_id");
           console.log("user id after storing in async storage", user_id);
-        await AsyncStorage.setItem(
+           await AsyncStorage.setItem(
           "access_token",
           String(response?.payload?.data?.accessToken)
         );
         console.log("user id and accessToken stored in async storage");
         setIsActive(status.toLowerCase() === 'active');
+        navigation.replace(role.toLowerCase());
         await dispatch(
           showSnackbar({
             message: response?.payload?.message,
@@ -209,7 +213,10 @@ const LoginScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView
+    contentContainerStyle={{ flexGrow: 1 }}
+  showsVerticalScrollIndicator={false}
+    style={styles.container}>
       <MyStatusBar />
 
       {/* Logo Section */}
@@ -302,7 +309,7 @@ const LoginScreen = () => {
           </Text>
         </View>
       </View>
-    </SafeAreaView>
+    </ScrollView>
   );
 };
 
@@ -310,7 +317,6 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: Colors.whiteColor,
   },
   logoContainer: {

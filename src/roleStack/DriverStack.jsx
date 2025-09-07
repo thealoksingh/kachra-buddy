@@ -10,6 +10,7 @@ import DriverHome from '../screens/driver/DriverHome';
 import FinalPickupScreen from '../screens/driver/FinalPickupScreen';
 import HelpScreen from '../screens/HelpScreen';
 import RaisedTickets from "../screens/RaisedTickets"
+import NotificationScreen from "../screens/NotificationScreen";
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
@@ -23,7 +24,7 @@ function ActiveStack() {
        <Stack.Screen name="finalPickupScreen" component={FinalPickupScreen} />
       <Stack.Screen name="helpScreen" component={HelpScreen} />
       <Stack.Screen name="raisedTickets" component={RaisedTickets} />
-
+     <Stack.Screen name="notificationScreen" component={NotificationScreen} />
 
     </Stack.Navigator>
   );
