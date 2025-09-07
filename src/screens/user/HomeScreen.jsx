@@ -24,6 +24,8 @@ import MiniProductScrollSection from '../../components/userComponents/MiniProduc
 import { useNavigation } from '@react-navigation/native';
 import {products,addsData} from '../../utils/dummyData';
 import { FaddedIcon } from '../../components/commonComponents';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../store/selector';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -63,6 +65,8 @@ export const icons = [
 ];
 
 export default function HomeScreen() {
+
+  const user = useSelector(selectUser);
   const navigation = useNavigation();
   return (
     <LinearGradient
@@ -79,7 +83,7 @@ export default function HomeScreen() {
             style={styles.profileImage}
           />
           <View>
-          <Text style={styles.userName}>Alok Singh</Text>
+          <Text style={styles.userName}>{user?.fullName}</Text>
           <Text style={{...textStyles.extraSmall,color:Colors.whiteColor}}>Sinhgad College of Engineering</Text>
           </View>
         </View>

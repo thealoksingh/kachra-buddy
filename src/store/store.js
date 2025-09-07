@@ -6,6 +6,8 @@ import adminSlice from './slices/adminSlice';
 import snackbarSlice from './slices/snackbarSlice';
 import snackbarReducer, { showSnackbar } from "../store/slices/snackbarSlice";
 import authReducer from "../store/slices/authSlice";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserById } from '../store/thunks/userThunk';
 
 
 export const store = configureStore({
@@ -23,12 +25,11 @@ export const store = configureStore({
 const loadUserData = async () => {
   try {
     const user_id = await AsyncStorage.getItem("user_id");
-    // const accessToken = await AsyncStorage.getItem("accessToken");
+ 
     console.log("user Id in store", user_id);
-    // console.log("Access token in store", accessToken);
-    // if (user_id && accessToken) {
+ 
     if (user_id) {
-      await store.dispatch(getUserById(parseInt(user_id)));
+      await store.dispatch(getUserById({ userId: parseInt(user_id) }));
     }
   } catch (error) {
     console.log("Error loading user data:", error);
@@ -38,7 +39,7 @@ const loadUserData = async () => {
   }
 };
 
-// loadUserData();
+loadUserData();
 
 
 export default store;

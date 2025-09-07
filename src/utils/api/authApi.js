@@ -1,14 +1,12 @@
 import Key from "../../constants/key";
+import { apiGetRequest } from '../http/get';
 import { apiPostRequest } from "../http/post";
-import {apiGetRequest} from '../http/get';
-import { apiPutRequest } from "../http/put";
-import { apiDeleteRequest } from "../http/delete";
 
-const {APP_BACKEND_API} = Key;
+const { API_BASE_URL } = Key;
 
 export const sendOtpAPI = (data) =>
   apiPostRequest({
-    apiUrl: `${APP_BACKEND_API}/api/auth/send-otp`,
+    apiUrl: `${API_BASE_URL}/api/auth/send-otp`,
     content_type: "application/json",
     data: data,
 });
@@ -16,7 +14,7 @@ export const sendOtpAPI = (data) =>
 //Verify OTP API
 export const verifyOtpAPI = (data) =>
   apiPostRequest({
-    apiUrl: `${APP_BACKEND_API}/api/auth/verify-otp`,
+    apiUrl: `${API_BASE_URL}/api/auth/verify-otp`,
     content_type: "application/json",
     data: data,
 });
@@ -25,7 +23,7 @@ export const verifyOtpAPI = (data) =>
 
 export const pingServerAPI = () =>
   apiGetRequest({
-    apiUrl: `${APP_BACKEND_API}/api/auth/ping`,
+    apiUrl: `${API_BASE_URL}/api/auth/ping`,
     content_type: "application/json",
     data: null,
 });

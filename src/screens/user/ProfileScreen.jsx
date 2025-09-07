@@ -21,6 +21,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MyStatusBar from '../../components/MyStatusBar';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../store/selector';
 
 const image =
   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGdpcmx8ZW58MHx8MHx8fDA%3D';
@@ -30,6 +32,7 @@ const ProfileScreen = () => {
   const [showLogoutSheet, setshowLogoutSheet] = useState(false);
   const [avatar, setAvatar] = useState(image);
   const navigation = useNavigation();
+   const user = useSelector(selectUser);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
@@ -58,6 +61,7 @@ const ProfileScreen = () => {
   );
 
   function profileInfoWithOptions() {
+   
     return (
       <View style={styles.profileInfoWithOptionsWrapStyle}>
         <TouchableOpacity
@@ -83,8 +87,8 @@ const ProfileScreen = () => {
             marginBottom: Sizes.fixPadding,
           }}
         >
-          <Text style={{ ...Fonts.blackColor18SemiBold }}>Alok Singh</Text>
-          <Text style={{ ...Fonts.grayColor16Medium }}>+91 985678876</Text>
+          <Text style={{ ...Fonts.blackColor18SemiBold }}>{user?.fullName}</Text>
+          <Text style={{ ...Fonts.grayColor16Medium }}>+91 {user?.contactNumber}</Text>
         </View>
         <View>
           {profileOption({

@@ -1,43 +1,53 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { setLoading, setProfile, setRequests, setBookings, setError } from '../slices/userSlice';
+import { completeProfileAPI, getUserByIdAPI, updateProfilePicAPI, updateUserAPI } from '../../utils/api/userApi';
+import { handleAxiosError } from '../../utils/handleAxiosError';
 
-export const fetchUserProfile = createAsyncThunk(
-  'user/fetchProfile',
-  async (_, { dispatch, rejectWithValue }) => {
+// Thunk for sending OTP
+export const getUserById = createAsyncThunk(
+  "auth/getUserById",
+  async (data, thunkAPI) => {
     try {
-      dispatch(setLoading(true));
-      // Replace with actual API call
-      const response = await fetch('/api/user/profile');
-      if (!response.ok) throw new Error('Failed to fetch profile');
-      
-      const data = await response.json();
-      dispatch(setProfile(data));
-      return data;
+      const response = await getUserByIdAPI(data);
+      return response?.data;
     } catch (error) {
-      dispatch(setError(error.message));
-      return rejectWithValue(error.message);
-    } finally {
-      dispatch(setLoading(false));
+      return handleAxiosError(error, thunkAPI);
     }
   }
 );
 
-export const fetchUserRequests = createAsyncThunk(
-  'user/fetchRequests',
-  async (_, { dispatch, rejectWithValue }) => {
+// Thunk for completing user profile
+export const completeUserProfile = createAsyncThunk(
+  "auth/completeUserProfile",
+  async (data, thunkAPI) => {
     try {
-      dispatch(setLoading(true));
-      const response = await fetch('/api/user/requests');
-      if (!response.ok) throw new Error('Failed to fetch requests');
-      
-      const data = await response.json();
-      dispatch(setRequests(data));
-      return data;
+      const response = await completeProfileAPI(data);
+      return response?.data;
     } catch (error) {
-      dispatch(setError(error.message));
-      return rejectWithValue(error.message);
-    } finally {
-      dispatch(setLoading(false));
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+export const updateProfilePic = createAsyncThunk(
+  "user/updateProfilePic",
+  async (data, thunkAPI) => {
+    try {
+      const response = await updateProfilePicAPI(data);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+export const updateUser = createAsyncThunk(
+  "user/updateUser",
+  async (data, thunkAPI) => {
+    try {
+      const response = await updateUserAPI(data);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
     }
   }
 );

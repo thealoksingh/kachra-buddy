@@ -20,6 +20,8 @@ import { useNavigation } from '@react-navigation/native';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
 import { useDispatch } from 'react-redux';
 import { sendOtp, verifyOtp } from '../../store/thunks/authThunk';
+import { completeProfile, completeUserProfile } from '../../store/thunks/userThunk';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -129,7 +131,21 @@ const LoginScreen = () => {
 
       if (verifyOtp.fulfilled.match(response)) {
         setIsVerified(true);
-        console.log('response ', response?.payload?.data?.status);
+        const status =  response?.payload?.data?.status;
+        await AsyncStorage.setItem(
+          "user_id",
+          String(response?.payload?.data?.id)
+        );
+        //Saving accessToken in async storage
+
+          const user_id = await AsyncStorage.getItem("user_id");
+          console.log("user id after storing in async storage", user_id);
+        await AsyncStorage.setItem(
+          "access_token",
+          String(response?.payload?.data?.accessToken)
+        );
+        console.log("user id and accessToken stored in async storage");
+        setIsActive(status.toLowerCase() === 'active');
         await dispatch(
           showSnackbar({
             message: response?.payload?.message,
@@ -156,12 +172,40 @@ const LoginScreen = () => {
   };
 
   // step 3: signup new user
-  const handleSignup = () => {
+  const handleSignup = async () => {
+    const data = {
+      userId: await AsyncStorage.getItem("user_id"),
+      fullName: name,
+    };
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const response = await dispatch(completeUserProfile(data));
+      console.log("response from completeUserProfile", response?.payload);
+      if (completeUserProfile.fulfilled.match(response)) {
+        await dispatch(
+          showSnackbar({
+            message: 'Profile completed successfully!',
+            type: 'success',
+            time: 3000,
+          }),
+        );
+        // navigation.replace('home');
+      } else {
+        await dispatch(
+          showSnackbar({
+            message: response?.payload?.message,
+            type: 'error',
+            time: 5000,
+          }),
+        );
+      }
+    } catch (e) {
+      await dispatch(
+        showSnackbar({ message: 'Failed to complete profile', type: 'error', time: 3000 }),
+      );
+    } finally {
       setLoading(false);
-      navigation.replace('home'); // after signup success
-    }, 1500);
+    }
   };
 
   return (
