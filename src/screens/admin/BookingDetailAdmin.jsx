@@ -22,6 +22,7 @@ import MyStatusBar from '../../components/MyStatusBar';
 const { width } = Dimensions.get('window');
 const BookingDetailAdmin = () => {
   const navigation = useNavigation();
+  const[selectedDriver ,setSelectedDriver] =useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
@@ -135,27 +136,25 @@ const BookingDetailAdmin = () => {
             <Text style={styles.userPhone}>+91 98765 43210</Text>
           </View>
         </View>
-        {true && (
+        {selectedDriver && (
           <>
             <View style={styles.headingSection}>
               <Text style={styles.sectionTitle}>Driver Detail</Text>
             </View>
             <View style={styles.userCard}>
               <Image
-                source={{
-                  uri: 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                }}
+                source={{ uri: selectedDriver?.avatar }}
                 style={styles.userImage}
               />
               <View style={{ marginLeft: 12 }}>
-                <Text style={styles.userName}>Driver name</Text>
-                <Text style={styles.userPhone}>+91 98765 43210</Text>
+                <Text style={styles.userName}>{selectedDriver?.owner_legal_name}</Text>
+                <Text style={styles.userPhone}>{selectedDriver?.mobile_number}</Text>
                 <View style={{ flexDirection: 'row', marginTop: 1 }}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Text
                       key={i}
                       style={{
-                        color: i < 4 ? '#FFD700' : '#ccc',
+                        color: i < selectedDriver?.rating ? '#FFD700' : '#ccc',
                         fontSize: 16,
                       }}
                     >
@@ -337,6 +336,12 @@ const BookingDetailAdmin = () => {
           >
            <TouchableOpacity
             activeOpacity={0.8}
+             onPress={() =>
+              navigation.navigate('allUsersScreen', {
+                fromSelectUser: 'driver',
+                onUserSelect: user => setSelectedDriver(user),
+              })
+            }
             style={[styles.outlinedBtn, { borderColor: Colors.primary }]}
            >
             <Text style={[styles.outlinedBtnText, { color: Colors.primary }]}>

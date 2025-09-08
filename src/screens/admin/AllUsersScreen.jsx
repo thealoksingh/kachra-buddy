@@ -34,6 +34,7 @@ const dummyUsers = [
     owner_legal_name: 'Alok singh',
     mobile_number: '+91 9687543210',
     status: 'Active',
+    rating:2,
     role: 'user',
     avatar:
       'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
@@ -43,6 +44,7 @@ const dummyUsers = [
     owner_legal_name: 'Ravi Kumar',
     mobile_number: '+91 9876543211',
     status: 'Blocked',
+    rating:4,
     role: 'driver',
     avatar:
       'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
@@ -52,6 +54,7 @@ const dummyUsers = [
     owner_legal_name: 'Gendu Singh',
     mobile_number: '+91 9896543212',
     status: 'Inactive',
+    rating:5,
     role: 'user',
     avatar: null,
   },
