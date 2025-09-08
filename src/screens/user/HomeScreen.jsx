@@ -157,15 +157,7 @@ export default function HomeScreen() {
        <FaddedIcon/>
       </ScrollView>
       
-  {/* {true && (
-  <LottieAlert
-    type="warning"
-    message="Payment Successful 🎉"
-    loop={false}
-    onClose={() => {}}
-    autoClose = {true}
-  />
-)} */}
+  
 
     </LinearGradient>
   );

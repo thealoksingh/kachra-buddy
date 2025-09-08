@@ -9,20 +9,23 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
-import {
-  CommonAppBar,
-  FaddedIcon,
-} from '../../components/commonComponents';
-import ImagePreviewModal from "../../components/ImagePreviewModal"
+import { CommonAppBar, FaddedIcon } from '../../components/commonComponents';
+import ImagePreviewModal from '../../components/ImagePreviewModal';
 import { Colors, commonStyles, textStyles } from '../../styles/commonStyles';
 import { useNavigation } from '@react-navigation/native';
-
+import { WarningWithButton } from '../../components/lottie/WarningWithButton';
+import { DottedBlackLoader } from '../../components/lottie/loaderView';
+import { LottieAlert } from '../../components/lottie/LottieAlert';
 const { width } = Dimensions.get('window');
 
 const BookingDetailScreen = () => {
   const navigation = useNavigation();
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
+  const [warningVisible, setWarningVisible] = useState(false);
+  const[failureAlertVisible,setFailureAlertVisible]=useState(false);
+  const[succesAlertVisible,setSuccessAlertVisible]=useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const flatListRef = useRef();
 
@@ -182,6 +185,7 @@ const BookingDetailScreen = () => {
         </View>
         {true ? (
           <TouchableOpacity
+            onPress={() => setWarningVisible(true)}
             style={[styles.cancelBtn, { borderColor: Colors.secondary }]}
           >
             <Text style={[styles.cancelBtnText, { color: Colors.secondary }]}>
@@ -201,16 +205,44 @@ const BookingDetailScreen = () => {
         <FaddedIcon />
         <View style={{ height: 80 }} />
         <ImagePreviewModal
+          image={previewImage}
+          visibility={previewVisible}
+          setVisibility={setPreviewVisible}
+        />
+      </ScrollView>
+      <ImagePreviewModal
         image={previewImage}
         visibility={previewVisible}
         setVisibility={setPreviewVisible}
       />
-        </ScrollView>
-       <ImagePreviewModal
-       image={previewImage}
-        visibility={previewVisible}
-        setVisibility={setPreviewVisible}
-       />
+      {warningVisible && (
+        <WarningWithButton
+          message="Are you sure you want to Cancel this Order?"
+          onYes={() => {
+            setWarningVisible(false);
+          }}
+          onClose={() => setWarningVisible(false)}
+        />
+      )}
+      {isLoading && <DottedBlackLoader />}
+      { succesAlertVisible&& (
+        <LottieAlert
+          type="success"
+          message="Order Cancelled Successfuly"
+          loop={false}
+          onClose={() => {setSuccessAlertVisible(false)}}
+          autoClose = {true}
+        />
+      )}
+      {failureAlertVisible&& (
+        <LottieAlert
+          type="failure"
+          message="Order Cancellation Failed ,Try Again "
+          loop={false}
+          onClose={() => {setFailureAlertVisible(false)}}
+          autoClose = {true}
+        />
+      )}
     </View>
   );
 };
