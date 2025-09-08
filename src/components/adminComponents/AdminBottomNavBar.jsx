@@ -1,17 +1,20 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Colors, Fonts, Sizes, commonStyles } from '../../styles/commonStyles';
 import { View, StyleSheet, Text, BackHandler, Platform } from 'react-native';
+
 import { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
+import AdminHome from '../../screens/admin/AdminHome';
+import AdminProfile from '../../screens/admin/AdminProfile';
+import AllBookingsScreen from '../../screens/admin/AllBookingsScreen';
+import AllUsersScreen from '../../screens/admin/AllUsersScreen';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import DriverHome from '../../screens/driver/DriverHome';
-import PickupRequests from '../../screens/driver/PickupRequests';
-import DriverProfileScreen from '../../screens/driver/DriverProfileScreen';
+
 
 const Tab = createBottomTabNavigator();
 
-const DriverBottomNavBar = ({ navigation }) => {
+const AdminBottomNavBar = ({ navigation }) => {
   const [backClickCount, setBackClickCount] = useState(0);
 
   const backAction = () => {};
@@ -54,9 +57,8 @@ const DriverBottomNavBar = ({ navigation }) => {
       >
         <Tab.Screen
           name="Home"
-          component={DriverHome}
-          //  component={LocationPickerScreen}
-          options={{
+          component={AdminHome}
+             options={{
             tabBarIcon: ({ focused }) =>
               focused ? (
                 // <View style={styles.selectedTabCircleStyle}>
@@ -70,8 +72,31 @@ const DriverBottomNavBar = ({ navigation }) => {
         />
 
         <Tab.Screen
-          name="Pickup"
-          component={PickupRequests}
+          name="Users"
+          component={AllUsersScreen}
+          options={{
+            tabBarIcon: ({ focused }) =>
+              focused ? (
+                // <View style={styles.selectedTabCircleStyle}>
+                <MaterialIcons
+                  name="group"
+                  size={24}
+                  color={Colors.primary}
+                />
+              ) : (
+                // </View>
+                <MaterialIcons
+                  name="group"
+                  size={24}
+                  color={Colors.grayColor}
+                />
+              ),
+            tabBarLabel: 'All Users',
+          }}
+        />
+         <Tab.Screen
+          name="Bookings"
+          component={AllBookingsScreen}
           options={{
             tabBarIcon: ({ focused }) =>
               focused ? (
@@ -89,12 +114,14 @@ const DriverBottomNavBar = ({ navigation }) => {
                   color={Colors.grayColor}
                 />
               ),
-            tabBarLabel: 'Bookings',
+            tabBarLabel: 'All Bookings',
           }}
         />
+
+
         <Tab.Screen
           name="Profile"
-          component={DriverProfileScreen}
+          component={AdminProfile}
           options={{
             tabBarIcon: ({ focused }) =>
               focused ? (
@@ -127,7 +154,7 @@ const DriverBottomNavBar = ({ navigation }) => {
   }
 };
 
-export default DriverBottomNavBar;
+export default AdminBottomNavBar ;
 
 const styles = StyleSheet.create({
   exitInfoWrapStyle: {

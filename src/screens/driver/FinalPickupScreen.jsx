@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Colors } from '../../styles/commonStyles';
@@ -14,6 +21,20 @@ import { useImagePicker } from '../../components/useImagePicker';
 import ImagePickerSheet from '../../components/ImagePickerSheet';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
 import MyStatusBar from '../../components/MyStatusBar';
+import EditableOrderCard from '../../components/driverComponents/EditableOrderCard';
+
+const orders = [
+  {
+    price: 100,
+    type: 'countable',
+    description: 'Fresh apples',
+  },
+  {
+    price: 250,
+    type: 'weighable',
+    description: 'Premium Basmati Rice',
+  },
+];
 
 const FinalPickupScreen = () => {
   const navigation = useNavigation();
@@ -75,6 +96,15 @@ const FinalPickupScreen = () => {
       <CommonAppBar navigation={navigation} label="Pickup Order" />
 
       <View style={{ flex: 1, marginBottom: 20, marginHorizontal: 10 }}>
+        <View style={{ padding: 0, margin: 12 }}>
+          {orders.map((item, idx) => (
+            <EditableOrderCard
+              key={idx}
+              price={item.price}
+              type={item.type}
+            />
+          ))}
+        </View>
         <View style={styles.formCard}>
           <InputBox
             value={givenAmount}
