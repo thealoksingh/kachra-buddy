@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Modal,
+  ScrollView,
   StatusBar,
 } from "react-native";
 import {
@@ -30,15 +31,15 @@ import { useNavigation } from "@react-navigation/native";
 const dummyUsers = [
   {
     id: 1,
-    owner_legal_name: "John Doe",
-    mobile_number: "+91 9876543210",
+    owner_legal_name: "Alok singh",
+    mobile_number: "+91 9687543210",
     status: "Active",
     role: "user",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
   },
   {
     id: 2,
-    owner_legal_name: "Jane Smith",
+    owner_legal_name: "Ravi Kumar",
     mobile_number: "+91 9876543211",
     status: "Blocked",
     role: "driver",
@@ -46,8 +47,8 @@ const dummyUsers = [
   },
   {
     id: 3,
-    owner_legal_name: "Mike Johnson",
-    mobile_number: "+91 9876543212",
+    owner_legal_name: "Gendu Singh",
+    mobile_number: "+91 9896543212",
     status: "Inactive",
     role: "user",
     avatar: null
@@ -58,9 +59,10 @@ const dummyUsers = [
 const AllUsersScreen = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
+
   const [selectedRole, setSelectedRole] = useState("both");
   const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
 
   const filteredUsers = dummyUsers.filter((user) => {
     const matchesSearch = searchQuery === "" || 
@@ -99,7 +101,7 @@ const AllUsersScreen = () => {
         }
       />
       
-      {bottonSheet()}
+      {bottomSheet()}
     </View>
   );
 
@@ -154,6 +156,106 @@ const AllUsersScreen = () => {
     );
   }
 
+  function bottomSheet() {
+    return (
+      <Modal
+        visible={isBottomSheetVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setBottomSheetVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.bottomSheet}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Filter Options</Text>
+              <TouchableOpacity onPress={() => setBottomSheetVisible(false)}>
+                <MaterialIcons name="close" size={24} color={Colors.blackColor} />
+              </TouchableOpacity>
+            </View>
+            
+            {roleFilter()}
+            {statusFilter()}
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
+  function roleFilter() {
+    const roles = ["both", "user", "driver"];
+    
+    return (
+      <View style={styles.filterSection}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+          {roles.map((role) => (
+            <TouchableOpacity
+              key={role}
+              style={[
+                styles.filterChip,
+                selectedRole === role && styles.selectedChip,
+              ]}
+              onPress={() => setSelectedRole(role)}
+            >
+              <Text
+                style={[
+                  styles.filterChipText,
+                  selectedRole === role && styles.selectedChipText,
+                ]}
+              >
+                {role === "both" ? "All" : role.charAt(0).toUpperCase() + role.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  }
+
+  function statusFilter() {
+    const allStatuses = ["Active", "Inactive", "Blocked", "New", "Completed", "Rejected"];
+    
+    const toggleStatus = (status) => {
+      if (selectedStatuses.includes(status)) {
+        setSelectedStatuses(selectedStatuses.filter((s) => s !== status));
+      } else {
+        setSelectedStatuses([...selectedStatuses, status]);
+      }
+    };
+
+    return (
+      <View style={styles.filterSection}>
+        <View style={styles.statusHeader}>
+           {/* {selectedStatuses.length > 0 && (
+            <TouchableOpacity onPress={() => setSelectedStatuses([])}>
+              <Text style={styles.clearText}>Clear</Text>
+            </TouchableOpacity>
+          )} */}
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+          {allStatuses.map((status) => (
+            <TouchableOpacity
+              key={status}
+              style={[
+                styles.filterChip,
+                selectedStatuses.includes(status) && styles.selectedChip,
+              ]}
+              onPress={() => toggleStatus(status)}
+            >
+              <Text
+                style={[
+                  styles.filterChipText,
+                  selectedStatuses.includes(status) && styles.selectedChipText,
+                ]}
+              >
+                {status}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  }
+
   function searchBar() {
     return (
       <View
@@ -163,10 +265,7 @@ const AllUsersScreen = () => {
           alignItems: "center",
         }}
       >
-        <MyStatusBar />
-
-        {/* Wrap SearchBar and give it flex: 1 */}
-        <View style={[styles.searchBar, { flex: 1 }]}>
+          <View style={[styles.searchBar, { flex: 1 }]}>
           <MaterialIcons
             name="search"
             size={24}
@@ -186,159 +285,19 @@ const AllUsersScreen = () => {
           />
         </View>
 
-        {/* Filter Icon */}
-           <View style={{ position: "relative", marginLeft: 12 }}>
-          <MaterialIcons
-            name="filter-list"
-            color={Colors.blackColor}
-            size={26}
-            onPress={() => setBottomSheetVisible(true)}
-          />
-          <View
-            style={{
-              position: "absolute",
-              top: -8,
-              right: -8,
-              backgroundColor: "red",
-              borderRadius: 10,
-              width: 18,
-              height: 18,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text style={{ color: "white", fontSize: 10, fontWeight: "bold" }}>
-           {filteredUsers.length}
-            </Text>
+        <TouchableOpacity 
+          style={styles.filterIcon}
+          onPress={() => setBottomSheetVisible(true)}
+        >
+          <MaterialIcons name="filter-list" size={24} color={Colors.blackColor} />
+          <View style={styles.filterBadge}>
+            <Text style={styles.filterBadgeText}>{filteredUsers.length}</Text>
           </View>
-        </View>
-      </View>
-    );
-  }
-  function bottonSheet() {
-    return (
-      <Modal
-        visible={isBottomSheetVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setBottomSheetVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.bottomSheet}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Filter Options</Text>
-              <TouchableOpacity onPress={() => setBottomSheetVisible(false)}>
-                <MaterialIcons name="close" size={24} color={Colors.blackColor} />
-              </TouchableOpacity>
-            </View>
-            {roleSelector()}
-            {statusSection()}
-          </View>
-        </View>
-      </Modal>
-    );
-  }
-
-  function roleSelector() {
-    const roles = ["user", "driver", "both"];
-
-    return (
-      <View style={[styles.section, { marginBottom: 12 }]}>
-        <Text style={{ marginBottom: 4, fontWeight: "bold", fontSize: 14 }}>
-          Select Role
-        </Text>
-
-        <View style={styles.TypeContainer}>
-          {roles.map((role) => (
-            <TouchableOpacity
-              key={role}
-              style={[
-                styles.TypeButton,
-                selectedRole === role && styles.selectedButton,
-              ]}
-              onPress={() => setSelectedRole(role)}
-            >
-              <Text
-                style={[
-                  styles.TypebuttonText,
-                  selectedRole === role && styles.selectedButtonText,
-                ]}
-              >
-                {role.charAt(0).toUpperCase() + role.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        </TouchableOpacity>
       </View>
     );
   }
 
-  function statusSection() {
-    // const statuses = ["New", "Active", "Inactive", "Blocked"];
-    const driverStatuses = ["New", "Completed", 'Rejected', "Active", "Inactive", "Blocked"];
-    const userStatuses = ["Active", "Inactive", "Blocked"];
-   
-
-    const toggleStatus = (status) => {
-      if (selectedStatuses.includes(status)) {
-        setSelectedStatuses(selectedStatuses.filter((s) => s !== status));
-      } else {
-        setSelectedStatuses([...selectedStatuses, status]);
-      }
-    };
-
-    return (
-      <View style={[styles.section, { marginBottom: 12 }]}>
-        <Text style={{ marginBottom: 4, fontWeight: "bold", fontSize: 14 }}>
-          Select Status
-        </Text>
-
-        <View style={[styles.TypeContainer, { flexWrap: "wrap" }]}>
-          {selectedRole==="user" && userStatuses.map((status) => (
-            <TouchableOpacity
-              key={status}
-              style={[
-                styles.TypeButton,
-                selectedStatuses.includes(status) && styles.selectedButton,
-              ]}
-              onPress={() => toggleStatus(status)}
-            >
-              <Text
-                style={[
-                  styles.TypebuttonText,
-                  selectedStatuses.includes(status) &&
-                    styles.selectedButtonText,
-                ]}
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-          {(selectedRole==="driver" ||  selectedRole === 'both') && driverStatuses.map((status) => (
-            <TouchableOpacity
-              key={status}
-              style={[
-                styles.TypeButton,
-                selectedStatuses.includes(status) && styles.selectedButton,
-              ]}
-              onPress={() => toggleStatus(status)}
-            >
-              <Text
-                style={[
-                  styles.TypebuttonText,
-                  selectedStatuses.includes(status) &&
-                    styles.selectedButtonText,
-                ]}
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-          
-        </View>
-      </View>
-    );
-  }
 };
 
 const styles = StyleSheet.create({
@@ -498,6 +457,97 @@ container: {
   },
   selectedButtonText: {
     color: "white",
+  },
+  filterIcon: {
+    position: "relative",
+    marginLeft: 12,
+    padding: 8,
+  },
+  filterBadge: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  filterBadgeText: {
+    color: Colors.whiteColor,
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  bottomSheet: {
+    backgroundColor: Colors.whiteColor,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 10,
+    maxHeight: "70%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  modalTitle: {
+    marginLeft:16,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Colors.blackColor,
+  },
+  filterSection: {
+    marginHorizontal: 20,
+    marginBottom: 30,
+  },
+  filterTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Colors.blackColor,
+    marginBottom: 10,
+  },
+  statusHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  clearText: {
+    color: Colors.primary,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  filterScroll: {
+    flexDirection: "row",
+  },
+  filterChip: {
+    backgroundColor: Colors.extraLightGrayColor,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: Colors.grayColor,
+  },
+  selectedChip: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  filterChipText: {
+    fontSize: 14,
+    color: Colors.blackColor,
+    fontWeight: "500",
+  },
+  selectedChipText: {
+    color: Colors.whiteColor,
+    fontWeight: "bold",
   },
 });
 

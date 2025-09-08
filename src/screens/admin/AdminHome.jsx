@@ -74,12 +74,12 @@ const adminCards = [
   {
     id: 1,
     icon: 'person-add-outline',
-    title: 'User Management',
-    bottomTitle: 'Create & Manage Users',
+    title: 'Create User',
+    bottomTitle: 'Create a New User/Driver',
     description: 'Add new users and drivers to the platform',
     firstColor: '#667eea',
     secondColor: '#764ba2',
-    screen: ''
+    screen: 'createUserScreen'
   },
   // {
   //   id: 2,

@@ -7,13 +7,16 @@ import NotificationScreen from '../screens/NotificationScreen';
 import AdminProfile from '../screens/admin/AdminProfile';
 import EditAdminProfile from '../screens/admin/EditAdminProfile';
 import AllBookingsScreen from '../screens/admin/AllBookingsScreen';
+import CreateUserScreen from '../screens/admin/CreateUserScreen'
 import BookingDetailAdmin from '../screens/admin/BookingDetailAdmin';
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="createUserScreen" component={CreateUserScreen} />
       <Stack.Screen name="adminBottomNavBar" component={AdminBottomNavBar} />
+    
       <Stack.Screen name="adminHome" component={AdminHome} />
       <Stack.Screen name="helpScreen" component={HelpScreen} />
       <Stack.Screen name="notificationScreen" component={NotificationScreen} />

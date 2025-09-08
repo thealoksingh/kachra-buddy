@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const EditUserProfile = () => {
+const UpdateUserProfile = () => {
   return (
     <View>
       <Text>EditUserProfile</Text>
@@ -9,6 +9,6 @@ const EditUserProfile = () => {
   )
 }
 
-export default EditUserProfile
+export default UpdateUserProfile
 
 const styles = StyleSheet.create({})
