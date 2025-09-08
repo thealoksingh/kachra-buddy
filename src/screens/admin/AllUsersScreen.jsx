@@ -25,7 +25,7 @@ import MyStatusBar from '../../components/MyStatusBar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { CommonAppBar } from '../../components/commonComponents';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 // Dummy users data for UI
 const dummyUsers = [
@@ -45,7 +45,7 @@ const dummyUsers = [
     status: 'Blocked',
     role: 'driver',
     avatar:
-      'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
   },
   {
     id: 3,
@@ -58,28 +58,43 @@ const dummyUsers = [
 ];
 
 const AllUsersScreen = () => {
+  const route = useRoute();
   const navigation = useNavigation();
+  const { fromSelectUser, onUserSelect } = route.params || {};
   const [searchQuery, setSearchQuery] = useState('');
-
   const [selectedRole, setSelectedRole] = useState('both');
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
+  
+ const filteredUsers = dummyUsers.filter((user) => {
+  const matchesSearch =
+    searchQuery === "" ||
+    user?.owner_legal_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user?.mobile_number?.includes(searchQuery);
 
-  const filteredUsers = dummyUsers.filter(user => {
-    const matchesSearch =
-      searchQuery === '' ||
-      user?.owner_legal_name
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      user?.mobile_number?.includes(searchQuery);
+  const matchesRole =
+    selectedRole === "both" || user?.role === selectedRole;
 
-    const matchesRole = selectedRole === 'both' || user?.role === selectedRole;
+  const matchesStatus =
+    selectedStatuses.length === 0 || selectedStatuses.includes(user?.status);
 
-    const matchesStatus =
-      selectedStatuses.length === 0 || selectedStatuses.includes(user?.status);
+  const matchesFromSelect =
+    fromSelectUser === "both" || !fromSelectUser || user?.role === fromSelectUser;
 
-    return matchesSearch && matchesRole && matchesStatus;
-  });
+  return matchesSearch && matchesRole && matchesStatus && matchesFromSelect;
+});
+
+
+  const handleCardPress = (user) => {
+  if (fromSelectUser && onUserSelect) {
+    // Means we came here in "select mode"
+    onUserSelect(user);
+    navigation.goBack();
+  } else {
+    // Normal mode → open user update page
+    navigation.navigate("updateUserScreen", { user });
+  }
+};
 
   return (
     <View style={styles.container}>
@@ -104,22 +119,21 @@ const AllUsersScreen = () => {
 
       {bottomSheet()}
 
-      <TouchableOpacity
-        activeOpacity={0.8}
-        style={styles.floatingButton}
-        onPress={() => navigation.navigate('createUserScreen')}
-      >
-        <Text style={styles.floatingButtonText}>+</Text>
-      </TouchableOpacity>
+      {!fromSelectUser && (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.floatingButton}
+          onPress={() => navigation.navigate('createUserScreen')}
+        >
+          <Text style={styles.floatingButtonText}>+</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 
   function UserInfo({ user }) {
     return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate('updateUserScreen', { user })}
-        style={styles.userItem}
-      >
+      <TouchableOpacity onPress={() => handleCardPress(user)} style={styles.userItem}>
         {user?.avatar ? (
           <Image source={{ uri: user?.avatar }} style={styles.avatar} />
         ) : (
@@ -254,11 +268,7 @@ const AllUsersScreen = () => {
     return (
       <View style={styles.filterSection}>
         <View style={styles.statusHeader}>
-          {/* {selectedStatuses.length > 0 && (
-            <TouchableOpacity onPress={() => setSelectedStatuses([])}>
-              <Text style={styles.clearText}>Clear</Text>
-            </TouchableOpacity>
-          )} */}
+   
         </View>
         <ScrollView
           horizontal
@@ -318,7 +328,7 @@ const AllUsersScreen = () => {
           />
         </View>
 
-        <TouchableOpacity
+        {!fromSelectUser&&(<TouchableOpacity
           style={styles.filterIcon}
           onPress={() => setBottomSheetVisible(true)}
         >
@@ -330,11 +340,12 @@ const AllUsersScreen = () => {
           <View style={styles.filterBadge}>
             <Text style={styles.filterBadgeText}>{filteredUsers.length}</Text>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity>)}
       </View>
     );
   }
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -584,7 +595,7 @@ const styles = StyleSheet.create({
   selectedChipText: {
     color: Colors.whiteColor,
     fontWeight: 'bold',
-  }, 
+  },
   floatingButton: {
     position: 'absolute',
     bottom: 100,

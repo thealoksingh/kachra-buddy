@@ -49,7 +49,6 @@ const UpdateUserScreen = () => {
       setPickerSheetVisible(false);
     }
   };
-
   const handleUpdateUser = () => {
     console.log('Updated user:', { name, mobNumber, email, role, status, avatar });
   };

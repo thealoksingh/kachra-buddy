@@ -72,7 +72,7 @@ export const icons = [
 const adminCards = [
   
   {
-    id: 3,
+    id: 1,
     icon: 'storefront-outline',
     title: 'Product Catalog',
     bottomTitle: 'Manage Products',
@@ -82,7 +82,7 @@ const adminCards = [
     screen: 'allProductsScreen'
   },
   {
-    id: 4,
+    id: 2,
     icon: 'megaphone-outline',
     title: 'Advertisement',
     bottomTitle: 'Promote Services',
@@ -90,29 +90,19 @@ const adminCards = [
     firstColor: '#4facfe',
     secondColor: '#00f2fe',
     screen: ''
-  },  {
-    id: 5,
-    icon: 'send-outline',
-    title: 'Targeted Alerts',
-    bottomTitle: 'Specific Notifications',
-    description: 'Send personalized messages to specific users',
-    firstColor: '#667eea',
-    secondColor: '#764ba2',
-    screen: ''
-  },
-  
+  },  
   {
-    id: 6,
+    id: 3,
     icon: 'notifications-outline',
-    title: 'Global Alerts',
+    title: 'Notification',
     bottomTitle: 'Broadcast Messages',
     description: 'Send notifications to all users and drivers',
-    firstColor: '#64c5ecff',
-    secondColor: '#b455fdff',
-    screen: ''
+    firstColor: '#667eea',
+    secondColor: '#764ba2',
+    screen: 'sendNotificationScreen'
   },
   {
-    id: 7,
+    id: 4,
     icon: 'pricetag-outline',
     title: 'Special Offers',
     bottomTitle: 'Best Deals',
@@ -122,7 +112,7 @@ const adminCards = [
     screen: ''
   },
   {
-    id: 8,
+    id: 5,
     icon: 'cube-outline',
     title: 'Inventory',
     bottomTitle: 'Stock Management',
@@ -130,8 +120,9 @@ const adminCards = [
     firstColor: '#5f27cd',
     secondColor: '#341f97',
     screen: ''
-  },{
-    id: 9,
+  },
+  {
+    id: 6,
     icon: 'chatbubbles-outline',
     title: 'Support Tickets',
     bottomTitle: 'Resolve Queries',
