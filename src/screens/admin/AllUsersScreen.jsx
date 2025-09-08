@@ -1,5 +1,5 @@
 // ViewAllUserPage.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -12,64 +12,68 @@ import {
   Modal,
   ScrollView,
   StatusBar,
-} from "react-native";
+} from 'react-native';
 import {
   Colors,
   screenWidth,
   commonStyles,
   Sizes,
   Fonts,
-} from "../../styles/commonStyles";
+} from '../../styles/commonStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MyStatusBar from "../../components/MyStatusBar";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { CommonAppBar } from "../../components/commonComponents";
-import { useNavigation } from "@react-navigation/native";
+import MyStatusBar from '../../components/MyStatusBar';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { CommonAppBar } from '../../components/commonComponents';
+import { useNavigation } from '@react-navigation/native';
 
 // Dummy users data for UI
 const dummyUsers = [
   {
     id: 1,
-    owner_legal_name: "Alok singh",
-    mobile_number: "+91 9687543210",
-    status: "Active",
-    role: "user",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+    owner_legal_name: 'Alok singh',
+    mobile_number: '+91 9687543210',
+    status: 'Active',
+    role: 'user',
+    avatar:
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
   },
   {
     id: 2,
-    owner_legal_name: "Ravi Kumar",
-    mobile_number: "+91 9876543211",
-    status: "Blocked",
-    role: "driver",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
+    owner_legal_name: 'Ravi Kumar',
+    mobile_number: '+91 9876543211',
+    status: 'Blocked',
+    role: 'driver',
+    avatar:
+      'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
   },
   {
     id: 3,
-    owner_legal_name: "Gendu Singh",
-    mobile_number: "+91 9896543212",
-    status: "Inactive",
-    role: "user",
-    avatar: null
-  }
+    owner_legal_name: 'Gendu Singh',
+    mobile_number: '+91 9896543212',
+    status: 'Inactive',
+    role: 'user',
+    avatar: null,
+  },
 ];
-
 
 const AllUsersScreen = () => {
   const navigation = useNavigation();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const [selectedRole, setSelectedRole] = useState("both");
+  const [selectedRole, setSelectedRole] = useState('both');
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
 
-  const filteredUsers = dummyUsers.filter((user) => {
-    const matchesSearch = searchQuery === "" || 
-      user?.owner_legal_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredUsers = dummyUsers.filter(user => {
+    const matchesSearch =
+      searchQuery === '' ||
+      user?.owner_legal_name
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
       user?.mobile_number?.includes(searchQuery);
 
-    const matchesRole = selectedRole === "both" || user?.role === selectedRole;
+    const matchesRole = selectedRole === 'both' || user?.role === selectedRole;
 
     const matchesStatus =
       selectedStatuses.length === 0 || selectedStatuses.includes(user?.status);
@@ -77,19 +81,16 @@ const AllUsersScreen = () => {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-
-
-
   return (
     <View style={styles.container}>
       <MyStatusBar />
-         
+
       {searchBar()}
 
       <FlatList
         data={filteredUsers}
         renderItem={({ item }) => <UserInfo user={item} />}
-        keyExtractor={(item) => item?.id?.toString()}
+        keyExtractor={item => item?.id?.toString()}
         contentContainerStyle={styles.listContainer}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         showsVerticalScrollIndicator={false}
@@ -100,15 +101,23 @@ const AllUsersScreen = () => {
           </View>
         }
       />
-      
+
       {bottomSheet()}
+
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={styles.floatingButton}
+        onPress={() => navigation.navigate('createUserScreen')}
+      >
+        <Text style={styles.floatingButtonText}>+</Text>
+      </TouchableOpacity>
     </View>
   );
 
   function UserInfo({ user }) {
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate("userDetailScreen", { user })}
+        onPress={() => navigation.navigate('updateUserScreen', { user })}
         style={styles.userItem}
       >
         {user?.avatar ? (
@@ -123,21 +132,21 @@ const AllUsersScreen = () => {
         )}
 
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>{user?.owner_legal_name || "N/A"}</Text>
-          <Text style={styles.userMobile}>{user?.mobile_number || "N/A"}</Text>
-          <Text style={[styles.userMobile,{color: Colors.blackColor}]}>
-            Status:{" "}
+          <Text style={styles.userName}>{user?.owner_legal_name || 'N/A'}</Text>
+          <Text style={styles.userMobile}>{user?.mobile_number || 'N/A'}</Text>
+          <Text style={[styles.userMobile, { color: Colors.blackColor }]}>
+            Status:{' '}
             <Text
               style={{
                 color:
-                  user?.status === "Active"
+                  user?.status === 'Active'
                     ? Colors.primary
-                    : user?.status === "Blocked"
+                    : user?.status === 'Blocked'
                     ? Colors.redColor
-                    : Colors.secondary, 
+                    : Colors.secondary,
               }}
-             >
-              {user?.status || "N/A"}
+            >
+              {user?.status || 'N/A'}
             </Text>
           </Text>
         </View>
@@ -146,10 +155,13 @@ const AllUsersScreen = () => {
           <Text
             style={[
               styles.roleText,
-              { color: user?.role === "user" ? Colors.primary : Colors.secondary },
+              {
+                color:
+                  user?.role === 'user' ? Colors.primary : Colors.secondary,
+              },
             ]}
           >
-            {user?.role || "N/A"}
+            {user?.role || 'N/A'}
           </Text>
         </View>
       </TouchableOpacity>
@@ -169,10 +181,14 @@ const AllUsersScreen = () => {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Filter Options</Text>
               <TouchableOpacity onPress={() => setBottomSheetVisible(false)}>
-                <MaterialIcons name="close" size={24} color={Colors.blackColor} />
+                <MaterialIcons
+                  name="close"
+                  size={24}
+                  color={Colors.blackColor}
+                />
               </TouchableOpacity>
             </View>
-            
+
             {roleFilter()}
             {statusFilter()}
           </View>
@@ -182,12 +198,16 @@ const AllUsersScreen = () => {
   }
 
   function roleFilter() {
-    const roles = ["both", "user", "driver"];
-    
+    const roles = ['both', 'user', 'driver'];
+
     return (
       <View style={styles.filterSection}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
-          {roles.map((role) => (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.filterScroll}
+        >
+          {roles.map(role => (
             <TouchableOpacity
               key={role}
               style={[
@@ -202,7 +222,9 @@ const AllUsersScreen = () => {
                   selectedRole === role && styles.selectedChipText,
                 ]}
               >
-                {role === "both" ? "All" : role.charAt(0).toUpperCase() + role.slice(1)}
+                {role === 'both'
+                  ? 'All'
+                  : role.charAt(0).toUpperCase() + role.slice(1)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -212,11 +234,18 @@ const AllUsersScreen = () => {
   }
 
   function statusFilter() {
-    const allStatuses = ["Active", "Inactive", "Blocked", "New", "Completed", "Rejected"];
-    
-    const toggleStatus = (status) => {
+    const allStatuses = [
+      'Active',
+      'Inactive',
+      'Blocked',
+      'New',
+      'Completed',
+      'Rejected',
+    ];
+
+    const toggleStatus = status => {
       if (selectedStatuses.includes(status)) {
-        setSelectedStatuses(selectedStatuses.filter((s) => s !== status));
+        setSelectedStatuses(selectedStatuses.filter(s => s !== status));
       } else {
         setSelectedStatuses([...selectedStatuses, status]);
       }
@@ -225,14 +254,18 @@ const AllUsersScreen = () => {
     return (
       <View style={styles.filterSection}>
         <View style={styles.statusHeader}>
-           {/* {selectedStatuses.length > 0 && (
+          {/* {selectedStatuses.length > 0 && (
             <TouchableOpacity onPress={() => setSelectedStatuses([])}>
               <Text style={styles.clearText}>Clear</Text>
             </TouchableOpacity>
           )} */}
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
-          {allStatuses.map((status) => (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.filterScroll}
+        >
+          {allStatuses.map(status => (
             <TouchableOpacity
               key={status}
               style={[
@@ -261,11 +294,11 @@ const AllUsersScreen = () => {
       <View
         style={{
           margin: 20,
-          flexDirection: "row",
-          alignItems: "center",
+          flexDirection: 'row',
+          alignItems: 'center',
         }}
       >
-          <View style={[styles.searchBar, { flex: 1 }]}>
+        <View style={[styles.searchBar, { flex: 1 }]}>
           <MaterialIcons
             name="search"
             size={24}
@@ -281,15 +314,19 @@ const AllUsersScreen = () => {
               fontSize: 12,
             }}
             value={searchQuery}
-            onChangeText={(text) => setSearchQuery(text)}
+            onChangeText={text => setSearchQuery(text)}
           />
         </View>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.filterIcon}
           onPress={() => setBottomSheetVisible(true)}
         >
-          <MaterialIcons name="filter-list" size={24} color={Colors.blackColor} />
+          <MaterialIcons
+            name="filter-list"
+            size={24}
+            color={Colors.blackColor}
+          />
           <View style={styles.filterBadge}>
             <Text style={styles.filterBadgeText}>{filteredUsers.length}</Text>
           </View>
@@ -297,48 +334,47 @@ const AllUsersScreen = () => {
       </View>
     );
   }
-
 };
 
 const styles = StyleSheet.create({
-container: {
+  container: {
     flex: 1,
     backgroundColor: Colors.bodyBackColor,
     paddingHorizontal: Sizes.fixPadding * 0.5,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: Colors.bodyBackColor,
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
   },
   loaderContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     // backgroundColor: "rgba(182, 206, 232, 0.3)",
     zIndex: 999,
   },
   searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 10,
     paddingHorizontal: 12,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -346,8 +382,8 @@ container: {
   },
 
   searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: Colors.whiteColor,
     borderRadius: 8,
     marginHorizontal: 16,
@@ -355,7 +391,7 @@ container: {
     paddingHorizontal: 12,
     paddingVertical: 4,
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -373,8 +409,8 @@ container: {
     paddingBottom: 16,
   },
   userItem: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: Colors.whiteColor,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -395,7 +431,7 @@ container: {
   },
   userName: {
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.blackColor,
     marginBottom: 4,
   },
@@ -407,12 +443,12 @@ container: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 4,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   roleText: {
     fontSize: 12,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   separator: {
     height: 1,
@@ -421,86 +457,86 @@ container: {
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingVertical: 60,
   },
   emptyText: {
     fontSize: 14,
-    color:Colors.extraLightGrayColor,
+    color: Colors.extraLightGrayColor,
     marginTop: 12,
   },
   bottomSheet: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     padding: 20,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
   },
   TypeContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 10,
   },
   TypeButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: '#e0e0e0',
     borderRadius: 8,
   },
   TypebuttonText: {
     fontSize: 12,
-    color: "#555",
+    color: '#555',
   },
   selectedButton: {
     backgroundColor: Colors.primaryColor,
     borderColor: Colors.primaryColor,
   },
   selectedButtonText: {
-    color: "white",
+    color: 'white',
   },
   filterIcon: {
-    position: "relative",
+    position: 'relative',
     marginLeft: 12,
     padding: 8,
   },
   filterBadge: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     right: 0,
     backgroundColor: Colors.primary,
     borderRadius: 10,
     minWidth: 20,
     height: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   filterBadgeText: {
     color: Colors.whiteColor,
     fontSize: 10,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "flex-end",
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
   },
   bottomSheet: {
     backgroundColor: Colors.whiteColor,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 10,
-    maxHeight: "70%",
+    maxHeight: '70%',
   },
   modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 20,
   },
   modalTitle: {
-    marginLeft:16,
+    marginLeft: 16,
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.blackColor,
   },
   filterSection: {
@@ -509,23 +545,23 @@ container: {
   },
   filterTitle: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.blackColor,
     marginBottom: 10,
   },
   statusHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 10,
   },
   clearText: {
     color: Colors.primary,
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   filterScroll: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   filterChip: {
     backgroundColor: Colors.extraLightGrayColor,
@@ -543,14 +579,35 @@ container: {
   filterChipText: {
     fontSize: 14,
     color: Colors.blackColor,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   selectedChipText: {
     color: Colors.whiteColor,
-    fontWeight: "bold",
+    fontWeight: 'bold',
+  }, 
+  floatingButton: {
+    position: 'absolute',
+    bottom: 100,
+    right: 40,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: Colors.whiteColor,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  floatingButtonText: {
+    fontSize: 24,
+    color: Colors.whiteColor,
+    fontWeight: 'bold',
   },
 });
-
-
 
 export default AllUsersScreen;

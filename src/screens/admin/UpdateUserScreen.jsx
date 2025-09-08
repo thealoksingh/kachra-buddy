@@ -11,16 +11,26 @@ import { useImagePicker } from '../../components/useImagePicker';
 import ImagePickerSheet from '../../components/ImagePickerSheet';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const CreateUserScreen = () => {
+const dummyUser = {
+  id: 1,
+  name: 'alok singh',
+  mobNumber: '9876543210',
+  email: 'thealoksinghh@gmail.com',
+  role: 'driver',
+  status: 'active',
+  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400'
+};
+
+const UpdateUserScreen = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState('');
-  const [mobNumber, setMobNumber] = useState('');
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState('user');
-  const [status, setStatus] = useState('active');
+  const [name, setName] = useState(dummyUser.name);
+  const [mobNumber, setMobNumber] = useState(dummyUser.mobNumber);
+  const [email, setEmail] = useState(dummyUser.email);
+  const [role, setRole] = useState(dummyUser.role);
+  const [status, setStatus] = useState(dummyUser.status);
   const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
-  const [avatar, setAvatar] = useState(null);
+  const [avatar, setAvatar] = useState(dummyUser.avatar);
 
   const { openCamera, openGallery } = useImagePicker();
 
@@ -40,13 +50,13 @@ const CreateUserScreen = () => {
     }
   };
 
-  const handleCreateUser = () => {
-    console.log('Creating user:', { name, mobNumber, email, role, status, avatar });
+  const handleUpdateUser = () => {
+    console.log('Updated user:', { name, mobNumber, email, role, status, avatar });
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
-      <CommonAppBar navigation={navigation} label="Create New User/Driver" />
+      <CommonAppBar navigation={navigation} label="Update User" />
 
       <View style={{ flex: 1, marginHorizontal: 16, marginTop: 20 }}>
         <View style={styles.avatarContainer}>
@@ -219,10 +229,10 @@ const CreateUserScreen = () => {
 
         <View style={{ marginTop: 20 }}>
           <ButtonWithLoader
-            name="Submit"
-            loadingName="Processing..."
+            name="Update"
+            loadingName="Updating..."
             isLoading={loading}
-            method={handleCreateUser}
+            method={handleUpdateUser}
           />
         </View>
       </View>
@@ -237,7 +247,7 @@ const CreateUserScreen = () => {
   );
 };
 
-export default CreateUserScreen;
+export default UpdateUserScreen;
 
 const styles = StyleSheet.create({
   formCard: {

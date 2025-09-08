@@ -56,7 +56,7 @@ const PostProductsScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
-      <CommonAppBar navigation={navigation} label="Post Item" />
+      <CommonAppBar navigation={navigation} label="Post a New Item" />
 
       <View style={{ flex: 1, marginBottom: 20, marginHorizontal: 10 }}>
         <View style={styles.formCard}>

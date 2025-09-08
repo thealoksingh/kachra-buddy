@@ -72,26 +72,6 @@ export const icons = [
 const adminCards = [
   
   {
-    id: 1,
-    icon: 'person-add-outline',
-    title: 'Create User',
-    bottomTitle: 'Create a New User/Driver',
-    description: 'Add new users and drivers to the platform',
-    firstColor: '#667eea',
-    secondColor: '#764ba2',
-    screen: 'createUserScreen'
-  },
-  // {
-  //   id: 2,
-  //   icon: 'calendar-outline',
-  //   title: 'Booking Manager',
-  //   bottomTitle: 'Schedule Pickups',
-  //   description: 'Assign drivers and manage pickup schedules',
-  //   firstColor: '#f12711',
-  //   secondColor: '#f5af19',
-  //   screen: ''
-  // },
-  {
     id: 3,
     icon: 'storefront-outline',
     title: 'Product Catalog',
@@ -99,7 +79,7 @@ const adminCards = [
     description: 'Add and update recyclable product listings',
     firstColor: '#f093fb',
     secondColor: '#f5576c',
-    screen: ''
+    screen: 'allProductsScreen'
   },
   {
     id: 4,
@@ -127,8 +107,8 @@ const adminCards = [
     title: 'Global Alerts',
     bottomTitle: 'Broadcast Messages',
     description: 'Send notifications to all users and drivers',
-    firstColor: '#fa709a',
-    secondColor: '#fee140',
+    firstColor: '#64c5ecff',
+    secondColor: '#b455fdff',
     screen: ''
   },
   {

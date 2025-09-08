@@ -1,10 +1,13 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { Colors, textStyles, commonStyles, screenWidth } from '../../styles/commonStyles';
 
 const LargeProductCardAdmin = ({ product, isInCart = false, onToggleCart }) => {
+    const navigation= useNavigation()
+
   return (
-    <View style={styles.card}>
+    <TouchableOpacity onPress={()=>navigation.navigate("updateProductScreen")} style={styles.card}>
         <Image
         source={
           product?.image
@@ -31,7 +34,7 @@ const LargeProductCardAdmin = ({ product, isInCart = false, onToggleCart }) => {
           : `₹ ${product?.price} / kg`}
       </Text>
 
-    </View>
+    </TouchableOpacity>
   );
 };
 
