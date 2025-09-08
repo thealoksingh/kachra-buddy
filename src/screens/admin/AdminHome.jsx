@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  StatusBar,
 } from 'react-native';
 import {
   appFonts,
@@ -168,6 +169,7 @@ export default function AdminHome() {
       colors={[Colors.primary, Colors.whiteColor]}
       style={{ flex: 1 }}
     >
+      
       <MyStatusBar />
       <View style={styles.topBar}>
         <TouchableOpacity

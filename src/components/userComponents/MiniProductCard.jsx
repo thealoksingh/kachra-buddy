@@ -27,14 +27,11 @@ const MiniProductCard = ({ title, price, image, type }) => {
 
       {true?(<TouchableOpacity activeOpacity={0.7} style={[styles.cartButton,{backgroundColor:Colors.secondary}]}>
         <Text style={styles.cartButtonText}>Remove item</Text>
-      </TouchableOpacity>):
-      type === 'countable'?(<TouchableOpacity activeOpacity={0.7} style={styles.cartButton}>
-        <Text style={styles.cartButtonText}>Remove item</Text>
-      </TouchableOpacity>):
+      </TouchableOpacity>):(
       <TouchableOpacity activeOpacity={0.7} style={styles.cartButton}>
         <Text style={styles.cartButtonText}>Add to Cart</Text>
       </TouchableOpacity>
-      }
+     ) }
     </View>
   );
 };

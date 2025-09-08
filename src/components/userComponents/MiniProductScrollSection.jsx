@@ -20,8 +20,8 @@ const MiniProductScrollSection = ({ products }) => {
         ))}
       </ScrollView>
 
-       {row2Products.length > 0 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {row2Products.length > 0 && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {row2Products.map((product, index) => (
             <MiniProductCard
               key={index + 3}

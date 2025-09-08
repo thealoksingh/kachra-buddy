@@ -10,9 +10,10 @@ export default function SplashScreen({ navigation }) {
   useEffect(() => {
     const timer = setTimeout(() => {
 
-      if(user && user?.role === "USER" && user?.status === "ACTIVE") {
+      // if(user && user?.role === "USER" && user?.status === "ACTIVE") {
+      if(true){
       // For now,
-        navigation.replace("user");
+        navigation.replace("admin");
       } else if(user && user?.role === "ADMIN" && user?.status === "ACTIVE") {
         navigation.replace("admin");
       } else if(user && user?.role === "DRIVER" && user?.status === "ACTIVE") {
