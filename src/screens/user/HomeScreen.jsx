@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -14,18 +14,20 @@ import {
   textStyles,
 } from '../../styles/commonStyles';
 import MyStatusBar from '../../components/MyStatusBar';
-import {LottieAlert} from '../../components/lottie/LottieAlert';
-import {DottedBlackLoader, DottedWhiteLoader} from "../../components/lottie/loaderView"
+import { LottieAlert } from '../../components/lottie/LottieAlert';
+import { DottedBlackLoader, DottedWhiteLoader } from "../../components/lottie/loaderView"
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import MovingIcons from '../../components/userComponents/MovingIcons';
 import AdSlider from '../../components/userComponents/AdSlider';
 import MiniProductScrollSection from '../../components/userComponents/MiniProductScrollSection';
 import { useNavigation } from '@react-navigation/native';
-import {products,addsData} from '../../utils/dummyData';
+import { products, addsData } from '../../utils/dummyData';
 import { FaddedIcon } from '../../components/commonComponents';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../../store/selector';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectCart, selectItems, selectUser } from '../../store/selector';
+import { fetchItems, fetchCart } from '../../store/thunks/userThunk';
+import Key from '../../constants/key';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -66,8 +68,22 @@ export const icons = [
 
 export default function HomeScreen() {
 
+    const {API_BASE_URL} = Key;
   const user = useSelector(selectUser);
+  const cart = useSelector(selectCart);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const items = useSelector(selectItems);
+  console.log("Items in home screen", items)
+
+  useEffect(() => {
+    if (user) {
+      // Fetch items when user is present
+      dispatch(fetchItems());
+      // Fetch user's cart when user is present
+      dispatch(fetchCart());
+    }
+  }, [user, dispatch]);
   return (
     <LinearGradient
       colors={[Colors.primary, Colors.whiteColor]}
@@ -78,29 +94,32 @@ export default function HomeScreen() {
         <View style={styles.profileSection}>
           <Image
             source={{
-              uri: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1170&auto=format&fit=crop',
+              uri: API_BASE_URL + user?.avatarUrl,
+              headers: {
+                Authorization: `Bearer ${user?.accessToken}`,
+              },
             }}
             style={styles.profileImage}
           />
           <View>
-          <Text style={styles.userName}>{user?.fullName}</Text>
-          <Text style={{...textStyles.extraSmall,color:Colors.whiteColor}}>Sinhgad College of Engineering</Text>
+            <Text style={styles.userName}>{user?.fullName}</Text>
+            <Text style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}>Sinhgad College of Engineering</Text>
           </View>
         </View>
-        <TouchableOpacity onPress={()=>navigation.navigate("cart")} style={{ position: 'relative' }}>
+        <TouchableOpacity onPress={() => navigation.navigate("cart")} style={{ position: 'relative' }}>
           <Ionicons name="cart-outline" size={28} color={Colors.whiteColor} />
 
           <View style={styles.badge}>
             <Text
               style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
             >
-              0
+              {cart?.cartItems?.length || 0}
             </Text>
           </View>
         </TouchableOpacity>
       </View>
 
-        <TouchableOpacity onPress={()=>navigation.navigate("searchScreen")} style={styles.searchBar}>
+      <TouchableOpacity onPress={() => navigation.navigate("searchScreen")} style={styles.searchBar}>
         <Ionicons name="search-outline" size={20} color="#999" />
         <Text style={styles.searchText}>Search here...</Text>
       </TouchableOpacity>
@@ -121,14 +140,14 @@ export default function HomeScreen() {
           <Text style={{ color: Colors.blackColor, ...textStyles.subHeading }}>
             Best Deals
           </Text>
-          <TouchableOpacity onPress={()=>navigation.navigate("searchScreen")}>
+          <TouchableOpacity onPress={() => navigation.navigate("searchScreen")}>
             <Text style={{ color: Colors.primary, ...textStyles.subHeading }}>
               See All
             </Text>
           </TouchableOpacity>
         </View>
 
-        <MiniProductScrollSection products={products} />
+        <MiniProductScrollSection products={items} />
         <View style={{ marginVertical: 20 }}>
           <AdSlider data={addsData} height={90} />
         </View>
@@ -141,7 +160,7 @@ export default function HomeScreen() {
             <Text style={{ fontSize: 14, color: '#666', marginBottom: 15 }}>
               Turn your old stuff into cash today.
             </Text>
-             <TouchableOpacity onPress={()=>navigation.navigate("scrapVehicleScreen")} activeOpacity={0.7} style={styles.sellnowButton}>
+            <TouchableOpacity onPress={() => navigation.navigate("scrapVehicleScreen")} activeOpacity={0.7} style={styles.sellnowButton}>
               <Text style={{ color: 'white', fontWeight: '600' }}>
                 Sell Now
               </Text>
@@ -158,10 +177,10 @@ export default function HomeScreen() {
             }}
           />
         </View>
-       <FaddedIcon/>
+        <FaddedIcon />
       </ScrollView>
-      
-  
+
+
 
     </LinearGradient>
   );

@@ -21,8 +21,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MyStatusBar from '../../components/MyStatusBar';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../../store/selector';
+import { logout } from '../../store/slices/authSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const image =
   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGdpcmx8ZW58MHx8MHx8fDA%3D';
@@ -32,7 +34,24 @@ const ProfileScreen = () => {
   const [showLogoutSheet, setshowLogoutSheet] = useState(false);
   const [avatar, setAvatar] = useState(image);
   const navigation = useNavigation();
-   const user = useSelector(selectUser);
+  const user = useSelector(selectUser);
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    try {
+      setshowLogoutSheet(false);
+      await AsyncStorage.removeItem('user_id');
+      await AsyncStorage.removeItem('access_token');
+      dispatch(logout());
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'auth' }],
+      });
+      console.log('User logged out successfully');
+    } catch (error) {
+      console.log('Error during logout:', error);
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
@@ -243,12 +262,7 @@ const ProfileScreen = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => {
-                  setshowLogoutSheet(false);
-                  console.log(
-                    'User logged out successfully in profileScreen and navigating to Signin',
-                  );
-                }}
+                onPress={handleLogout}
                 style={{
                   ...styles.logoutButtonStyle,
                   ...styles.sheetButtonStyle,

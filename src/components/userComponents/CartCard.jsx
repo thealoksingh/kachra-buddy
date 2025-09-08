@@ -2,20 +2,54 @@ import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'reac
 import React, { useState } from 'react';
 import { Colors, screenWidth, textStyles } from '../../styles/commonStyles';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Key from '../../constants/key';
+import { useDispatch } from 'react-redux';
+import { removeItemFromCart } from '../../store/thunks/userThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
 
-const CartCard = ({ price, type, description, deleteMethod }) => {
-  const [quantity, setQuantity] = useState('');
-  const [weight, setWeight] = useState('');
+const CartCard = ({ cartItem, user }) => {
+  const [quantity, setQuantity] = useState(cartItem?.quantity?.toString() || '');
+  const {API_BASE_URL} = Key;
+  const dispatch = useDispatch();
+  
+  const handleRemoveItem = async () => {
+    try {
+      const response = await dispatch(removeItemFromCart(cartItem?.item?.id));
+      
+      if (removeItemFromCart.fulfilled.match(response)) {
+        await dispatch(
+          showSnackbar({
+            message: 'Item removed from cart successfully!',
+            type: 'success',
+            time: 3000,
+          }),
+        );
+      } else {
+        await dispatch(
+          showSnackbar({
+            message: response?.payload?.message || 'Failed to remove item from cart',
+            type: 'error',
+            time: 5000,
+          }),
+        );
+      }
+    } catch (error) {
+      await dispatch(
+        showSnackbar({ message: 'Error removing item from cart', type: 'error', time: 3000 }),
+      );
+    }
+  };
 
   return (
     <View style={styles.card}>
-       <TouchableOpacity style={styles.deleteBtn} onPress={deleteMethod}>
+       <TouchableOpacity style={styles.deleteBtn} onPress={handleRemoveItem}>
         <MaterialIcons name="delete" size={20} color={Colors.secondary} />
       </TouchableOpacity>
 
       <Image
         source={{
-          uri: 'https://images.unsplash.com/photo-1722695510527-cc033e43be1b?q=80&w=1170&auto=format&fit=crop',
+          uri: API_BASE_URL+cartItem?.item?.imageUrl || 'https://images.unsplash.com/photo-1722695510527-cc033e43be1b?q=80&w=1170&auto=format&fit=crop',
+          headers: { Authorization: `Bearer ${user?.accessToken}` },
         }}
         style={styles.image}
         resizeMode="cover"
@@ -24,40 +58,30 @@ const CartCard = ({ price, type, description, deleteMethod }) => {
       {/* Details Section */}
       <View style={{ flex: 1, paddingHorizontal: 10 }}>
         <Text style={styles.title} numberOfLines={1}>
-          Title here
+          {cartItem?.item?.name || 'Product Title'}
         </Text>
-        <Text style={styles.desc} numberOfLines={2}>
-          {description || 'Description goes here'}
-        </Text>
-
         <Text style={styles.rate}>
-          Rate: {type === 'countable' ? 'per piece' : 'per kg'}
+          ₹{cartItem?.item?.pricePerUnit} / {cartItem?.item?.unit?.toLowerCase()}
         </Text>
 
-        {/* Conditional Input */}
-        {type === 'countable' ? (
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Qty:</Text>
-            <TextInput
-              value={quantity}
-              onChangeText={setQuantity}
-              keyboardType="numeric"
-              placeholder="0"
-              style={styles.input}
-            />
-          </View>
-        ) : (
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>Weight (Kg):</Text>
-            <TextInput
-              value={weight}
-              onChangeText={setWeight}
-              keyboardType="numeric"
-              placeholder="0"
-              style={styles.input}
-            />
-          </View>
-        )}
+        <Text style={styles.price}>
+          Total: ₹{cartItem?.price}
+        </Text>
+
+        {/* Input for quantity */}
+        <View style={styles.inputRow}>
+          <Text style={styles.label}>
+            {cartItem?.item?.countable ? 'Qty:' : 'Weight (Kg):'}
+          </Text>
+          <TextInput
+            value={quantity}
+            onChangeText={setQuantity}
+            keyboardType="numeric"
+            placeholder="0"
+            style={styles.input}
+          />
+          <Text style={styles.unit}>{cartItem?.unit}</Text>
+        </View>
       </View>
     </View>
   );
@@ -98,11 +122,7 @@ const styles = StyleSheet.create({
     ...textStyles.smallBold,
     color: '#222',
   },
-  desc: {
-    ...textStyles.extraSmall,
-    color: Colors.grayColor,
-    marginVertical: 4,
-  },
+
   rate: {
     fontSize: 12,
     color: Colors.primaryColor,
@@ -127,5 +147,16 @@ const styles = StyleSheet.create({
     height: 38,
     flex: 1,
     backgroundColor: '#fafafa',
+  },
+  price: {
+    fontSize: 14,
+    color: Colors.blackColor,
+    fontWeight: 'bold',
+    marginVertical: 2,
+  },
+  unit: {
+    fontSize: 12,
+    color: '#666',
+    marginLeft: 8,
   },
 });
