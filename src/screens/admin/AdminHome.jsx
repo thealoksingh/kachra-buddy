@@ -111,16 +111,16 @@ const adminCards = [
     secondColor: '#ee5a24',
     screen: ''
   },
-  {
-    id: 5,
-    icon: 'cube-outline',
-    title: 'Inventory',
-    bottomTitle: 'Stock Management',
-    description: 'Track and manage recyclable material inventory',
-    firstColor: '#5f27cd',
-    secondColor: '#341f97',
-    screen: ''
-  },
+  // {
+  //   id: 5,
+  //   icon: 'cube-outline',
+  //   title: 'Inventory',
+  //   bottomTitle: 'Stock Management',
+  //   description: 'Track and manage recyclable material inventory',
+  //   firstColor: '#5f27cd',
+  //   secondColor: '#341f97',
+  //   screen: ''
+  // },
   {
     id: 6,
     icon: 'chatbubbles-outline',
@@ -186,7 +186,7 @@ export default function AdminHome() {
       <ScrollView style={styles.mainSection}>
         <MovingIcons icons={icons} />
         <Graph />
-        <AdSlider data={addsData} height={180} />
+        <AdSlider data={addsData} type={"big"} />
         
         {/* Admin Action Cards */}
         <View style={styles.cardsContainer}>
@@ -209,7 +209,7 @@ export default function AdminHome() {
           ))}
         </View>
         <View style={{ marginVertical: 20 }}>
-          <AdSlider data={addsData} height={90} />
+          <AdSlider data={addsData} type={"small"} />
         </View>
 
         <FaddedIcon />

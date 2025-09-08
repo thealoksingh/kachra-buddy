@@ -10,10 +10,14 @@ import {
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const AdSlider = ({ data ,height }) => {
+const AdSlider = ({ data, type }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef(null);
   const indexRef = useRef(currentIndex);
+
+  //(16:9 for big, ~3.5:1 for strip).
+  const width = screenWidth - 60;
+  const height = type === 'big' ? (width * 9) / 16 : width / 3.5;
 
   // Sync ref with state
   useEffect(() => {
@@ -52,16 +56,11 @@ const AdSlider = ({ data ,height }) => {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => (
-          <View
-            style={[
-              styles.adBox,
-              { height: height, width: screenWidth - 60 }, 
-            ]}
-          >
+          <View style={[styles.adBox, { height: height, width: width }]}>
             <Image
               source={{ uri: item.url }}
               style={styles.image}
-              resizeMode="cover" 
+              resizeMode="cover"
             />
             <View style={styles.adLabel}>
               <Text style={styles.adText}>Ad</Text>

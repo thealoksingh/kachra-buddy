@@ -116,7 +116,7 @@ export default function DriverHome() {
 
       <ScrollView style={styles.mainSection}>
         <MovingIcons icons={icons} />
-        <AdSlider data={addsData} height={180} />
+        <AdSlider data={addsData} type={"big"} />
         <View
           style={{
             flexDirection: 'row',
@@ -155,7 +155,7 @@ export default function DriverHome() {
           </TouchableOpacity>
         </View>
         <View style={{ marginVertical: 20 }}>
-          <AdSlider data={addsData} height={90} />
+          <AdSlider data={addsData} type={"small"}/>
         </View>
 
         <FaddedIcon />
