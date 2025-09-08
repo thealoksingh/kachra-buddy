@@ -54,8 +54,8 @@ const CurvedCard = ({
           >
             <Ionicons name={icon} size={28} color={Colors.whiteColor} />
           </View>
-          <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>
-            {title}
+          <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold', textAlign: 'center' }}>
+            {title.length > 12 ? title.split(' ').join('\n') : title}
           </Text>
         </LinearGradient>
       </View>
