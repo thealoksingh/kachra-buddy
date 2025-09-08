@@ -46,9 +46,9 @@ const LoginScreen = () => {
 
   useEffect(() => {
     const backAction = () => {
-      resetStates(); 
-  
-      return true; 
+      resetStates();
+
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
@@ -56,7 +56,7 @@ const LoginScreen = () => {
       backAction,
     );
 
-    return () => backHandler.remove(); 
+    return () => backHandler.remove();
   }, []);
 
 
@@ -132,8 +132,8 @@ const LoginScreen = () => {
       const response = await dispatch(verifyOtp(data));
 
       if (verifyOtp.fulfilled.match(response)) {
-        setIsVerified(true);
-        const status =  response?.payload?.data?.status;
+
+        const status = response?.payload?.data?.status;
         const role = response?.payload?.data?.role;
         await AsyncStorage.setItem(
           "user_id",
@@ -141,15 +141,20 @@ const LoginScreen = () => {
         );
         //Saving accessToken in async storage
 
-          const user_id = await AsyncStorage.getItem("user_id");
-          console.log("user id after storing in async storage", user_id);
-           await AsyncStorage.setItem(
+        const user_id = await AsyncStorage.getItem("user_id");
+        console.log("user id after storing in async storage", user_id);
+        await AsyncStorage.setItem(
           "access_token",
           String(response?.payload?.data?.accessToken)
         );
         console.log("user id and accessToken stored in async storage");
         setIsActive(status.toLowerCase() === 'active');
-        navigation.replace(role.toLowerCase());
+        if (status.toLowerCase() === 'active') {
+          navigation.replace(role.toLowerCase());
+          return;
+        }
+
+        setIsVerified(true);
         await dispatch(
           showSnackbar({
             message: response?.payload?.message,
@@ -214,9 +219,9 @@ const LoginScreen = () => {
 
   return (
     <ScrollView
-    contentContainerStyle={{ flexGrow: 1 }}
-  showsVerticalScrollIndicator={false}
-    style={styles.container}>
+      contentContainerStyle={{ flexGrow: 1 }}
+      showsVerticalScrollIndicator={false}
+      style={styles.container}>
       <MyStatusBar />
 
       {/* Logo Section */}
@@ -234,10 +239,10 @@ const LoginScreen = () => {
           {!otpSent
             ? 'Sign In'
             : !isVerified
-            ? 'Enter OTP'
-            : !isActive
-            ? 'Sign Up'
-            : ''}
+              ? 'Enter OTP'
+              : !isActive
+                ? 'Sign Up'
+                : ''}
         </Text>
 
         {/* Phone Input */}

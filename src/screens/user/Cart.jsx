@@ -5,10 +5,58 @@ import CartCard from "../../components/userComponents/CartCard";
 import { Colors, Fonts } from '../../styles/commonStyles';
 import { ButtonWithLoader } from '../../components/commonComponents';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectCart, selectUser } from '../../store/selector';
+import { checkoutCart } from '../../store/thunks/userThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
 
 const Cart = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
+  const user = useSelector(selectUser);
+  const cart = useSelector(selectCart);
+  const dispatch = useDispatch();
+
+  // Calculate totals dynamically
+  const subtotal = cart?.cartItems?.reduce((sum, item) => sum + (item.price || 0), 0) || 0;
+  const gstRate = 0.18; // 18% GST
+  const gstAmount = subtotal * gstRate;
+  const total = subtotal + gstAmount;
+
+  // Handle checkout method
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      const response = await dispatch(checkoutCart());
+      
+      if (checkoutCart.fulfilled.match(response)) {
+        await dispatch(
+          showSnackbar({
+            message: 'Order created successfully!',
+            type: 'success',
+            time: 3000,
+          }),
+        );
+        // Navigate with order data
+        navigation.navigate('checkoutScreen', { orderData: response?.payload?.data });
+        console.log("Order Data:", response?.payload?.data);
+      } else {
+        await dispatch(
+          showSnackbar({
+            message: response?.payload?.message || 'Failed to create order',
+            type: 'error',
+            time: 5000,
+          }),
+        );
+      }
+    } catch (error) {
+      await dispatch(
+        showSnackbar({ message: 'Error creating order', type: 'error', time: 3000 }),
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -17,10 +65,9 @@ const Cart = () => {
       {/* Cart Items */}
       <ScrollView contentContainerStyle={{ paddingBottom: 150 }}>
         <View style={styles.itemsContainer}>
-          <CartCard />
-          <CartCard />
-          <CartCard />
-          <CartCard />
+          {cart?.cartItems?.map((item, index) => (
+            <CartCard key={index} cartItem={item} user={user} />
+          ))}
         </View>
       </ScrollView>
 
@@ -29,15 +76,15 @@ const Cart = () => {
         <View style={styles.calculationContainer}>
           <View style={styles.row}>
             <Text style={styles.label}>Subtotal</Text>
-            <Text style={styles.value}>₹1200</Text>
+            <Text style={styles.value}>₹{subtotal.toFixed(2)}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Tax</Text>
-            <Text style={styles.value}>₹100</Text>
+            <Text style={styles.label}>GST (18%)</Text>
+            <Text style={styles.value}>₹{gstAmount.toFixed(2)}</Text>
           </View>
           <View style={[styles.row, { marginTop: 8 }]}>
             <Text style={[styles.label, { fontFamily: Fonts.bold }]}>Total</Text>
-            <Text style={[styles.value, { fontFamily: Fonts.bold }]}>₹1300</Text>
+            <Text style={[styles.value, { fontFamily: Fonts.bold }]}>₹{total.toFixed(2)}</Text>
           </View>
         </View>
 
@@ -45,13 +92,7 @@ const Cart = () => {
           name="Continue"
           loadingName="Processing..."
           isLoading={loading}
-          method={() => {
-            setLoading(true);
-            setTimeout(() => {
-              setLoading(false);
-              navigation.navigate('checkoutScreen'); 
-            }, 1500);
-          }}
+          method={handleCheckout}
         />
       </View>
     </View>

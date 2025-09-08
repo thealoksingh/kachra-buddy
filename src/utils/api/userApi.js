@@ -70,3 +70,57 @@ export const deleteProfilePicAPI = async (data) => {
     accessToken,
   });
 };
+
+export const fetchItemsAPI = async () => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiGetRequest({
+    apiUrl: `${API_BASE_URL}/items`,
+    content_type: "application/json",
+    data: null,
+    accessToken,
+  });
+};
+
+// API call for getting user's cart
+export const fetchCartAPI = async () => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiGetRequest({
+    apiUrl: `${API_BASE_URL}/cart/my-cart`,
+    content_type: "application/json",
+    data: null,
+    accessToken,
+  });
+};
+
+// API call for adding item to cart
+export const addItemToCartAPI = async (data) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiPostRequest({
+    apiUrl: `${API_BASE_URL}/cart/add-item?itemId=${data.itemId}&quantity=${data.quantity}&unit=${data.unit}`,
+    content_type: "application/json",
+    data: null,
+    accessToken,
+  });
+};
+
+// API call for removing item from cart
+export const removeItemFromCartAPI = async (itemId) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiDeleteRequest({
+    apiUrl: `${API_BASE_URL}/cart/remove-items?itemId=${itemId}`,
+    content_type: "application/json",
+    data: null,
+    accessToken,
+  });
+};
+
+// API call for checkout cart items
+export const checkoutCartAPI = async () => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiPostRequest({
+    apiUrl: `${API_BASE_URL}/cart/checkout-items`,
+    content_type: "application/json",
+    data: null,
+    accessToken,
+  });
+};
