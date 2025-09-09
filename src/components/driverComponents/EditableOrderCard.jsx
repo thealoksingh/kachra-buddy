@@ -3,16 +3,26 @@ import React, { useState } from 'react';
 import { Colors, screenWidth, textStyles } from '../../styles/commonStyles';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const EditableOrderCard = ({ price, type, description, deleteMethod }) => {
-  const [quantity, setQuantity] = useState('');
-  const [weight, setWeight] = useState('');
+const EditableOrderCard = ({ price, type, itemName, quantity: initialQuantity, unit, orderItem, onQuantityChange }) => {
+  const [quantity, setQuantity] = useState(initialQuantity?.toString() || '');
+  const [weight, setWeight] = useState(initialQuantity?.toString() || '');
+
+  const handleQuantityChange = (value) => {
+    setQuantity(value);
+    onQuantityChange?.(value);
+  };
+
+  const handleWeightChange = (value) => {
+    setWeight(value);
+    onQuantityChange?.(value);
+  };
 
   return (
     <View style={styles.card}>
      
       <Image
         source={{
-          uri: 'https://images.unsplash.com/photo-1722695510527-cc033e43be1b?q=80&w=1170&auto=format&fit=crop',
+          uri: orderItem?.item?.imageUrl ? `${require('../../constants/key').default.API_BASE_URL}${orderItem.item.imageUrl}` : 'https://images.unsplash.com/photo-1722695510527-cc033e43be1b?q=80&w=1170&auto=format&fit=crop',
         }}
         style={styles.image}
         resizeMode="cover"
@@ -21,11 +31,11 @@ const EditableOrderCard = ({ price, type, description, deleteMethod }) => {
       {/* Details Section */}
       <View style={{ flex: 1, paddingHorizontal: 10 }}>
         <Text style={styles.title} numberOfLines={1}>
-          Title here
+          {itemName || 'Item Name'}
         </Text>
       
         <Text style={styles.rate}>
-          Rate: 100  {type === 'countable' ? 'per piece' : 'per kg'}
+          Rate: ₹{orderItem?.item?.pricePerUnit || price}  {type === 'countable' ? 'per piece' : `per ${orderItem?.item?.unit || 'kg'}`}
         </Text>
 
         {/* Conditional Input */}
@@ -34,7 +44,7 @@ const EditableOrderCard = ({ price, type, description, deleteMethod }) => {
             <Text style={styles.label}>Qty:</Text>
             <TextInput
               value={quantity}
-              onChangeText={setQuantity}
+              onChangeText={handleQuantityChange}
               keyboardType="numeric"
               placeholder="0"
               style={styles.input}
@@ -45,7 +55,7 @@ const EditableOrderCard = ({ price, type, description, deleteMethod }) => {
             <Text style={styles.label}>W(Kg)</Text>
             <TextInput
               value={weight}
-              onChangeText={setWeight}
+              onChangeText={handleWeightChange}
               keyboardType="numeric"
               placeholder="0"
               style={styles.input}

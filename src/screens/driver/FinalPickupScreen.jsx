@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from 'react-native';
 import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Colors } from '../../styles/commonStyles';
 import {
   ButtonWithLoader,
@@ -22,23 +22,22 @@ import ImagePickerSheet from '../../components/ImagePickerSheet';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
 import MyStatusBar from '../../components/MyStatusBar';
 import EditableOrderCard from '../../components/driverComponents/EditableOrderCard';
+import ItemSelectionModal from '../../components/driverComponents/ItemSelectionModal';
+import { sendPickupOtpAPI } from '../../utils/api/driverApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateDriverOrder, fetchAllItems, addItemsToOrder } from '../../store/thunks/driverThunk';
+import { selectDriverLoader, selectDriverItems } from '../../store/selector';
 
-const orders = [
-  {
-    price: 100,
-    type: 'countable',
-    description: 'Fresh apples',
-  },
-  {
-    price: 250,
-    type: 'weighable',
-    description: 'Premium Basmati Rice',
-  },
-];
+
 
 const FinalPickupScreen = () => {
   const navigation = useNavigation();
-  const [loading, setLoading] = useState(false);
+  const route = useRoute();
+  const dispatch = useDispatch();
+  const { currentOrder } = route.params || {};
+  const loading = useSelector(selectDriverLoader);
+  const availableItems = useSelector(selectDriverItems);
+  const [otpLoading, setOtpLoading] = useState(false);
   const [failureAlertVisible, setFailureAlertVisible] = useState(false);
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
   const [givenAmount, setGivenAmount] = useState(null);
@@ -46,14 +45,105 @@ const FinalPickupScreen = () => {
   const [images, setImages] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
   const [otpInput, setOtpInput] = useState('');
-  const [otpSent, setOtpSent] = useState(true);
+  const [otpSent, setOtpSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const [updatedQuantities, setUpdatedQuantities] = useState({});
+  const [additionalItems, setAdditionalItems] = useState([]);
+  const [showItemsModal, setShowItemsModal] = useState(false);
 
   //removable in future
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
   const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
 
   const { openCamera, openGallery } = useImagePicker();
+
+  React.useEffect(() => {
+    dispatch(fetchAllItems());
+  }, [dispatch]);
+
+  const addAdditionalItem = (item, quantity) => {
+    const newItem = {
+      item,
+      quantity: parseFloat(quantity),
+      price: item.pricePerUnit * parseFloat(quantity)
+    };
+    setAdditionalItems(prev => [...prev, newItem]);
+  };
+
+  const removeAdditionalItem = (index) => {
+    setAdditionalItems(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleQuantityChange = (orderItemId, newQuantity) => {
+    setUpdatedQuantities(prev => ({
+      ...prev,
+      [orderItemId]: parseFloat(newQuantity) || 0
+    }));
+  };
+
+  const calculateTotalPrice = () => {
+    const originalTotal = currentOrder?.orderItems?.reduce((total, orderItem) => {
+      const quantity = updatedQuantities[orderItem.id] ?? orderItem.quantity;
+      return total + (quantity * orderItem.item.pricePerUnit);
+    }, 0) || 0;
+    
+    const additionalTotal = additionalItems.reduce((total, item) => {
+      return total + item.price;
+    }, 0);
+    
+    return originalTotal + additionalTotal;
+  };
+
+  const sendOtp = async () => {
+    setOtpLoading(true);
+    try {
+      await sendPickupOtpAPI(currentOrder.id);
+      setOtpSent(true);
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      setFailureAlertVisible(true);
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const submitOrder = async () => {
+    const updatedOrderItems = currentOrder.orderItems.map(item => ({
+      ...item,
+      quantity: updatedQuantities[item.id] ?? item.quantity
+    }));
+    
+    // Add additional items if any
+    if (additionalItems.length > 0) {
+      await dispatch(addItemsToOrder({
+        orderId: currentOrder.id,
+        items: additionalItems
+      }));
+    }
+    
+    const orderData = {
+      orderItems: [...updatedOrderItems, ...additionalItems],
+      finalPrice: calculateTotalPrice(),
+      remark: remark,
+    };
+    
+    const result = await dispatch(updateDriverOrder({
+      orderId: currentOrder.id,
+      orderData,
+      postedBy: 'DRIVER',
+      otp: otpInput,
+      images
+    }));
+    
+    if (updateDriverOrder.fulfilled.match(result)) {
+      setSuccessAlertVisible(true);
+      setTimeout(() => {
+        navigation.pop(2); // Go back 2 steps
+      }, 2000);
+    } else {
+      setFailureAlertVisible(true);
+    }
+  };
 
   const pickImage = async source => {
     try {
@@ -97,13 +187,43 @@ const FinalPickupScreen = () => {
 
       <View style={{ flex: 1, marginBottom: 20, marginHorizontal: 10 }}>
         <View style={{ padding: 0, margin: 12 }}>
-          {orders.map((item, idx) => (
+          {currentOrder?.orderItems?.map((orderItem, idx) => (
             <EditableOrderCard
-              key={idx}
-              price={item.price}
-              type={item.type}
+              key={orderItem.id || idx}
+              price={orderItem.price}
+              type={orderItem.item.countable ? 'countable' : 'weighable'}
+              itemName={orderItem.item.name}
+              quantity={orderItem.quantity}
+              unit={orderItem.unit}
+              orderItem={orderItem}
+              onQuantityChange={(newQuantity) => handleQuantityChange(orderItem.id, newQuantity)}
             />
           ))}
+        </View>
+        
+        <View style={styles.formCard}>
+          <Text style={styles.sectionLabel}>Additional Items Found</Text>
+          <TouchableOpacity 
+            style={styles.addItemBtn}
+            onPress={() => setShowItemsModal(true)}
+          >
+            <Text style={styles.addItemText}>+ Add Items</Text>
+          </TouchableOpacity>
+          
+          {additionalItems.map((item, index) => (
+            <View key={index} style={styles.additionalItemRow}>
+              <Text style={styles.itemName}>{item.item.name}</Text>
+              <Text style={styles.itemQuantity}>Qty: {item.quantity}</Text>
+              <Text style={styles.itemPrice}>₹{item.price.toFixed(2)}</Text>
+              <TouchableOpacity onPress={() => removeAdditionalItem(index)}>
+                <Text style={styles.removeItemText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+        
+        <View style={styles.priceCard}>
+          <Text style={styles.priceLabel}>Total Price: ₹{calculateTotalPrice().toFixed(2)}</Text>
         </View>
         <View style={styles.formCard}>
           <InputBox
@@ -173,29 +293,17 @@ const FinalPickupScreen = () => {
           {!otpSent && !isVerified && (
             <ButtonWithLoader
               name="Send OTP"
-              loadingName="Processing..."
-              isLoading={loading}
-              method={() => {
-                setLoading(true);
-                setTimeout(() => {
-                  setLoading(false);
-                  navigation.navigate('checkoutScreen');
-                }, 500);
-              }}
+              loadingName="Sending OTP..."
+              isLoading={otpLoading}
+              method={sendOtp}
             />
           )}
           {otpSent && !isVerified && (
             <ButtonWithLoader
               name="Submit"
-              loadingName="Processing..."
+              loadingName="Submitting..."
               isLoading={loading}
-              method={() => {
-                setLoading(true);
-                setTimeout(() => {
-                  setLoading(false);
-                  navigation.navigate('checkoutScreen');
-                }, 500);
-              }}
+              method={submitOrder}
             />
           )}
         </View>
@@ -218,7 +326,7 @@ const FinalPickupScreen = () => {
       {succesAlertVisible && (
         <LottieAlert
           type="success"
-          message="Order Cancelled Successfuly"
+          message="Order Updated Successfully"
           loop={false}
           onClose={() => {
             setSuccessAlertVisible(false);
@@ -229,7 +337,7 @@ const FinalPickupScreen = () => {
       {failureAlertVisible && (
         <LottieAlert
           type="failure"
-          message="Order Cancellation Failed ,Try Again "
+          message="Operation Failed, Try Again"
           loop={false}
           onClose={() => {
             setFailureAlertVisible(false);
@@ -237,6 +345,13 @@ const FinalPickupScreen = () => {
           autoClose={true}
         />
       )}
+      
+      <ItemSelectionModal 
+        visible={showItemsModal}
+        items={availableItems}
+        onClose={() => setShowItemsModal(false)}
+        onAddItem={addAdditionalItem}
+      />
     </ScrollView>
   );
 };
@@ -308,5 +423,59 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: Colors.primary,
     fontWeight: 'bold',
+  },
+  priceCard: {
+    margin: 12,
+    padding: 16,
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  priceLabel: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.whiteColor,
+  },
+  addItemBtn: {
+    backgroundColor: Colors.primary,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  addItemText: {
+    color: Colors.whiteColor,
+    fontWeight: '600',
+  },
+  additionalItemRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 8,
+    backgroundColor: Colors.extraLightGrayColor,
+    borderRadius: 8,
+    marginBottom: 5,
+  },
+  itemName: {
+    flex: 2,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  itemQuantity: {
+    flex: 1,
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  itemPrice: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'right',
+  },
+  removeItemText: {
+    color: Colors.redColor,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 10,
   },
 });

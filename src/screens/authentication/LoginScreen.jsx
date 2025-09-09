@@ -190,6 +190,7 @@ const LoginScreen = () => {
     try {
       const response = await dispatch(completeUserProfile(data));
       console.log("response from completeUserProfile", response?.payload);
+        const role = response?.payload?.data?.role;
       if (completeUserProfile.fulfilled.match(response)) {
         await dispatch(
           showSnackbar({
@@ -198,7 +199,7 @@ const LoginScreen = () => {
             time: 3000,
           }),
         );
-        // navigation.replace('home');
+        navigation.replace(role.toLowerCase());
       } else {
         await dispatch(
           showSnackbar({

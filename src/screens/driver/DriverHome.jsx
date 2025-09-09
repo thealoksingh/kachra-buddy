@@ -29,6 +29,9 @@ import { products, addsData } from '../../utils/dummyData';
 import { FaddedIcon } from '../../components/commonComponents';
 import CurvedCard from '../../screens/driver/CurvedCard';
 import {fetchAddressFromCoordinates, getUserLocation} from "../../utils/CommonMethods";
+import { useSelector, useDispatch } from 'react-redux';
+import { selectUser } from '../../store/selector';
+import { fetchDriverOrders } from '../../store/thunks/driverThunk';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -68,8 +71,11 @@ export const icons = [
 ];
 
 export default function DriverHome() {
-   const navigation = useNavigation();
-   const [userAddress, setUserAddress] = useState('Getting location...');
+  const user = useSelector(selectUser);
+  const dispatch = useDispatch();
+  console.log("user in driver home", user);
+  const navigation = useNavigation();
+  const [userAddress, setUserAddress] = useState('Getting location...');
 
   useEffect(() => {
     getUserLocation(
@@ -82,7 +88,12 @@ export default function DriverHome() {
         console.log('Error:', error);
       }
     );
-  }, []);
+    
+    // Fetch driver orders when user is present
+    if (user) {
+      dispatch(fetchDriverOrders());
+    }
+  }, [user, dispatch]);
 
   return (
     <LinearGradient
@@ -102,7 +113,7 @@ export default function DriverHome() {
             style={styles.profileImage}
           />
           <View>
-            <Text style={styles.userName}>Alok Singh</Text>
+            <Text style={styles.userName}>{user?.fullName || 'Driver'}</Text>
             <Text
               style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
             >

@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authSlice from './slices/authSlice';
 import userSlice from './slices/userSlice';
-import driverSlice from './slices/driverSlice';
+import driverReducer from './slices/driverSlice';
 import adminSlice from './slices/adminSlice';
 import snackbarSlice from './slices/snackbarSlice';
 import snackbarReducer, { showSnackbar } from "../store/slices/snackbarSlice";
@@ -14,7 +14,7 @@ export const store = configureStore({
   reducer: {
     auth: authReducer,
     user: userSlice,
-    driver: driverSlice,
+    driver: driverReducer,
     admin: adminSlice,
     snackbar: snackbarReducer,
   },

@@ -21,13 +21,38 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MyStatusBar from '../../components/MyStatusBar';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectUser } from '../../store/selector';
+import { logout } from '../../store/slices/authSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Key from '../../constants/key';
 
 const DriverProfileScreen = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
   const [showLogoutSheet, setshowLogoutSheet] = useState(false);
-  const [avatar, setAvatar] = useState(null);
   const navigation = useNavigation();
+  const user = useSelector(selectUser);
+  const dispatch = useDispatch();
+  const { API_BASE_URL } = Key;
+  
+  const avatar = user?.avatarUrl ? API_BASE_URL + user.avatarUrl : null;
+  
+  const handleLogout = async () => {
+    try {
+      setshowLogoutSheet(false);
+      await AsyncStorage.removeItem('user_id');
+      await AsyncStorage.removeItem('access_token');
+      dispatch(logout());
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'auth' }],
+      });
+      console.log('Driver logged out successfully');
+    } catch (error) {
+      console.log('Error during logout:', error);
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
@@ -60,13 +85,21 @@ const DriverProfileScreen = () => {
       <View style={styles.profileInfoWithOptionsWrapStyle}>
         <TouchableOpacity
           onPress={() => {
-            setPreviewImage(image);
+            setPreviewImage(avatar);
             setFullImageModalVisible(true);
           }}
           style={{ alignItems: 'center' }}
         >
           {avatar ? (
-            <Image source={{ uri: avatar }} style={styles.userImageStyle} />
+            <Image 
+              source={{ 
+                uri: avatar,
+                headers: {
+                  Authorization: `Bearer ${user?.accessToken}`,
+                }
+              }} 
+              style={styles.userImageStyle} 
+            />
           ) : (
             <View style={styles.userIconStyle}>
               <Icon name="person-off" size={60} color="#e0e0eb" />
@@ -81,8 +114,8 @@ const DriverProfileScreen = () => {
             marginBottom: Sizes.fixPadding,
           }}
         >
-          <Text style={{ ...Fonts.blackColor18SemiBold }}>Alok Singh</Text>
-          <Text style={{ ...Fonts.grayColor16Medium }}>+91 985678876</Text>
+          <Text style={{ ...Fonts.blackColor18SemiBold }}>{user?.fullName || 'Driver'}</Text>
+          <Text style={{ ...Fonts.grayColor16Medium }}>+91 {user?.contactNumber || 'N/A'}</Text>
         </View>
         <View>
           {profileOption({
@@ -237,12 +270,7 @@ const DriverProfileScreen = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => {
-                  setshowLogoutSheet(false);
-                  console.log(
-                    'User logged out successfully in profileScreen and navigating to Signin',
-                  );
-                }}
+                onPress={handleLogout}
                 style={{
                   ...styles.logoutButtonStyle,
                   ...styles.sheetButtonStyle,

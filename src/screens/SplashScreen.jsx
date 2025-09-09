@@ -10,15 +10,15 @@ export default function SplashScreen({ navigation }) {
   useEffect(() => {
     const timer = setTimeout(() => {
 
-      if(user && user?.role === "USER" && user?.status === "ACTIVE") {
-      // if(true){
-      // For now,
-      console.log("navigating to user");
-        navigation.replace("driver");
-      } else if(user && user?.role === "ADMIN" && user?.status === "ACTIVE") {
+      if (user && user?.role === "USER" && user?.status === "ACTIVE") {
+        // if(true){
+        // For now,
+        console.log("navigating to user");
+        navigation.replace("user");
+      } else if (user && user?.role === "ADMIN" && user?.status === "ACTIVE") {
         console.log("navigating to admin");
         navigation.replace("admin");
-      } else if(user && user?.role === "DRIVER" && user?.status === "ACTIVE") {
+      } else if (user && user?.role === "DRIVER" && user?.status === "ACTIVE") {
         console.log("navigating to driver");
         navigation.replace("driver");
       } else {

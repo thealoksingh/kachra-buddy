@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { completeProfileAPI, getUserByIdAPI, updateProfilePicAPI, updateUserAPI, fetchItemsAPI, fetchCartAPI, addItemToCartAPI, removeItemFromCartAPI, checkoutCartAPI, updateOrderAPI, fetchOrdersAPI, getOrderByIdAPI } from '../../utils/api/userApi';
+import { completeProfileAPI, getUserByIdAPI, updateProfilePicAPI, updateUserAPI, fetchItemsAPI, fetchCartAPI, addItemToCartAPI, removeItemFromCartAPI, checkoutCartAPI, updateOrderAPI, fetchOrdersAPI, getOrderByIdAPI, cancelOrderAPI } from '../../utils/api/userApi';
 import { handleAxiosError } from '../../utils/handleAxiosError';
 
 // Thunk for sending OTP
@@ -148,6 +148,19 @@ export const getOrderById = createAsyncThunk(
   async (orderId, thunkAPI) => {
     try {
       const response = await getOrderByIdAPI(orderId);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for canceling order
+export const cancelOrder = createAsyncThunk(
+  "user/cancelOrder",
+  async (orderId, thunkAPI) => {
+    try {
+      const response = await cancelOrderAPI(orderId);
       return response?.data;
     } catch (error) {
       return handleAxiosError(error, thunkAPI);

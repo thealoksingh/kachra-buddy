@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,59 +12,59 @@ import {
 import { CommonAppBar, FaddedIcon } from '../../components/commonComponents';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
 import { Colors, commonStyles, textStyles } from '../../styles/commonStyles';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { WarningWithButton } from '../../components/lottie/WarningWithButton';
 import { DottedBlackLoader } from '../../components/lottie/loaderView';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { openGoogleMaps, callUser } from '../../utils/CommonMethods';
 import MyStatusBar from '../../components/MyStatusBar';
+import { getOrderByIdAPI } from '../../utils/api/driverApi';
+import Key from '../../constants/key';
 const { width } = Dimensions.get('window');
 const PickupRequestDetail = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { orderId } = route.params || {};
+  
+  const [currentOrder, setCurrentOrder] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
   const [failureAlertVisible, setFailureAlertVisible] = useState(false);
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const flatListRef = useRef();
+  
+  const fetchOrderDetails = async () => {
+    if (!orderId) return;
+    
+    setLoading(true);
+    try {
+      const response = await getOrderByIdAPI(orderId);
+      setCurrentOrder(response?.data?.data || response?.data);
+    } catch (error) {
+      console.error('Error fetching order:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
+    fetchOrderDetails();
+  }, [orderId]);
 
-  const images = [
-    'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  ];
-
-  const items = [
-    {
-      id: 1,
-      image:
-        'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      title: 'Wooden Chair',
-      desc: 'Premium oak chair',
-      qty: 2,
-      weight: '15kg',
-    },
-    {
-      id: 2,
-      image:
-        'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      title: 'Table Lamp',
-      desc: 'White desk lamp',
-      qty: 1,
-      weight: '3kg',
-    },
-    {
-      id: 3,
-      image:
-        'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      title: 'Cardboard Boxes',
-      desc: 'Set of 10 packing boxes',
-      qty: 10,
-      weight: '20kg',
-    },
-  ];
+  const images = currentOrder?.orderImages?.map(img => `${Key.API_BASE_URL}${img.imageUrl}`) || [];
+  const orderItems = currentOrder?.orderItems || [];
+  const user = currentOrder?.user;
+  const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+  
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
@@ -72,39 +72,53 @@ const PickupRequestDetail = () => {
       <CommonAppBar navigation={navigation} label="Pickup Request Detail" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <FlatList
-          ref={flatListRef}
-          data={images}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(_, i) => i.toString()}
-          onMomentumScrollEnd={e => {
-            const index = Math.round(e.nativeEvent.contentOffset.x / width);
-            setActiveIndex(index);
-          }}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={() => {
-                setPreviewImage(item);
-                setPreviewVisible(true);
-              }}
-            >
-              <Image source={{ uri: item }} style={styles.image} />
-            </TouchableOpacity>
-          )}
-        />
+        {images.length > 0 ? (
+          <FlatList
+            ref={flatListRef}
+            data={images}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(_, i) => i.toString()}
+            onMomentumScrollEnd={e => {
+              const index = Math.round(e.nativeEvent.contentOffset.x / width);
+              setActiveIndex(index);
+            }}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => {
+                  setPreviewImage(item);
+                  setPreviewVisible(true);
+                }}
+              >
+                <Image 
+                  source={{ 
+                    uri: item,
+                    headers: { Authorization: `Bearer ${Key.ACCESS_TOKEN}` }
+                  }} 
+                  style={styles.image} 
+                />
+              </TouchableOpacity>
+            )}
+          />
+        ) : (
+          <View style={[styles.image, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f0f0' }]}>
+            <Text style={{ color: '#666' }}>No images available</Text>
+          </View>
+        )}
 
-        <View style={styles.dotsContainer}>
-          {images.map((_, i) => (
-            <View
-              key={i}
-              style={[styles.dot, activeIndex === i && styles.activeDot]}
-            />
-          ))}
-        </View>
-        {true && (
+        {images.length > 1 && (
+          <View style={styles.dotsContainer}>
+            {images.map((_, i) => (
+              <View
+                key={i}
+                style={[styles.dot, activeIndex === i && styles.activeDot]}
+              />
+            ))}
+          </View>
+        )}
+        {user && (
           <>
             <View style={styles.headingSection}>
               <Text style={styles.sectionTitle}>User Detail</Text>
@@ -112,13 +126,14 @@ const PickupRequestDetail = () => {
             <View style={styles.userCard}>
               <Image
                 source={{
-                  uri: 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                  uri: user?.avatarUrl ? `${Key.API_BASE_URL}${user?.avatarUrl}` : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                  headers: user?.avatarUrl ? { Authorization: `Bearer ${user?.accessToken}` } : undefined
                 }}
                 style={styles.userImage}
               />
               <View style={{ marginLeft: 12 }}>
-                <Text style={styles.userName}>User name</Text>
-                <Text style={styles.userPhone}>+91 98765 43210</Text>
+                <Text style={styles.userName}>{user.fullName || 'N/A'}</Text>
+                <Text style={styles.userPhone}>{user.contactNumber || 'N/A'}</Text>
               </View>
             </View>
           </>
@@ -130,20 +145,19 @@ const PickupRequestDetail = () => {
         <View style={styles.itemsSection}>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Items</Text>
-            <Text style={textStyles.small}>7</Text>
+            <Text style={textStyles.small}>{totalItems}</Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Pickup Date Time</Text>
-            <Text style={textStyles.small}>7/10/25 10AM</Text>
+            <Text style={textStyles.small}>{formatDate(currentOrder?.pickupDate)}</Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Pickup Status</Text>
-            <Text style={textStyles.small}>Pending</Text>
+            <Text style={textStyles.small}>{currentOrder?.status || 'N/A'}</Text>
           </View>
-
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Expected Price</Text>
-            <Text style={textStyles.small}>₹120</Text>
+            <Text style={textStyles.small}>₹{currentOrder?.finalPrice || 0}</Text>
           </View>
         </View>
         <View style={styles.headingSection}>
@@ -152,31 +166,20 @@ const PickupRequestDetail = () => {
         <View style={{ padding: 10 }}>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Customer Name</Text>
-            <Text style={textStyles.small}> Ravi KUmar</Text>
+            <Text style={textStyles.small}>{currentOrder?.sellerName || 'N/A'}</Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Customer Mobile Number</Text>
-            <Text style={textStyles.small}>+91 9708571269</Text>
+            <Text style={textStyles.small}>{currentOrder?.sellerContactNo || 'N/A'}</Text>
           </View>
-
           <Text
             style={[
               textStyles.small,
-              { flex: 1, textAlign: 'right', textAlign: 'justify' },
-            ]}
-          >
-            <Text style={textStyles.smallBold}>Landmark: </Text>
-            221B Baker Street, London 221B Baker Street,
-          </Text>
-          <Text
-            style={[
-              textStyles.small,
-              { flex: 1, textAlign: 'right', textAlign: 'justify' },
+              { flex: 1, textAlign: 'justify', marginTop: 8 },
             ]}
           >
             <Text style={textStyles.smallBold}>Address: </Text>
-            221B Baker Street, London 221B Baker Street, London 221B Baker
-            Street, London 221B Baker Street, London 221B Baker Street, London
+            {currentOrder?.orderPickupAddress || currentOrder?.pickupAddress || 'N/A'}
           </Text>
           <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
             <TouchableOpacity
@@ -190,7 +193,10 @@ const PickupRequestDetail = () => {
                   gap: 6,
                 },
               ]}
-              onPress={() => openGoogleMaps(28.6139, 77.209)} // pass dynamic coords here
+              onPress={() => openGoogleMaps(
+                currentOrder?.orderPickupLatitude || 28.6139, 
+                currentOrder?.orderPickupLongitude || 77.209
+              )}
             >
               <Ionicons name="map-outline" size={18} color={Colors.secondary} />
               <Text
@@ -199,7 +205,6 @@ const PickupRequestDetail = () => {
                 Get Direction
               </Text>
             </TouchableOpacity>
-
             <TouchableOpacity
               activeOpacity={0.8}
               style={[
@@ -212,7 +217,7 @@ const PickupRequestDetail = () => {
                   gap: 6,
                 },
               ]}
-              onPress={() => callUser('9876543210')}
+              onPress={() => callUser(currentOrder?.sellerContactNo?.replace(/[^0-9]/g, '') || '9876543210')}
             >
               <Ionicons
                 name="call-outline"
@@ -232,14 +237,20 @@ const PickupRequestDetail = () => {
           <Text style={styles.sectionTitle}>Item In this Booking</Text>
         </View>
         <View style={styles.itemsSection}>
-          {items.map(item => (
-            <View key={item.id} style={styles.itemCard}>
-              <Image source={{ uri: item.image }} style={styles.itemImage} />
+          {orderItems.map(orderItem => (
+            <View key={orderItem.id} style={styles.itemCard}>
+              <Image 
+                source={{ 
+                  uri: orderItem.item.imageUrl ? `${Key.API_BASE_URL}${orderItem.item.imageUrl}` : 'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                  headers: orderItem.item.imageUrl ? { Authorization: `Bearer ${Key.ACCESS_TOKEN}` } : undefined
+                }} 
+                style={styles.itemImage} 
+              />
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.itemTitle}>{item.title}</Text>
-                <Text style={styles.itemDesc}>{item.desc}</Text>
+                <Text style={styles.itemTitle}>{orderItem.item.name}</Text>
+                <Text style={styles.itemDesc}>₹{orderItem.item.pricePerUnit} per {orderItem.item.unit}</Text>
                 <Text style={styles.itemInfo}>
-                  Qty: {item.qty} | {item.weight}
+                  Qty: {orderItem.quantity} {orderItem.unit} | ₹{orderItem.price}
                 </Text>
               </View>
             </View>
@@ -248,7 +259,7 @@ const PickupRequestDetail = () => {
 
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => navigation.navigate('finalPickupScreen')}
+          onPress={() => navigation.navigate('finalPickupScreen', { currentOrder })}
           style={[styles.outlinedBtn, { borderColor: Colors.primary }]}
         >
           <Text style={[styles.outlinedBtnText, { color: Colors.primary }]}>
@@ -278,7 +289,7 @@ const PickupRequestDetail = () => {
           onClose={() => setWarningVisible(false)}
         />
       )}
-      {isLoading && <DottedBlackLoader />}
+      {loading && <DottedBlackLoader />}
       {succesAlertVisible && (
         <LottieAlert
           type="success"

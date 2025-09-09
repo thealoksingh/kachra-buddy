@@ -123,8 +123,7 @@ export const checkoutCartAPI = async () => {
     data: null,
     accessToken,
   });
-};
-
+}; 
 // API call for updating order with images
 export const updateOrderAPI = async (data) => {
   const accessToken = await AsyncStorage.getItem("access_token");
@@ -169,6 +168,17 @@ export const getOrderByIdAPI = async (orderId) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiGetRequest({
     apiUrl: `${API_BASE_URL}/api/orders/${orderId}`,
+    content_type: "application/json",
+    data: null,
+    accessToken,
+  });
+};
+
+// API call for canceling order
+export const cancelOrderAPI = async (orderId) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiPatchRequest({
+    apiUrl: `${API_BASE_URL}/api/orders/${orderId}/cancel`,
     content_type: "application/json",
     data: null,
     accessToken,

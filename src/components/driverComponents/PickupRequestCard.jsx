@@ -8,32 +8,81 @@ import {
   Sizes,
   textStyles,
 } from '../../styles/commonStyles';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectUser } from '../../store/selector';
+import { outForPickup, outForDelivery } from '../../store/thunks/driverThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
+import Key from '../../constants/key';
 
 const PickupRequestCard = ({ booking }) => {
   const navigation = useNavigation();
-  const {
-    address,
-    status,
-    pickupStatus,
-    driverStatus,
-    pickupDateTime,
-    items,
-    expectedPrice,
-    images,
-  } = booking;
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const { API_BASE_URL } = Key;
+  
+  const handleOutForPickup = async () => {
+    try {
+      const result = await dispatch(outForPickup(booking?.id));
+      if (result.type.endsWith('/fulfilled')) {
+        dispatch(showSnackbar({ message: 'Order marked as out for pickup successfully', type: 'success', time: 3000 }));
+      } else {
+        dispatch(showSnackbar({ message: 'Failed to mark order as out for pickup', type: 'error', time: 3000 }));
+      }
+    } catch (error) {
+      dispatch(showSnackbar({ message: 'Failed to mark order as out for pickup', type: 'error', time: 3000 }));
+    }
+  };
+  
+
+  
+  // Extract data from order entity
+  const allOrderImages = booking?.orderImages || [];
+  const images = allOrderImages
+    .filter(image => image?.postedBy === 'USER')
+    .map(image => API_BASE_URL + image?.imageUrl);
+  const orderItems = booking?.orderItems || [];
+  const itemCount = orderItems.length;
+  const pickupDate = booking?.pickupDate ? new Date(booking.pickupDate).toLocaleDateString() : 'N/A';
+  const address = booking?.orderPickupAddress || booking?.pickupAddress || 'Address not provided';
+  const sellerName = booking?.sellerName || booking?.user?.fullName || 'N/A';
 
   const maxVisible = 3;
   const visibleImages = images.slice(0, maxVisible);
   const extraCount = images.length - maxVisible;
 
   const renderImages = () => {
-    if (images.length === 1) {
-      return <Image source={{ uri: images[0] }} style={styles.singleImage} />;
+    if (images.length === 0) {
+      return (
+        <View style={styles.noImageContainer}>
+          <Text style={styles.noImageText}>No images available</Text>
+        </View>
+      );
+    } else if (images.length === 1) {
+      return (
+        <Image 
+          source={{ 
+            uri: images[0],
+            headers: {
+              Authorization: `Bearer ${user?.accessToken}`,
+            },
+          }} 
+          style={styles.singleImage} 
+        />
+      );
     } else if (images.length === 2) {
       return (
         <View style={styles.twoImageRow}>
           {images.map((uri, index) => (
-            <Image key={index} source={{ uri }} style={styles.twoImage} />
+            <Image 
+              key={index} 
+              source={{ 
+                uri,
+                headers: {
+                  Authorization: `Bearer ${user?.accessToken}`,
+                }
+              }} 
+              style={styles.twoImage} 
+            />
           ))}
         </View>
       );
@@ -41,7 +90,16 @@ const PickupRequestCard = ({ booking }) => {
       return (
         <View style={styles.imageRow}>
           {visibleImages.map((uri, index) => (
-            <Image key={index} source={{ uri }} style={styles.imageThumb} />
+            <Image 
+              key={index} 
+              source={{ 
+                uri,
+                headers: {
+                  Authorization: `Bearer ${user?.accessToken}`,
+                }
+              }} 
+              style={styles.imageThumb} 
+            />
           ))}
           {extraCount > 0 && (
             <View style={styles.extraImages}>
@@ -51,19 +109,18 @@ const PickupRequestCard = ({ booking }) => {
         </View>
       );
     }
-    return null;
   };
 
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate('pickupRequestDetail')}
+      onPress={() => navigation.navigate('pickupRequestDetail',{ orderId: booking?.id})}
       activeOpacity={0.7}
       style={[styles.card, commonStyles.shadow]}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <Text style={textStyles.subHeading}>Booking</Text>
         <Text style={[textStyles.subHeading, { color: Colors.secondaryLight }]}>
-          #GRB45859
+          #{booking?.id || 'N/A'}
         </Text>
       </View>
       <Text
@@ -71,47 +128,79 @@ const PickupRequestCard = ({ booking }) => {
       >
         {address}
       </Text>
+      
+      <Text
+        style={[textStyles.extraSmall, { color: Colors.primary, marginTop: 2 }]}
+      >
+        Seller: {sellerName}
+      </Text>
 
       {renderImages()}
 
       <View style={styles.divider} />
 
       <View style={commonStyles.rowSpaceBetween}>
-        <Text style={textStyles.smallBold}>Pickup Status</Text>
+        <Text style={textStyles.smallBold}>Order Status</Text>
         <Text
           style={[
             textStyles.small,
             {
               color:
-                pickupStatus === 'Completed'
+                booking?.status === 'COMPLETED'
                   ? Colors.greenColor
-                  : Colors.yellowColor,
+                  : booking?.status === 'NEW'
+                  ? Colors.yellowColor
+                  : Colors.primary,
             },
           ]}
         >
-          {pickupStatus}
+          {booking?.status || 'N/A'}
         </Text>
       </View>
-     
+      
+      <View style={commonStyles.rowSpaceBetween}>
+        <Text style={textStyles.smallBold}>Seller Contact</Text>
+        <Text style={textStyles.small}>
+          {booking?.sellerContactNo || booking?.user?.contactNumber || 'N/A'}
+        </Text>
+      </View>
 
       <View style={commonStyles.rowSpaceBetween}>
         <Text style={textStyles.smallBold}>Pickup Date</Text>
-        <Text style={textStyles.small}>{pickupDateTime}</Text>
+        <Text style={textStyles.small}>{pickupDate}</Text>
       </View>
 
       <View style={commonStyles.rowSpaceBetween}>
         <Text style={textStyles.smallBold}>Items</Text>
-        <Text style={textStyles.small}>{items}</Text>
+        <Text style={textStyles.small}>{itemCount}</Text>
       </View>
 
       <View
         style={[commonStyles.rowSpaceBetween, { marginTop: Sizes.fixPadding }]}
       >
-        <Text style={textStyles.smallBold}>Expected Price</Text>
+        <Text style={textStyles.smallBold}>Final Price</Text>
         <Text style={[textStyles.smallBold, { color: Colors.greenColor }]}>
-          {expectedPrice}
+          ₹{booking?.finalPrice || 0}
         </Text>
       </View>
+      
+      {booking?.status === 'NEW' && (
+        <TouchableOpacity
+          onPress={handleOutForPickup}
+          style={styles.outForPickupBtn}
+        >
+          <Text style={styles.outForPickupText}>Out for Pickup</Text>
+        </TouchableOpacity>
+      )}
+      
+      {booking?.status === 'ACTIVE' && (
+        <TouchableOpacity
+          onPress={handleOutForPickup}
+          style={styles.outForPickupBtn}
+        >
+          <Text style={styles.outForPickupText}>Out for Pickup</Text>
+        </TouchableOpacity>
+      )}
     </TouchableOpacity>
   );
 };
@@ -169,5 +258,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 4,
+  },
+  outForPickupBtn: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  outForPickupText: {
+    color: Colors.whiteColor,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  noImageContainer: {
+    backgroundColor: Colors.extraLightGrayColor,
+    height: 80,
+    borderRadius: 10,
+    marginTop: Sizes.fixPadding,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noImageText: {
+    color: Colors.grayColor,
+    fontSize: 12,
   },
 });

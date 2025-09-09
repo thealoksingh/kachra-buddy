@@ -18,3 +18,10 @@ export const selectIsItemInCart = createSelector(
   }
 );
 
+// ✅ Driver selectors
+
+export const selectDriverOrders = (state) => state.driver.orders;  // ✅ Get all orders data
+export const selectDriverItems = (state) => state.driver.items;  // ✅ Get all items data
+export const selectDriverLoader = (state) => state.driver.loading;  // ✅ Get driver loader data
+export const selectDriverError = (state) => state.driver.error;  // ✅ Get driver error data
+
