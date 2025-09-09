@@ -46,6 +46,9 @@ const userSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    resetUserState: (state) => {
+      return initialState;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -162,5 +165,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setLoading, setItems, setCart, setCurrentOrder, setOrders, setError, clearError } = userSlice.actions;
+export const { setLoading, setItems, setCart, setCurrentOrder, setOrders, setError, clearError, resetUserState } = userSlice.actions;
 export default userSlice.reducer;

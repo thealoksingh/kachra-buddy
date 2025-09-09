@@ -21,6 +21,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MyStatusBar from '../../components/MyStatusBar';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
+import { useDispatch } from 'react-redux';
+import { performLogout } from '../../store/thunks/logoutThunk';
 
 const AdminProfile = () => {
   const [previewImage, setPreviewImage] = useState(null);
@@ -28,6 +30,21 @@ const AdminProfile = () => {
   const [showLogoutSheet, setshowLogoutSheet] = useState(false);
   const [avatar, setAvatar] = useState(null);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    try {
+      setshowLogoutSheet(false);
+      await dispatch(performLogout());
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'auth' }],
+      });
+      console.log('Admin logged out successfully');
+    } catch (error) {
+      console.log('Error during logout:', error);
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
@@ -231,12 +248,7 @@ const AdminProfile = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => {
-                  setshowLogoutSheet(false);
-                  console.log(
-                    'User logged out successfully in profileScreen and navigating to Signin',
-                  );
-                }}
+                onPress={handleLogout}
                 style={{
                   ...styles.logoutButtonStyle,
                   ...styles.sheetButtonStyle,

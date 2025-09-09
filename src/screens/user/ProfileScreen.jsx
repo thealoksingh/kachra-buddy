@@ -23,8 +23,7 @@ import MyStatusBar from '../../components/MyStatusBar';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../../store/selector';
-import { logout } from '../../store/slices/authSlice';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { performLogout } from '../../store/thunks/logoutThunk';
 import Key from '../../constants/key';
 
 const ProfileScreen = () => {
@@ -41,9 +40,7 @@ const ProfileScreen = () => {
   const handleLogout = async () => {
     try {
       setshowLogoutSheet(false);
-      await AsyncStorage.removeItem('user_id');
-      await AsyncStorage.removeItem('access_token');
-      dispatch(logout());
+      await dispatch(performLogout());
       navigation.reset({
         index: 0,
         routes: [{ name: 'auth' }],

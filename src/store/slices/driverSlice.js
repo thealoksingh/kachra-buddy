@@ -31,6 +31,9 @@ const driverSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    resetDriverState: (state) => {
+      return initialState;
+    },
 
   },
   extraReducers: (builder) => {
@@ -149,5 +152,5 @@ const driverSlice = createSlice({
   },
 });
 
-export const { setLoading, setAllOrders, setOrders, setItems, setError, clearError } = driverSlice.actions;
+export const { setLoading, setAllOrders, setOrders, setItems, setError, clearError, resetDriverState } = driverSlice.actions;
 export default driverSlice.reducer;

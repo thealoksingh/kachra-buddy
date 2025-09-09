@@ -34,6 +34,9 @@ const adminSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    resetAdminState: (state) => {
+      return initialState;
+    },
   },
 });
 
@@ -44,6 +47,7 @@ export const {
   setRequests, 
   setAnalytics, 
   setError, 
-  clearError 
+  clearError,
+  resetAdminState 
 } = adminSlice.actions;
 export default adminSlice.reducer;
