@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   quantityInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 12,
     color: Colors.blackColor,
     fontWeight: '500',
   },
