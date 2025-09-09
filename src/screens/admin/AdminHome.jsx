@@ -76,7 +76,7 @@ const adminCards = [
     icon: 'storefront-outline',
     title: 'Product Catalog',
     bottomTitle: 'Manage Products',
-    description: 'Add and update recyclable product listings',
+    description: 'Add or update in product listings',
     firstColor: '#f093fb',
     secondColor: '#f5576c',
     screen: 'allProductsScreen'
@@ -87,9 +87,9 @@ const adminCards = [
     title: 'Advertisement',
     bottomTitle: 'Promote Services',
     description: 'Create and manage promotional campaigns',
-    firstColor: '#4facfe',
-    secondColor: '#00f2fe',
-    screen: ''
+    firstColor: '#00f2fe',
+    secondColor: '#4facfe',
+    screen: 'postAd'
   },  
   {
     id: 3,
@@ -127,8 +127,8 @@ const adminCards = [
     title: 'Support Tickets',
     bottomTitle: 'Resolve Queries',
     description: 'Handle customer support and complaints',
-    firstColor: '#43e97b',
-    secondColor: '#38f9d7',
+    firstColor:'#38f9d7',
+    secondColor: '#43e97b',
     screen: ''
   },
 ];

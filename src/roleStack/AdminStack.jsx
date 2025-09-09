@@ -15,12 +15,15 @@ import UpdateProductScreen from '../screens/admin/UpdateProductScreen';
 import UpdateUserScreen from '../screens/admin/UpdateUserScreen';
 import SendNotificationScreen from '../screens/admin/SendNotificationScreen';
 import AllUsersScreen from '../screens/admin/AllUsersScreen';
+import PostAd from '../screens/admin/PostAd';
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
+     
       <Stack.Screen name="adminBottomNavBar" component={AdminBottomNavBar} />
+       <Stack.Screen name="postAd" component={PostAd} />
       <Stack.Screen name="sendNotificationScreen" component={SendNotificationScreen} />
       <Stack.Screen name="updateUserScreen" component={UpdateUserScreen} />
       <Stack.Screen name="updateProductScreen" component={UpdateProductScreen} />
