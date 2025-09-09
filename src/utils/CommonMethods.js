@@ -1,78 +1,159 @@
-import React, { useRef, useState } from 'react';
+import { Platform, PermissionsAndroid, Alert, Linking } from 'react-native';
+import Geolocation from '@react-native-community/geolocation';
 import Key from '../constants/key';
-import { Linking } from "react-native";
 
-export const trimText = (text, maxLength) => {
-  if (typeof text !== "string") return "";
-  return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+export const requestLocationPermission = async () => {
+  if (Platform.OS === 'android') {
+    try {
+      const hasPermission = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+      
+      if (hasPermission) {
+        console.log('[perm] already granted');
+        return true;
+      }
+      
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Location Permission',
+          message: 'App needs access to your location to show nearby services',
+          buttonPositive: 'Allow',
+          buttonNegative: 'Deny',
+        },
+      );
+      console.log('[perm] granted:', granted);
+      
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn('[perm] error:', err);
+      return false;
+    }
+  }
+  return true;
 };
 
-export const fetchImageForCity = async ({ city }) => {
-  const response = await fetch(
-    `https://api.unsplash.com/photos/random?query=mountain&orientation=landscape&client_id=${Key.unsplashApiKey}`
-  );
-  const data = await response.json();
-  // console.log("image data",data?.urls?.regular);
-  if (data && data?.urls) {
-    return data?.urls?.regular;
+export const fetchAddressFromCoordinates = async (lat, lng) => {
+  const mapkey = Key?.mapApiKey;
+  console.log('[geo] reverse geocode for:', lat, lng);
+  
+  try {
+    const res = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${mapkey}`,
+    );
+    const data = await res.json();
+    console.log('[geo] reverse geocode response:', data?.status);
+    
+    if (data?.results?.length > 0) {
+      return data.results[0].formatted_address;
+    } else {
+      return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    }
+  } catch (error) {
+    console.log('[geo] reverse geocode error:', error);
+    return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
   }
 };
-export const openGoogleMaps = (lat, lng) => {
-  const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-  Linking.openURL(url).catch(err => console.error("Failed to open maps:", err));
+
+export const formatAddress = (fullAddress) => {
+  if (!fullAddress) return 'Unknown location';
+  
+  const parts = fullAddress.split(',').map(part => part.trim());
+  
+  let city = '';
+  let state = '';
+  let country = '';
+  let pincode = '';
+  
+  // Extract pincode (6 digits for India)
+  const pincodeMatch = fullAddress.match(/\b\d{6}\b/);
+  if (pincodeMatch) {
+    pincode = pincodeMatch[0];
+  }
+  
+  // Country is usually the last part
+  if (parts.length > 0) {
+    country = parts[parts.length - 1];
+  }
+  
+  // State is usually second last (before country)
+  if (parts.length > 1) {
+    const statePart = parts[parts.length - 2];
+    // Remove pincode from state if present
+    state = statePart.replace(/\b\d{6}\b/, '').trim();
+  }
+  
+  // City is usually third last or look for known city patterns
+  if (parts.length > 2) {
+    city = parts[parts.length - 3].replace(/\b\d{6}\b/, '').trim();
+  }
+  
+  // Build formatted address
+  const addressParts = [city, state, country, pincode].filter(part => part && part.length > 0);
+  
+  return addressParts.length > 0 ? addressParts.join(', ') : 'Unknown location';
 };
 
 
-export const callUser = (phoneNumber) => {
-  Linking.openURL(`tel:${phoneNumber}`).catch(err =>
-    console.error("Failed to make call:", err)
+export const getUserLocation = async (onSuccess, onError) => {
+  console.log('[loc] fetching user location...');
+  const hasPermission = await requestLocationPermission();
+  
+  if (!hasPermission) {
+    Alert.alert('Permission Denied', 'Cannot access location');
+    return;
+  }
+
+ Geolocation.getCurrentPosition(
+    async (position) => {
+      console.log('[loc] position:', position);
+      const { latitude, longitude } = position.coords;
+      
+      // Fetch address for the coordinates
+      const fullAddress = await fetchAddressFromCoordinates(latitude, longitude);
+      const formattedAddress = formatAddress(fullAddress);
+      
+      if (onSuccess) {
+        onSuccess({ latitude, longitude, address: formattedAddress, fullAddress });
+      }
+    },
+    (error) => {
+      console.log('[loc] error code:', error.code);
+      console.log('[loc] error message:', error.message);
+      
+      if (error.code === 1) {
+        Alert.alert(
+          'Permission Required',
+          'Location permission is needed. Please go to Settings > Apps > Your App > Permissions and enable Location.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings() }
+          ]
+        );
+      } else if (error.code === 2) {
+        Alert.alert(
+          'Enable GPS', 
+          'GPS is turned off. Please enable Location/GPS in your device settings.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings() }
+          ]
+        );
+      } else if (error.code === 3) {
+        Alert.alert('Timeout', 'Location request timed out. Please try again.');
+      } else {
+        Alert.alert('Location Error', 'Could not get current location');
+      }
+      
+      if (onError) {
+        onError(error);
+      }
+    },
+    {
+      enableHighAccuracy: false,
+      timeout: 10000,
+      maximumAge: 60000,
+    }
   );
 };
-
-// export const fetchAddress = async (latitude, longitude) => {
-//   const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${Key.mapApiKey}`;
-
-//   try {
-//     const response = await fetch(url);
-//     const data = await response.json();
-
-//     if (data.status !== "OK" || !data.results.length) {
-//       console.log("Geocoding failed:", data.status);
-//       return null;
-//     }
-
-//     const address = data.results[0].formatted_address;
-//     const locationComponents = data.results[0].address_components;
-
-//     const cityComponent = locationComponents.find(
-//       (component) =>
-//         component.types.includes("locality") ||
-//         component.types.includes("administrative_area_level_2")
-//     );
-//     const state = locationComponents.find((component) =>
-//       component.types.includes("administrative_area_level_1")
-//     );
-//     const country = locationComponents.find((component) =>
-//       component.types.includes("country")
-//     );
-//     const pinCode = locationComponents.find((component) =>
-//       component.types.includes("postal_code")
-//     );
-
-//     const city = cityComponent ? cityComponent.long_name : "";
-//     const addressData = {
-//       latitude,
-//       longitude,
-//       address,
-//       city,
-//       state: state ? state.long_name : "",
-//       pinCode: pinCode ? pinCode.long_name : "",
-//       country: country ? country.long_name : "",
-//     };
-//     console.log("address data in fetchAddress ", addressData);
-//     return addressData;
-//   } catch (error) {
-//     console.log("Error fetching address:", error);
-//     return null;
-//   }
-// };

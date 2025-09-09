@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -28,6 +28,7 @@ import { useNavigation } from '@react-navigation/native';
 import { products, addsData } from '../../utils/dummyData';
 import { FaddedIcon } from '../../components/commonComponents';
 import CurvedCard from '../../screens/driver/CurvedCard';
+import {fetchAddressFromCoordinates, getUserLocation} from "../../utils/CommonMethods";
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -67,7 +68,22 @@ export const icons = [
 ];
 
 export default function DriverHome() {
-  const navigation = useNavigation();
+   const navigation = useNavigation();
+   const [userAddress, setUserAddress] = useState('Getting location...');
+
+  useEffect(() => {
+    getUserLocation(
+      (locationData) => {
+        setUserAddress(locationData.address);
+        console.log('Address:', locationData.address);
+      },
+      (error) => {
+        setUserAddress('Unable to get location');
+        console.log('Error:', error);
+      }
+    );
+  }, []);
+
   return (
     <LinearGradient
       colors={[Colors.primary, Colors.whiteColor]}
@@ -90,7 +106,7 @@ export default function DriverHome() {
             <Text
               style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
             >
-              Sinhgad College of Engineering
+              {userAddress}
             </Text>
           </View>
         </TouchableOpacity>
