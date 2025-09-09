@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -28,6 +28,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectCart, selectItems, selectUser } from '../../store/selector';
 import { fetchItems, fetchCart, fetchOrders } from '../../store/thunks/userThunk';
 import Key from '../../constants/key';
+import { getUserLocation } from '../../utils/CommonMethods';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -68,14 +69,27 @@ export const icons = [
 
 export default function HomeScreen() {
 
-    const {API_BASE_URL} = Key;
+  const {API_BASE_URL} = Key;
   const user = useSelector(selectUser);
   const cart = useSelector(selectCart);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const items = useSelector(selectItems);
   console.log("Items in home screen", items)
+  const [userAddress, setUserAddress] = useState('Getting location...');
 
+  useEffect(() => {
+    getUserLocation(
+      (locationData) => {
+        setUserAddress(locationData.address);
+        console.log('Address:', locationData.address);
+      },
+      (error) => {
+        setUserAddress('Unable to get location');
+        console.log('Error:', error);
+      }
+    );
+  }, []);
   useEffect(() => {
     if (user) {
       // Fetch items when user is present
@@ -105,7 +119,7 @@ export default function HomeScreen() {
           />
           <View>
             <Text style={styles.userName}>{user?.fullName}</Text>
-            <Text style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}>Sinhgad College of Engineering</Text>
+            <Text style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}>{userAddress}</Text>
           </View>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate("cart")} style={{ position: 'relative' }}>
