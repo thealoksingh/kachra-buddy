@@ -25,6 +25,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../../store/selector';
 import { logout } from '../../store/slices/authSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Key from '../../constants/key';
 
 const image =
   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGdpcmx8ZW58MHx8MHx8fDA%3D';
@@ -32,10 +33,12 @@ const ProfileScreen = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
   const [showLogoutSheet, setshowLogoutSheet] = useState(false);
-  const [avatar, setAvatar] = useState(image);
   const navigation = useNavigation();
   const user = useSelector(selectUser);
+  const [avatar, setAvatar] = useState(user?.avatarUrl || image);
   const dispatch = useDispatch();
+
+  const {API_BASE_URL} = Key; // Replace with your actual base URL
 
   const handleLogout = async () => {
     try {
@@ -91,7 +94,11 @@ const ProfileScreen = () => {
           style={{ alignItems: 'center' }}
         >
           {avatar ? (
-            <Image source={{ uri: avatar }} style={styles.userImageStyle} />
+            <Image source={{ uri: API_BASE_URL+avatar,
+               headers: {
+                  Authorization: `Bearer ${user?.accessToken}`,
+                }
+             }} style={styles.userImageStyle} />
           ) : (
             <View style={styles.userIconStyle}>
               <Icon name="person-off" size={60} color="#e0e0eb" />

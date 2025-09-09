@@ -6,34 +6,44 @@ import { useNavigation } from '@react-navigation/native';
 import { Colors } from '../../styles/commonStyles';
 import BookingCard from '../../components/userComponents/BookingCard';
 import { bookings } from '../../utils/dummyData';
+import { selectOrders } from '../../store/selector';
+import { useSelector } from 'react-redux';
 
-const PreviousBookings = () => (
-  <FlatList
-    data={bookings}
-    keyExtractor={(item) => item.id}
-    renderItem={({ item }) => <BookingCard booking={item} />}
-    ListFooterComponent={<FaddedIcon />}
-  />
-);
+const PreviousBookings = ({ orders }) => {
+  const completedOrders = orders?.filter(order => order.status === 'COMPLETED');
+  return (
+    <FlatList
+      data={completedOrders}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => <BookingCard booking={item} />}
+      ListFooterComponent={<FaddedIcon />}
+    />
+  );
+};
 
-const OngoingBookings = () => (
-  <FlatList
-    data={bookings}
-    keyExtractor={(item) => item.id}
-    renderItem={({ item }) => <BookingCard booking={item} />}
-    ListFooterComponent={<FaddedIcon />}
-  />
-);
+const OngoingBookings = ({ orders }) => {
+  const ongoingOrders = orders?.filter(order => order.status === 'NEW' || order.status === 'IN_PROGRESS');
+  return (
+    <FlatList
+      data={ongoingOrders}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => <BookingCard booking={item} />}
+      ListFooterComponent={<FaddedIcon />}
+    />
+  );
+};
 
 const BookingScreen = () => {
+  console.log("Rendering BookingScreen");
   const navigation = useNavigation();
-
+  const orders = useSelector(selectOrders);
+  console.log("orders in booking screen", orders);
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
       <CommonAppBar navigation={navigation} label={'Bookings'} />
       <SwipableTabs
         titles={['Ongoing Bookings', 'Previous Bookings']}
-        components={[<OngoingBookings />, <PreviousBookings />]}
+        components={[<OngoingBookings orders={orders} />, <PreviousBookings orders={orders} />]}
       />
     </View>
   );

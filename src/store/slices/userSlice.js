@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchItems, fetchCart, addItemToCart, removeItemFromCart, checkoutCart } from '../thunks/userThunk';
+import { fetchItems, fetchCart, addItemToCart, removeItemFromCart, checkoutCart, updateOrder, fetchOrders } from '../thunks/userThunk';
 
 const initialState = {
   items: [],
@@ -35,6 +35,10 @@ const userSlice = createSlice({
     // Reducer for setting current order
     setCurrentOrder: (state, action) => {
       state.currentOrder = action.payload;
+    },
+    // Reducer for setting orders
+    setOrders: (state, action) => {
+      state.orders = action.payload;
     },
     setError: (state, action) => {
       state.error = action.payload;
@@ -109,9 +113,37 @@ const userSlice = createSlice({
       .addCase(checkoutCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action?.payload?.message;
+      })
+      // Extra reducers for updating order
+      .addCase(updateOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentOrder = action?.payload?.data || action?.payload;
+      })
+      .addCase(updateOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action?.payload?.message;
+      })
+      // Extra reducers for fetching orders
+      .addCase(fetchOrders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchOrders.fulfilled, (state, action) => {
+        state.loading = false;
+
+        state.orders = action?.payload?.data || action?.payload;
+        console.log("Fetched orders:", state.orders);
+      })
+      .addCase(fetchOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action?.payload?.message;
       });
   },
 });
 
-export const { setLoading, setItems, setCart, setCurrentOrder, setError, clearError } = userSlice.actions;
+export const { setLoading, setItems, setCart, setCurrentOrder, setOrders, setError, clearError } = userSlice.actions;
 export default userSlice.reducer;

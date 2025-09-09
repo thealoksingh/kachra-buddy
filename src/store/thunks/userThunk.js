@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { completeProfileAPI, getUserByIdAPI, updateProfilePicAPI, updateUserAPI, fetchItemsAPI, fetchCartAPI, addItemToCartAPI, removeItemFromCartAPI, checkoutCartAPI } from '../../utils/api/userApi';
+import { completeProfileAPI, getUserByIdAPI, updateProfilePicAPI, updateUserAPI, fetchItemsAPI, fetchCartAPI, addItemToCartAPI, removeItemFromCartAPI, checkoutCartAPI, updateOrderAPI, fetchOrdersAPI, getOrderByIdAPI } from '../../utils/api/userApi';
 import { handleAxiosError } from '../../utils/handleAxiosError';
 
 // Thunk for sending OTP
@@ -109,6 +109,45 @@ export const checkoutCart = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await checkoutCartAPI();
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for updating order
+export const updateOrder = createAsyncThunk(
+  "user/updateOrder",
+  async (data, thunkAPI) => {
+    try {
+      const response = await updateOrderAPI(data);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for fetching all orders
+export const fetchOrders = createAsyncThunk(
+  "user/fetchOrders",
+  async (_, thunkAPI) => {
+    try {
+      const response = await fetchOrdersAPI();
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for getting order by ID
+export const getOrderById = createAsyncThunk(
+  "user/getOrderById",
+  async (orderId, thunkAPI) => {
+    try {
+      const response = await getOrderByIdAPI(orderId);
       return response?.data;
     } catch (error) {
       return handleAxiosError(error, thunkAPI);

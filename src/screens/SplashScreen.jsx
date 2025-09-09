@@ -12,10 +12,13 @@ export default function SplashScreen({ navigation }) {
 
       if(user && user?.role === "USER" && user?.status === "ACTIVE") {
       // For now,
+      console.log("navigating to user");
         navigation.replace("user");
       } else if(user && user?.role === "ADMIN" && user?.status === "ACTIVE") {
+        console.log("navigating to admin");
         navigation.replace("admin");
       } else if(user && user?.role === "DRIVER" && user?.status === "ACTIVE") {
+        console.log("navigating to driver");
         navigation.replace("driver");
       } else {
         navigation.replace("auth");

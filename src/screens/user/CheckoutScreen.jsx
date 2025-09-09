@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
-import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 import { Colors } from '../../styles/commonStyles';
+import { updateOrder } from '../../store/thunks/userThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
 import {
   ButtonWithLoader,
   CommonAppBar,
@@ -15,13 +18,69 @@ import { LottieAlert } from '../../components/lottie/LottieAlert';
 
 const CheckoutScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  
+  // Get order data from navigation params
+  const { orderData } = route.params || {};
+  console.log('Order Data received:', orderData);
+  
   const [failureAlertVisible, setFailureAlertVisible] = useState(false);
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
-  const [name, setName] = useState(null);
-  const [mobNumber, setMobNUmber] = useState(null);
-  const [address, setAddress] = useState(null);
-  const [coordinate, setCoordinate] = useState(null);
+  const [name, setName] = useState(orderData?.user?.fullName || '');
+  const [mobNumber, setMobNUmber] = useState(orderData?.user?.contactNumber || '');
+  const [address, setAddress] = useState(orderData?.orderPickupAddress || '');
+  const [coordinate, setCoordinate] = useState({
+    latitude: orderData?.orderPickupLatitude || 0,
+    longitude: orderData?.orderPickupLongitude || 0
+  });
+
+  // Handle submit method
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const updateData = {
+        orderId: orderData?.id,
+        orderData: {
+          sellerName: name,
+          sellerContactNo: mobNumber,
+          orderPickupAddress: address,
+          orderPickupLatitude: coordinate?.latitude,
+          orderPickupLongitude: coordinate?.longitude,
+        },
+        images: images,
+        postedBy: 'USER'
+      };
+      
+      const response = await dispatch(updateOrder(updateData));
+      
+      if (updateOrder.fulfilled.match(response)) {
+        await dispatch(
+          showSnackbar({
+            message: 'Order updated successfully!',
+            type: 'success',
+            time: 3000,
+          }),
+        );
+        navigation.pop(2);
+      } else {
+        await dispatch(
+          showSnackbar({
+            message: response?.payload?.message || 'Failed to update order',
+            type: 'error',
+            time: 5000,
+          }),
+        );
+      }
+    } catch (error) {
+      await dispatch(
+        showSnackbar({ message: 'Error updating order', type: 'error', time: 3000 }),
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
   const [images, setImages] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
@@ -66,7 +125,7 @@ const CheckoutScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
-      <CommonAppBar navigation={navigation} label="Checkout" />
+      <CommonAppBar navigation={navigation} label="Add More Detail" />
 
       <View style={{ flex: 1, marginBottom: 20, marginHorizontal: 10 }}>
         <View style={styles.formCard}>
@@ -162,13 +221,7 @@ const CheckoutScreen = () => {
             name="Submit"
             loadingName="Processing..."
             isLoading={loading}
-            method={() => {
-              setLoading(true);
-              setTimeout(() => {
-                setLoading(false);
-                navigation.navigate('checkoutScreen');
-              }, 500);
-            }}
+            method={handleSubmit}
           />
         </View>
       </View>

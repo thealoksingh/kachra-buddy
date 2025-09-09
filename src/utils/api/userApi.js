@@ -124,3 +124,53 @@ export const checkoutCartAPI = async () => {
     accessToken,
   });
 };
+
+// API call for updating order with images
+export const updateOrderAPI = async (data) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  const formData = new FormData();
+  
+  // Add order JSON
+  formData.append('order', JSON.stringify(data.orderData));
+  formData.append('postedBy', data.postedBy);
+  
+  // Add images if any
+  if (data.images && data.images.length > 0) {
+    data.images.forEach((image, index) => {
+      formData.append('files', {
+        uri: image,
+        type: 'image/jpeg',
+        name: `order_image_${index}.jpg`,
+      });
+    });
+  }
+  
+  return apiPutRequest({
+    apiUrl: `${API_BASE_URL}/api/orders/${data.orderId}`,
+    content_type: "multipart/form-data",
+    data: formData,
+    accessToken,
+  });
+};
+
+// API call for getting all orders
+export const fetchOrdersAPI = async () => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiGetRequest({
+    apiUrl: `${API_BASE_URL}/api/orders`,
+    content_type: "application/json",
+    data: null,
+    accessToken,
+  });
+};
+
+// API call for getting order by ID
+export const getOrderByIdAPI = async (orderId) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiGetRequest({
+    apiUrl: `${API_BASE_URL}/api/orders/${orderId}`,
+    content_type: "application/json",
+    data: null,
+    accessToken,
+  });
+};

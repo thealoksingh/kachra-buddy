@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,14 +12,24 @@ import {
 import { CommonAppBar, FaddedIcon } from '../../components/commonComponents';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
 import { Colors, commonStyles, textStyles } from '../../styles/commonStyles';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectUser } from '../../store/selector';
+import { getOrderById } from '../../store/thunks/userThunk';
+import Key from '../../constants/key';
 import { WarningWithButton } from '../../components/lottie/WarningWithButton';
 import { DottedBlackLoader } from '../../components/lottie/loaderView';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
 const { width } = Dimensions.get('window');
 
 const BookingDetailScreen = () => {
+  console.log("Rendering BookingDetailScreen");
   const navigation = useNavigation();
+  const route = useRoute();
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const { API_BASE_URL } = Key;
+  
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
@@ -27,42 +37,41 @@ const BookingDetailScreen = () => {
   const[succesAlertVisible,setSuccessAlertVisible]=useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
+  const [orderData, setOrderData] = useState(null);
   const flatListRef = useRef();
+  
+  // Get order ID from route params
+  const { orderId } = route?.params || {};
+  
+  // Fetch order by ID when component renders
+  useEffect(() => {
+    if (orderId) {
+      const fetchOrderData = async () => {
+        setIsLoading(true);
+        try {
+          const response = await dispatch(getOrderById(orderId));
+          if (getOrderById.fulfilled.match(response)) {
+            console.log("Fetched order data:", response?.payload?.data );
+            setOrderData(response?.payload?.data || response?.payload);
+          }
+        } catch (error) {
+          console.log('Error fetching order:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchOrderData();
+    }
+  }, [orderId, dispatch]);
 
-  const images = [
-    'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  ];
+  // Extract order images (USER posted only)
+  const allOrderImages = orderData?.orderImages || [];
+  const images = allOrderImages
+    .filter(image => image?.postedBy === 'USER')
+    .map(image => API_BASE_URL + image?.imageUrl);
 
-  const items = [
-    {
-      id: 1,
-      image:
-        'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      title: 'Wooden Chair',
-      desc: 'Premium oak chair',
-      qty: 2,
-      weight: '15kg',
-    },
-    {
-      id: 2,
-      image:
-        'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      title: 'Table Lamp',
-      desc: 'White desk lamp',
-      qty: 1,
-      weight: '3kg',
-    },
-    {
-      id: 3,
-      image:
-        'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      title: 'Cardboard Boxes',
-      desc: 'Set of 10 packing boxes',
-      qty: 10,
-      weight: '20kg',
-    },
-  ];
+  // Extract order items
+  const items = orderData?.orderItems || [];
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
@@ -88,7 +97,15 @@ const BookingDetailScreen = () => {
                 setPreviewVisible(true);
               }}
             >
-              <Image source={{ uri: item }} style={styles.image} />
+              <Image 
+                source={{ 
+                  uri: item,
+                  headers: {
+                    Authorization: `Bearer ${user?.accessToken}`,
+                  }
+                }} 
+                style={styles.image} 
+              />
             </TouchableOpacity>
           )}
         />
@@ -101,7 +118,7 @@ const BookingDetailScreen = () => {
             />
           ))}
         </View>
-        {true && (
+        {orderData?.driver && (
           <>
             <View style={styles.headingSection}>
               <Text style={styles.sectionTitle}>Driver Details</Text>
@@ -109,13 +126,16 @@ const BookingDetailScreen = () => {
             <View style={styles.driverCard}>
               <Image
                 source={{
-                  uri: 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                  uri: orderData?.driver?.avatarUrl ? API_BASE_URL + orderData.driver.avatarUrl : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                  headers: {
+                    Authorization: `Bearer ${user?.accessToken}`,
+                  }
                 }}
                 style={styles.driverImage}
               />
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.driverName}>Driver name</Text>
-                <Text style={styles.driverPhone}>+91 98765 43210</Text>
+                <Text style={styles.driverName}>{orderData?.driver?.fullName || 'Driver name'}</Text>
+                <Text style={styles.driverPhone}>{orderData?.driver?.contactNumber || '+91 98765 43210'}</Text>
                 <View style={{ flexDirection: 'row', marginTop: 4 }}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Text
@@ -140,29 +160,29 @@ const BookingDetailScreen = () => {
         <View style={styles.itemsSection}>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Items</Text>
-            <Text style={textStyles.small}>7</Text>
+            <Text style={textStyles.small}>{items.length}</Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Pickup Date Time</Text>
-            <Text style={textStyles.small}>7/10/25 10AM</Text>
+            <Text style={textStyles.small}>{orderData?.pickupDate ? new Date(orderData.pickupDate).toLocaleDateString() : 'N/A'}</Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Pickup Status</Text>
-            <Text style={textStyles.small}>Pending</Text>
+            <Text style={textStyles.smallBold}>Order Status</Text>
+            <Text style={textStyles.small}>{orderData?.status || 'N/A'}</Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Driver Allocation</Text>
-            <Text style={textStyles.small}>Allocated</Text>
+            <Text style={textStyles.small}>{orderData?.driver ? 'Allocated' : 'Not Allocated'}</Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Pickup Address</Text>
             <Text style={[textStyles.small, { flex: 1, textAlign: 'right' }]}>
-              221B Baker Street, London
+              {orderData?.orderPickupAddress || orderData?.pickupAddress || 'N/A'}
             </Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Expected Price</Text>
-            <Text style={textStyles.small}>₹120</Text>
+            <Text style={textStyles.smallBold}>Final Price</Text>
+            <Text style={textStyles.small}>₹{orderData?.finalPrice || 0}</Text>
           </View>
         </View>
 
@@ -172,12 +192,20 @@ const BookingDetailScreen = () => {
         <View style={styles.itemsSection}>
           {items.map(item => (
             <View key={item.id} style={styles.itemCard}>
-              <Image source={{ uri: item.image }} style={styles.itemImage} />
+              <Image 
+                source={{ 
+                  uri: API_BASE_URL + item?.item?.imageUrl,
+                  headers: {
+                    Authorization: `Bearer ${user?.accessToken}`,
+                  }
+                }} 
+                style={styles.itemImage} 
+              />
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.itemTitle}>{item.title}</Text>
-                <Text style={styles.itemDesc}>{item.desc}</Text>
+                <Text style={styles.itemTitle}>{item?.item?.name || 'Item'}</Text>
+                <Text style={styles.itemDesc}>₹{item?.item?.pricePerUnit} / {item?.item?.unit?.toLowerCase()}</Text>
                 <Text style={styles.itemInfo}>
-                  Qty: {item.qty} | {item.weight}
+                  Qty: {item?.quantity} | {item?.unit} | ₹{item?.price}
                 </Text>
               </View>
             </View>

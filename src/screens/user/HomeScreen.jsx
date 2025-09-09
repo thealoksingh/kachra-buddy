@@ -26,7 +26,7 @@ import { products, addsData } from '../../utils/dummyData';
 import { FaddedIcon } from '../../components/commonComponents';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCart, selectItems, selectUser } from '../../store/selector';
-import { fetchItems, fetchCart } from '../../store/thunks/userThunk';
+import { fetchItems, fetchCart, fetchOrders } from '../../store/thunks/userThunk';
 import Key from '../../constants/key';
 
 export const icons = [
@@ -82,6 +82,8 @@ export default function HomeScreen() {
       dispatch(fetchItems());
       // Fetch user's cart when user is present
       dispatch(fetchCart());
+      // Fetch all orders when user is present
+      dispatch(fetchOrders());
     }
   }, [user, dispatch]);
   return (
