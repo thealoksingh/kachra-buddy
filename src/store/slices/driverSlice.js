@@ -125,6 +125,7 @@ const driverSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchAllItems.fulfilled, (state, action) => {
+        console.log("fetchAllItems fulfilled - Raw payload:", action?.payload);
         state.loading = false;
         state.items = action?.payload?.data || action?.payload;
       })

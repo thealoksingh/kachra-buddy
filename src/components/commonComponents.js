@@ -51,7 +51,7 @@ export function AuthInput({ label, value, setter, placeholder, type }) {
   );
 }
 
-export function ButtonWithLoader({ name, loadingName, isLoading, method }) {
+export function ButtonWithLoader({ name, loadingName, isLoading, method ,color=Colors.primary }) {
   return isLoading ? (
     <View style={{ ...commonStyles.button, flexDirection: 'row', gap: 10 }}>
       <ActivityIndicator size="small" color={Colors.whiteColor} />
@@ -60,7 +60,7 @@ export function ButtonWithLoader({ name, loadingName, isLoading, method }) {
   ) : (
     <TouchableOpacity
       activeOpacity={0.7}
-      style={{ ...commonStyles.button }}
+      style={{ ...commonStyles.button ,backgroundColor:color }}
       onPress={method}
     >
       <Text style={{ ...commonStyles.buttonText }}>{name}</Text>

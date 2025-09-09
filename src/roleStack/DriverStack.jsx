@@ -7,6 +7,7 @@ import DriverProfileScreen from '../screens/driver/DriverProfileScreen';
 import DriverEditProfileScreen from '../screens/driver/DriverEditProfileScreen';
 import DriverHome from '../screens/driver/DriverHome';
 import FinalPickupScreen from '../screens/driver/FinalPickupScreen';
+import SelectAdditionalItemScreen from '../screens/driver/SelectAdditionalItemScreen';
 import HelpScreen from '../screens/HelpScreen';
 import RaisedTickets from "../screens/RaisedTickets"
 import NotificationScreen from "../screens/NotificationScreen";
@@ -15,10 +16,11 @@ const Stack = createNativeStackNavigator();
 function ActiveStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-     
-      <Stack.Screen name="driverHome" component={DriverHome} />
+       <Stack.Screen name="driverHome" component={DriverHome} />
+         <Stack.Screen name="selectAdditionalItemScreen" component={SelectAdditionalItemScreen} />
+    
       <Stack.Screen name="pickupRequests" component={PickupRequests} />
-      <Stack.Screen name="pickupRequestDetail" component={PickupRequestDetail} />
+       <Stack.Screen name="pickupRequestDetail" component={PickupRequestDetail} />
       <Stack.Screen name="driverProfileScreen" component={DriverProfileScreen} />
       <Stack.Screen name="driverEditProfileScreen" component={DriverEditProfileScreen} />
         <Stack.Screen name="finalPickupScreen" component={FinalPickupScreen} />

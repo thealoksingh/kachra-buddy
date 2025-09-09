@@ -104,7 +104,7 @@ export const outForDeliveryAPI = async (orderId) => {
 export const getAllItemsAPI = async () => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiGetRequest({
-    apiUrl: `${API_BASE_URL}/api/items`,
+    apiUrl: `${API_BASE_URL}/items`,
     content_type: "application/json",
     data: null,
     accessToken,

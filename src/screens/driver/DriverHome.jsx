@@ -30,8 +30,8 @@ import { FaddedIcon } from '../../components/commonComponents';
 import CurvedCard from '../../screens/driver/CurvedCard';
 import {fetchAddressFromCoordinates, getUserLocation} from "../../utils/CommonMethods";
 import { useSelector, useDispatch } from 'react-redux';
-import { selectUser } from '../../store/selector';
-import { fetchDriverOrders } from '../../store/thunks/driverThunk';
+import { selectUser, selectDriverItems, selectDriverLoading } from '../../store/selector';
+import { fetchAllItems, fetchDriverOrders } from '../../store/thunks/driverThunk';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -72,8 +72,11 @@ export const icons = [
 
 export default function DriverHome() {
   const user = useSelector(selectUser);
+  const driverItems = useSelector(selectDriverItems);
+  // const driverLoading = useSelector(selectDriverLoading);
   const dispatch = useDispatch();
   console.log("user in driver home", user);
+  console.log("driver items", driverItems);
   const navigation = useNavigation();
   const [userAddress, setUserAddress] = useState('Getting location...');
 
@@ -89,8 +92,9 @@ export default function DriverHome() {
       }
     );
     
-    // Fetch driver orders when user is present
+    // Fetch driver data when user is present
     if (user) {
+      dispatch(fetchAllItems());
       dispatch(fetchDriverOrders());
     }
   }, [user, dispatch]);
