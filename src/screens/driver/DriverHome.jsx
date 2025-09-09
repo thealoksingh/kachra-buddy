@@ -137,8 +137,8 @@ export default function DriverHome() {
               title="Pickup"
               bottomTitle="Pickup Request"
               description="View and manage your pickup orders"
-               firstColor={Colors.primary}
-              secondColor="#3dec48ff"
+              firstColor='#00f2fe'
+              secondColor='#4facfe'
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -149,8 +149,8 @@ export default function DriverHome() {
               title="Contact Us"
               bottomTitle="Support Center"
               description="Get help for any queries you may have"
-              firstColor={Colors.secondary}
-              secondColor="#f9a136ff"     
+              firstColor="#f093fb"
+               secondColor="#f5576c"    
             />
           </TouchableOpacity>
         </View>

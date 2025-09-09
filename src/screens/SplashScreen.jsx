@@ -14,7 +14,7 @@ export default function SplashScreen({ navigation }) {
       // if(true){
       // For now,
       console.log("navigating to user");
-        navigation.replace("user");
+        navigation.replace("driver");
       } else if(user && user?.role === "ADMIN" && user?.status === "ACTIVE") {
         console.log("navigating to admin");
         navigation.replace("admin");

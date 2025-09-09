@@ -22,13 +22,11 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import MyStatusBar from '../../components/MyStatusBar';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
 
-const image =
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGdpcmx8ZW58MHx8MHx8fDA%3D';
 const AdminProfile = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
   const [showLogoutSheet, setshowLogoutSheet] = useState(false);
-  const [avatar, setAvatar] = useState(image);
+  const [avatar, setAvatar] = useState(null);
   const navigation = useNavigation();
 
   return (
