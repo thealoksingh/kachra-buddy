@@ -16,6 +16,9 @@ import UpdateUserScreen from '../screens/admin/UpdateUserScreen';
 import SendNotificationScreen from '../screens/admin/SendNotificationScreen';
 import AllUsersScreen from '../screens/admin/AllUsersScreen';
 import PostAd from '../screens/admin/PostAd';
+import AllBestDealProducts from '../screens/admin/AllBestDealProducts';
+import AllSupportIssues from '../screens/admin/AllSupportIssues';
+import SupportIssueDetail from '../screens/admin/SupportIssueDetail';
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
@@ -23,6 +26,9 @@ function ActiveStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
      
       <Stack.Screen name="adminBottomNavBar" component={AdminBottomNavBar} />
+      <Stack.Screen name="allSupportIssues" component={AllSupportIssues} />
+       <Stack.Screen name="supportIssueDetail" component={SupportIssueDetail} />
+       <Stack.Screen name="allBestDealProducts" component={AllBestDealProducts} />
        <Stack.Screen name="postAd" component={PostAd} />
       <Stack.Screen name="sendNotificationScreen" component={SendNotificationScreen} />
       <Stack.Screen name="updateUserScreen" component={UpdateUserScreen} />

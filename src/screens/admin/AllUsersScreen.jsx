@@ -168,13 +168,13 @@ const AllUsersScreen = () => {
           </Text>
         </View>
 
-        <View style={[styles.roleBadge]}>
+        <View style={[styles.roleBadge,{borderColor:user?.role==='user'?Colors.primary:Colors.secondaryLight}]}>
           <Text
             style={[
               styles.roleText,
               {
                 color:
-                  user?.role === 'user' ? Colors.primary : Colors.secondary,
+                  user?.role === 'user' ? Colors.primary :Colors.secondaryLight,
               },
             ]}
           >
@@ -455,10 +455,13 @@ const styles = StyleSheet.create({
   },
   roleBadge: {
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 4,
     borderRadius: 4,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius:14,
+    borderWidth:1,
+    backgroundColor: Colors.extraLightGrayColor,
   },
   roleText: {
     fontSize: 12,

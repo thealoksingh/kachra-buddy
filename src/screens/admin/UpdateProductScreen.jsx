@@ -18,7 +18,7 @@ const dummyProduct = {
   name: 'Plastic Bottles',
   type: 'countable',
   rate: '5',
-  image: 'https://images.unsplash.com/photo-1572879435493-37549bec6ace?w=400'
+  image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150'
 };
 
 const UpdateProductScreen = () => {

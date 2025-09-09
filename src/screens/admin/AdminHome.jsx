@@ -108,9 +108,9 @@ const adminCards = [
     title: 'Special Offers',
     bottomTitle: 'Best Deals',
     description: 'Create attractive deals and discount offers',
-    firstColor: '#ff6b6b',
-    secondColor: '#ee5a24',
-    screen: ''
+    firstColor: '#ffd271ff',
+    secondColor: '#faaf0dff',
+    screen: 'allBestDealProducts'
   },
   // {
   //   id: 5,
@@ -130,7 +130,7 @@ const adminCards = [
     description: 'Handle customer support and complaints',
     firstColor:'#38f9d7',
     secondColor: '#43e97b',
-    screen: ''
+    screen: 'allSupportIssues'
   },
 ];
 
