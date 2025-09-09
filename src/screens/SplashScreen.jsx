@@ -11,6 +11,7 @@ export default function SplashScreen({ navigation }) {
     const timer = setTimeout(() => {
 
       if(user && user?.role === "USER" && user?.status === "ACTIVE") {
+      // if(true){
       // For now,
       console.log("navigating to user");
         navigation.replace("user");

@@ -7,13 +7,27 @@ import NotificationScreen from '../screens/NotificationScreen';
 import AdminProfile from '../screens/admin/AdminProfile';
 import EditAdminProfile from '../screens/admin/EditAdminProfile';
 import AllBookingsScreen from '../screens/admin/AllBookingsScreen';
+import CreateUserScreen from '../screens/admin/CreateUserScreen';
 import BookingDetailAdmin from '../screens/admin/BookingDetailAdmin';
+import PostProductsScreen from '../screens/admin/PostProductsScreen';
+import AllProductsScreen from '../screens/admin/AllProductsScreen';
+import UpdateProductScreen from '../screens/admin/UpdateProductScreen';
+import UpdateUserScreen from '../screens/admin/UpdateUserScreen';
+import SendNotificationScreen from '../screens/admin/SendNotificationScreen';
+import AllUsersScreen from '../screens/admin/AllUsersScreen';
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="adminBottomNavBar" component={AdminBottomNavBar} />
+      <Stack.Screen name="sendNotificationScreen" component={SendNotificationScreen} />
+      <Stack.Screen name="updateUserScreen" component={UpdateUserScreen} />
+      <Stack.Screen name="updateProductScreen" component={UpdateProductScreen} />
+      <Stack.Screen name="allProductsScreen" component={AllProductsScreen} />
+      <Stack.Screen name="allUsersScreen" component={AllUsersScreen} />
+      <Stack.Screen name="postProductsScreen" component={PostProductsScreen} />
+      <Stack.Screen name="createUserScreen" component={CreateUserScreen} />
       <Stack.Screen name="adminHome" component={AdminHome} />
       <Stack.Screen name="helpScreen" component={HelpScreen} />
       <Stack.Screen name="notificationScreen" component={NotificationScreen} />

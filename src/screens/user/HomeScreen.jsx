@@ -128,7 +128,7 @@ export default function HomeScreen() {
 
       <ScrollView style={styles.mainSection}>
         <MovingIcons icons={icons} />
-        <AdSlider data={addsData} height={180} />
+        <AdSlider data={addsData} type={"big"} />
 
         <View
           style={{
@@ -151,7 +151,7 @@ export default function HomeScreen() {
 
         <MiniProductScrollSection products={items} />
         <View style={{ marginVertical: 20 }}>
-          <AdSlider data={addsData} height={90} />
+          <AdSlider data={addsData} type={"small"} />
         </View>
 
         <View style={styles.scrapVehicleCard}>

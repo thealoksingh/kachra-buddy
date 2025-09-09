@@ -3,6 +3,7 @@ import { Dimensions, StyleSheet } from 'react-native';
 
 export const Colors = {
   primary: '#30a134ff',
+  lightPrimary:"#cafac1ff",
   darkBlue: '#101942',
   secondary: '#FF5722',
   secondaryLight: "#FF8C00",

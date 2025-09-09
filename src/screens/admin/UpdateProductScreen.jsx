@@ -13,15 +13,23 @@ import { useImagePicker } from '../../components/useImagePicker';
 import ImagePickerSheet from '../../components/ImagePickerSheet';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
 
-const PostProductsScreen = () => {
+const dummyProduct = {
+  id: 1,
+  name: 'Plastic Bottles',
+  type: 'countable',
+  rate: '5',
+  image: 'https://images.unsplash.com/photo-1572879435493-37549bec6ace?w=400'
+};
+
+const UpdateProductScreen = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [failureAlertVisible, setFailureAlertVisible] = useState(false);
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
-  const [name, setName] = useState(null);
-  const [rate, setRate] = useState(null);
-  const [type, setType] = useState('countable');
-  const [image, setImage] = useState(null);
+  const [name, setName] = useState(dummyProduct.name);
+  const [rate, setRate] = useState(dummyProduct.rate);
+  const [type, setType] = useState(dummyProduct.type);
+  const [image, setImage] = useState(dummyProduct.image);
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
   const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
@@ -56,7 +64,7 @@ const PostProductsScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
-      <CommonAppBar navigation={navigation} label="Post a New Item" />
+      <CommonAppBar navigation={navigation} label="Update Item" />
 
       <View style={{ flex: 1, marginBottom: 20, marginHorizontal: 10 }}>
         <View style={styles.formCard}>
@@ -154,14 +162,14 @@ const PostProductsScreen = () => {
 
         <View style={{ marginHorizontal: 10, marginVertical: 10 }}>
           <ButtonWithLoader
-            name="Submit"
-            loadingName="Processing..."
+            name="Update"
+            loadingName="Updating..."
             isLoading={loading}
             method={() => {
               setLoading(true);
+              console.log('Updated Product:', { name, type, rate, image });
               setTimeout(() => {
                 setLoading(false);
-              
               }, 500);
             }}
           />
@@ -208,7 +216,7 @@ const PostProductsScreen = () => {
   );
 };
 
-export default PostProductsScreen;
+export default UpdateProductScreen;
 const styles = StyleSheet.create({
   formCard: {
     margin: 12,

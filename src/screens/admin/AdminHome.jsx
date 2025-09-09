@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  StatusBar,
 } from 'react-native';
 import {
   appFonts,
@@ -72,36 +73,16 @@ const adminCards = [
   
   {
     id: 1,
-    icon: 'person-add-outline',
-    title: 'User Management',
-    bottomTitle: 'Create & Manage Users',
-    description: 'Add new users and drivers to the platform',
-    firstColor: '#667eea',
-    secondColor: '#764ba2',
-    screen: ''
-  },
-  // {
-  //   id: 2,
-  //   icon: 'calendar-outline',
-  //   title: 'Booking Manager',
-  //   bottomTitle: 'Schedule Pickups',
-  //   description: 'Assign drivers and manage pickup schedules',
-  //   firstColor: '#f12711',
-  //   secondColor: '#f5af19',
-  //   screen: ''
-  // },
-  {
-    id: 3,
     icon: 'storefront-outline',
     title: 'Product Catalog',
     bottomTitle: 'Manage Products',
     description: 'Add and update recyclable product listings',
     firstColor: '#f093fb',
     secondColor: '#f5576c',
-    screen: ''
+    screen: 'allProductsScreen'
   },
   {
-    id: 4,
+    id: 2,
     icon: 'megaphone-outline',
     title: 'Advertisement',
     bottomTitle: 'Promote Services',
@@ -109,29 +90,19 @@ const adminCards = [
     firstColor: '#4facfe',
     secondColor: '#00f2fe',
     screen: ''
-  },  {
-    id: 5,
-    icon: 'send-outline',
-    title: 'Targeted Alerts',
-    bottomTitle: 'Specific Notifications',
-    description: 'Send personalized messages to specific users',
-    firstColor: '#667eea',
-    secondColor: '#764ba2',
-    screen: ''
-  },
-  
+  },  
   {
-    id: 6,
+    id: 3,
     icon: 'notifications-outline',
-    title: 'Global Alerts',
+    title: 'Notification',
     bottomTitle: 'Broadcast Messages',
     description: 'Send notifications to all users and drivers',
-    firstColor: '#fa709a',
-    secondColor: '#fee140',
-    screen: ''
+    firstColor: '#667eea',
+    secondColor: '#764ba2',
+    screen: 'sendNotificationScreen'
   },
   {
-    id: 7,
+    id: 4,
     icon: 'pricetag-outline',
     title: 'Special Offers',
     bottomTitle: 'Best Deals',
@@ -140,17 +111,18 @@ const adminCards = [
     secondColor: '#ee5a24',
     screen: ''
   },
+  // {
+  //   id: 5,
+  //   icon: 'cube-outline',
+  //   title: 'Inventory',
+  //   bottomTitle: 'Stock Management',
+  //   description: 'Track and manage recyclable material inventory',
+  //   firstColor: '#5f27cd',
+  //   secondColor: '#341f97',
+  //   screen: ''
+  // },
   {
-    id: 8,
-    icon: 'cube-outline',
-    title: 'Inventory',
-    bottomTitle: 'Stock Management',
-    description: 'Track and manage recyclable material inventory',
-    firstColor: '#5f27cd',
-    secondColor: '#341f97',
-    screen: ''
-  },{
-    id: 9,
+    id: 6,
     icon: 'chatbubbles-outline',
     title: 'Support Tickets',
     bottomTitle: 'Resolve Queries',
@@ -168,6 +140,7 @@ export default function AdminHome() {
       colors={[Colors.primary, Colors.whiteColor]}
       style={{ flex: 1 }}
     >
+      
       <MyStatusBar />
       <View style={styles.topBar}>
         <TouchableOpacity
@@ -213,7 +186,7 @@ export default function AdminHome() {
       <ScrollView style={styles.mainSection}>
         <MovingIcons icons={icons} />
         <Graph />
-        <AdSlider data={addsData} height={180} />
+        <AdSlider data={addsData} type={"big"} />
         
         {/* Admin Action Cards */}
         <View style={styles.cardsContainer}>
@@ -236,7 +209,7 @@ export default function AdminHome() {
           ))}
         </View>
         <View style={{ marginVertical: 20 }}>
-          <AdSlider data={addsData} height={90} />
+          <AdSlider data={addsData} type={"small"} />
         </View>
 
         <FaddedIcon />
