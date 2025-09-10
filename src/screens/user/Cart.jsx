@@ -53,7 +53,7 @@ const Cart = () => {
         );
         // Navigate with order data
         navigation.navigate('checkoutScreen', { orderData: response?.payload?.data });
-        console.log("Order Data:", response?.payload?.data);
+        console.log("Order Data at card sending to:", response?.payload?.data);
       } else {
         await dispatch(
           showSnackbar({

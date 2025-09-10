@@ -14,10 +14,10 @@ import {
 } from "../styles/commonStyles";
 import MyStatusBar from "../components/MyStatusBar";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { SupportTicket, TicketLoaderCard } from "../components/TicketCard";
+import { SupportTicket } from "../components/TicketCard";
 import { CommonAppBar } from "../components/commonComponents";
 import { useNavigation } from "@react-navigation/native";
-
+import {LoaderCard} from "../components/LoaderCard";
 const allIssues=[
 {
     id: "1",
@@ -50,7 +50,7 @@ const allIssues=[
 
 const RaisedTickets = () => {
 
-      const navigation = useNavigation();
+  const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
 
   return (
@@ -59,7 +59,7 @@ const RaisedTickets = () => {
       <CommonAppBar label={"Raised Tickets" } navigation={navigation}/>
      
        {isLoading ? (
-        <TicketLoaderCard count={5} />
+        <LoaderCard count={5} cardHeight={12}/>
       ):( <FlatList
         data={allIssues}
         renderItem={({ item }) => <SupportTicket issue={item} />}

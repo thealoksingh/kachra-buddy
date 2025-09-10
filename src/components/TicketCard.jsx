@@ -12,52 +12,11 @@ import {
   screenWidth,
 } from "../styles/commonStyles";
 
-export function TicketLoaderCard({ count = 1 }) {
-  const shimmerValue = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    Animated.loop(
-      Animated.timing(shimmerValue, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      })
-    ).start();
-  }, []);
 
-  const shimmerStyle = {
-    opacity: shimmerValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0.3, 1],
-    }),
-  };
 
-  const renderPlaceholder = (width = "80%", height = 12, marginBottom = 8) => (
-    <Animated.View
-      key={Math.random().toString()}
-      style={[
-        {
-          width,
-          height,
-          backgroundColor: Colors.extraLightGrayColor,
-          borderRadius: 4,
-          marginBottom,
-        },
-        shimmerStyle,
-      ]}
-    />
-  );
 
-  const renderSkeletonCard = () => (
-    <View style={styles.userItem} key={Math.random().toString()}>
-      {renderPlaceholder("40%", 12)}
-      {renderPlaceholder("60%", 12)}
-      {renderPlaceholder("70%", 12)}
-    </View>
-  );
 
-  return <>{Array.from({ length: count }, renderSkeletonCard)}</>;
-}
 
 export function SupportTicket({ issue, navigation }) {
   return (

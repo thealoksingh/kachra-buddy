@@ -281,7 +281,7 @@ const BookingDetailScreen = () => {
           {orderData?.status === 'INCOMPLETE'  && (
             <>
               <TouchableOpacity
-                onPress={() => navigation.navigate('checkoutScreen',orderData)}
+                onPress={() => navigation.navigate('checkoutScreen',{orderData})}
                 style={[styles.cancelBtn, { borderColor: Colors.primary }]}
               >
                 <Text

@@ -58,6 +58,7 @@ const CheckoutScreen = () => {
         orderData: {
           sellerName: name,
           sellerContactNo: mobNumber,
+          pickupDate: dateTime,
           orderPickupAddress: address,
           orderPickupLatitude: coordinate?.latitude,
           orderPickupLongitude: coordinate?.longitude,
@@ -65,6 +66,8 @@ const CheckoutScreen = () => {
         images: images,
         postedBy: 'USER',
       };
+
+      console.log("payload at checkout  updateData.orderData ==>",updateData.orderData);
 
       const response = await dispatch(updateOrder(updateData));
 
