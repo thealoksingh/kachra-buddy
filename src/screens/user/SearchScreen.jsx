@@ -15,31 +15,34 @@ import { products } from '../../utils/dummyData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ButtonWithLoader } from '../../components/commonComponents';
 import MyStatusBar from '../../components/MyStatusBar';
+import { useSelector } from 'react-redux';
+import { selectCart, selectItems, selectUser } from '../../store/selector';
 
 const filters = ['All', 'plastic', 'rubber', 'glass', 'aluminium', 'metal'];
 
 const SearchScreen = () => {
+  const items = useSelector(selectItems);
+  const cart = useSelector(selectCart);
   const [searchText, setSearchText] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
- 
-  const filteredProducts = products.filter(item => {
-    const textMatch =
-      item.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      item.type.toLowerCase().includes(searchText.toLowerCase());
+  const filteredProducts = items.filter(item => {
+    const textMatch = item?.name
+      ?.toLowerCase()
+      .includes(searchText.toLowerCase());
 
     const filterMatch =
       selectedFilter === 'All' ||
-      item.material.toLowerCase() === selectedFilter.toLowerCase();
+      item?.name?.toLowerCase().includes(selectedFilter.toLowerCase());
 
     return textMatch && filterMatch;
   });
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor, padding: 10 }}>
-     <MyStatusBar />
+      <MyStatusBar />
       <View style={styles.searchContainer}>
         <MaterialIcons
           name="search"
@@ -124,7 +127,7 @@ const SearchScreen = () => {
             }}
           >
             <Text style={{ textAlign: 'center', ...textStyles.small }}>
-              Total Selected Items to Sell : 9
+              Total Selected Items to Sell : {cart?.cartItems?.length || 0}
             </Text>
           </View>
         </View>
