@@ -29,9 +29,10 @@ import { useNavigation } from '@react-navigation/native';
 import { products, addsData } from '../../utils/dummyData';
 import { FaddedIcon } from '../../components/commonComponents';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectCart, selectItems, selectUser } from '../../store/selector';
+import { selectCart, selectItems, selectOrders, selectUser } from '../../store/selector';
 import { fetchItems, fetchCart, fetchOrders, getUserById } from '../../store/thunks/userThunk';
 import Key from '../../constants/key';
+import {PendingOrderAlert}  from "../../components/userComponents/PendingOrderAlert";
 import { getUserLocation } from '../../utils/CommonMethods';
 
 export const icons = [
@@ -79,9 +80,12 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const items = useSelector(selectItems);
+    const orders = useSelector(selectOrders);
   console.log('Items in home screen', items);
   const [userAddress, setUserAddress] = useState('Getting location...');
   const [refreshing, setRefreshing] = useState(false);
+  const[pendingAlertVisible ,setPendingAlertVisible]=useState(true)
+  const pendingOrders = orders?.filter(order => order.status === 'IN_PROGRESS');
 
   useEffect(() => {
     getUserLocation(
@@ -116,6 +120,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (user) {
+      setPendingAlertVisible(pendingOrders.length > 0);
       dispatch(fetchItems());
       dispatch(fetchCart());
       dispatch(fetchOrders());
@@ -254,8 +259,15 @@ export default function HomeScreen() {
             }}
           />
         </View>
-        <FaddedIcon />
+        <FaddedIcon/>
+       
       </ScrollView>
+       <PendingOrderAlert
+         visible={pendingAlertVisible}
+         title={"You have a Pending Order"}
+         message={"please Complete the order"}
+         onClose={()=>setPendingAlertVisible(false)}
+        />
     </LinearGradient>
   );
 }
