@@ -174,6 +174,33 @@ export const getOrderByIdAPI = async (orderId) => {
   });
 };
 
+// API call for creating new order with images
+export const createOrderAPI = async (data) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  const formData = new FormData();
+  
+  // Add order JSON
+  formData.append('order', JSON.stringify(data.orderData));
+  
+  // Add images if any
+  if (data.images && data.images.length > 0) {
+    data.images.forEach((image, index) => {
+      formData.append('files', {
+        uri: image,
+        type: 'image/jpeg',
+        name: `order_image_${index}.jpg`,
+      });
+    });
+  }
+  
+  return apiPostRequest({
+    apiUrl: `${API_BASE_URL}/api/orders`,
+    content_type: "multipart/form-data",
+    data: formData,
+    accessToken,
+  });
+};
+
 // API call for canceling order
 export const cancelOrderAPI = async (orderId) => {
   const accessToken = await AsyncStorage.getItem("access_token");

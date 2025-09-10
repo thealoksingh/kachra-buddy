@@ -17,6 +17,9 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Colors } from '../../styles/commonStyles';
 import Video from 'react-native-video';
+import { useDispatch, useSelector } from 'react-redux';
+import { createOrder } from '../../store/thunks/userThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
 
 
 const { width } = Dimensions.get('window');
@@ -50,12 +53,61 @@ const vehicleType = [
 
 const ScrapVehicleScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { user } = useSelector(state => state.auth);
+  const { loading } = useSelector(state => state.user);
+  
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [vehicleNumber, setVehicleNumber] = useState('');
   const [vehicleBrand, setVehicleBrand] = useState('');
   const [vehicleModel, setVehicleModel] = useState('');
-  const [loading, setLoading] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
+
+  const getVehicleTypeEnum = (vehicleName) => {
+    const vehicleMap = {
+      'Two Wheeler': 'TWO_WHEELER',
+      'Three Wheeler': 'THREE_WHEELER', 
+      'Car': 'CAR',
+      'Mini Cargo': 'MINI_CARGO',
+      'Truck': 'TRUCK',
+      'Bus': 'BUS'
+    };
+    return vehicleMap[vehicleName] || 'TWO_WHEELER';
+  };
+
+  const handleCreateOrder = async () => {
+    if (!selectedVehicle && selectedVehicle !== 0) {
+      dispatch(showSnackbar({ message: 'Please select a vehicle type', type: 'error', time: 3000 }));
+      return;
+    }
+    if (!vehicleNumber.trim()) {
+      dispatch(showSnackbar({ message: 'Please enter vehicle number', type: 'error', time: 3000 }));
+      return;
+    }
+    if (!vehicleBrand.trim()) {
+      dispatch(showSnackbar({ message: 'Please enter vehicle brand', type: 'error', time: 3000 }));
+      return;
+    }
+    if (!vehicleModel.trim()) {
+      dispatch(showSnackbar({ message: 'Please enter vehicle model', type: 'error', time: 3000 }));
+      return;
+    }
+
+     const orderData = {
+      userId: user?.id || 0,
+      orderType: 'VEHICLE',
+      vehicleType: getVehicleTypeEnum(vehicleType[selectedVehicle].name),
+      vehicleRegNum: vehicleNumber,
+      vehicleName: vehicleBrand,
+      vehicleModel: vehicleModel,
+    };
+    try {
+      const result = await dispatch(createOrder({ orderData }));
+      navigation.navigate('checkoutScreen', { orderData: result?.payload?.data });
+    } catch (error) {
+      dispatch(showSnackbar({ message: 'Failed to create order. Please try again.', type: 'error', time: 3000 }));
+    }
+  };
 
   const renderVehicleCard = ({ item, index }) => {
     const isSelected = selectedVehicle === index;
@@ -175,15 +227,9 @@ const ScrapVehicleScreen = () => {
       <View style={styles.bottomButton}>
         <ButtonWithLoader
           name="Continue"
-          loadingName="Processing..."
+          loadingName="Creating Order..."
           isLoading={loading}
-          method={() => {
-            setLoading(true);
-            setTimeout(() => {
-              setLoading(false);
-              navigation.navigate('checkoutScreen');
-            }, 500);
-          }}
+          method={handleCreateOrder}
         />
       </View>
       </ScrollView>

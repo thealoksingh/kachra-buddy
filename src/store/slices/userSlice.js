@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchItems, fetchCart, addItemToCart, removeItemFromCart, checkoutCart, updateOrder, fetchOrders, cancelOrder } from '../thunks/userThunk';
+import { fetchItems, fetchCart, addItemToCart, removeItemFromCart, checkoutCart, createOrder, updateOrder, fetchOrders, cancelOrder } from '../thunks/userThunk';
 
 const initialState = {
   items: [],
@@ -142,6 +142,21 @@ const userSlice = createSlice({
         console.log("Fetched orders:", state.orders);
       })
       .addCase(fetchOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action?.payload?.message;
+      })
+      // Extra reducers for creating order
+      .addCase(createOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        const newOrder = action?.payload?.data || action?.payload;
+        state.orders.push(newOrder);
+        
+      })
+      .addCase(createOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action?.payload?.message;
       })
