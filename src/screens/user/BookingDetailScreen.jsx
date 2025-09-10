@@ -183,7 +183,7 @@ const BookingDetailScreen = () => {
               {orderData?.driver ? 'Allocated' : 'Not Allocated'}
             </Text>
           </View>
-           {orderData?.type == 'general' && (
+           {orderData?.type == 'GENERAL' && (
             <>
             <View style={commonStyles.rowSpaceBetween}>
               <Text style={textStyles.smallBold}>Items</Text>
@@ -209,7 +209,7 @@ const BookingDetailScreen = () => {
             </Text>
           </View>
         </View>
-        <>
+        {orderData?.type == 'VEHICLE' && ( <>
           <View style={styles.headingSection}>
             <Text style={styles.sectionTitle}>Vehicle Details</Text>
           </View>
@@ -239,8 +239,8 @@ const BookingDetailScreen = () => {
             </View>
           
           </View>
-        </>
-        {orderData?.type == 'general' && (
+        </>)}
+        {orderData?.type == 'GENERAL' && (
           <>
             <View style={styles.headingSection}>
               <Text style={styles.sectionTitle}>Item In this Booking</Text>
@@ -427,6 +427,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 10,
     marginHorizontal: 12,
+    marginVertical:15,
     borderWidth: 1,
     alignItems: 'center',
   },
