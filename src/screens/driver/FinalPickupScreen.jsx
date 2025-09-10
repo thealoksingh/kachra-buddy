@@ -305,7 +305,7 @@ const FinalPickupScreen = () => {
             Total Price: ₹{calculateTotalPrice().toFixed(2)}
           </Text>
         </View>
-        {true && (
+        {otpSent && !isVerified && (
           <View style={styles.formCard}>
             <Text style={styles.sectionLabel}>
               Enter OTP sent to Customer Whatsapp number
