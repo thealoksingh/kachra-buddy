@@ -183,7 +183,7 @@ const BookingDetailScreen = () => {
               {orderData?.driver ? 'Allocated' : 'Not Allocated'}
             </Text>
           </View>
-           {orderData?.type == 'GENERAL' && (
+           {orderData?.orderType == 'GENERAL' && (
             <>
             <View style={commonStyles.rowSpaceBetween}>
               <Text style={textStyles.smallBold}>Items</Text>
@@ -209,7 +209,7 @@ const BookingDetailScreen = () => {
             </Text>
           </View>
         </View>
-        {orderData?.type == 'VEHICLE' && ( <>
+        {orderData?.orderType == 'VEHICLE' && ( <>
           <View style={styles.headingSection}>
             <Text style={styles.sectionTitle}>Vehicle Details</Text>
           </View>
@@ -240,7 +240,7 @@ const BookingDetailScreen = () => {
           
           </View>
         </>)}
-        {orderData?.type == 'GENERAL' && (
+        {orderData?.orderType == 'GENERAL' && (
           <>
             <View style={styles.headingSection}>
               <Text style={styles.sectionTitle}>Item In this Booking</Text>
@@ -308,7 +308,7 @@ const BookingDetailScreen = () => {
       />
       {warningVisible && (
         <WarningWithButton
-          message="Are you sure you want to Cancel this Order?"
+          message="Are you sure you want to cancel this Order?"
           onYes={() => {
             setWarningVisible(false);
           }}

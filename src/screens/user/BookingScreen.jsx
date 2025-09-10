@@ -1,13 +1,12 @@
-import { StyleSheet, View, FlatList } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import SwipableTabs from '../../components/SwipableTabs';
 import { CommonAppBar, FaddedIcon } from '../../components/commonComponents';
-import { useNavigation } from '@react-navigation/native';
-import { Colors } from '../../styles/commonStyles';
 import BookingCard from '../../components/userComponents/BookingCard';
-import { bookings } from '../../utils/dummyData';
 import { selectOrders } from '../../store/selector';
-import { useSelector } from 'react-redux';
+import { Colors } from '../../styles/commonStyles';
 
 const PreviousBookings = ({ orders }) => {
   const completedOrders = orders?.filter(order => order.status === 'COMPLETED');
