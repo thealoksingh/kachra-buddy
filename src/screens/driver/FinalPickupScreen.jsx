@@ -305,13 +305,20 @@ const FinalPickupScreen = () => {
             Total Price: ₹{calculateTotalPrice().toFixed(2)}
           </Text>
         </View>
-        {otpSent && !isVerified && (
+        {true && (
           <View style={styles.formCard}>
             <Text style={styles.sectionLabel}>
-              Enter OTP sent to Customer mobile number
+              Enter OTP sent to Customer Whatsapp number
               <Text style={{ color: Colors.secondary }}>*</Text>
             </Text>
             <OtpFields otpInput={otpInput} setOtpInput={setOtpInput} />
+            <TouchableOpacity 
+              style={styles.resendBtn} 
+              onPress={sendOtp}
+              disabled={otpLoading}
+            >
+              <Text style={styles.resendText}>Resend OTP</Text>
+            </TouchableOpacity> 
           </View>
         )}
         <View style={{ marginHorizontal: 10, marginVertical: 10 }}>
@@ -500,5 +507,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 10,
+  },
+  resendBtn: {
+    alignSelf: 'flex-end',
+    backgroundColor: Colors.darkBlue,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    marginTop: 8,
+  },
+  resendText: {
+    color: Colors.whiteColor,
+    fontSize: 12,
+    fontWeight: '500',
   },
 });
