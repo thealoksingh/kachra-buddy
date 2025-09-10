@@ -39,7 +39,7 @@ const CheckoutScreen = () => {
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
   const [dateTime, setDateTime] = useState(null);
   const [name, setName] = useState(orderData?.user?.fullName || '');
-  console.log("date time is ",dateTime)
+  // console.log("date time is ",dateTime);
   const [mobNumber, setMobNUmber] = useState(
     orderData?.user?.contactNumber || '',
   );

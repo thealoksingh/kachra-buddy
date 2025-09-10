@@ -10,7 +10,7 @@ import { Colors } from '../styles/commonStyles';
 import { CommonAppBar } from '../components/commonComponents';
 import { useNavigation } from '@react-navigation/native';
 
-export default function Notifications() {
+export default function NotificationScreen() {
     const navigation =useNavigation();
   const [notifications, setNotifications] = useState([
     {
