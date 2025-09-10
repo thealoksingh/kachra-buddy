@@ -85,7 +85,7 @@ export default function HomeScreen() {
   const [userAddress, setUserAddress] = useState('Getting location...');
   const [refreshing, setRefreshing] = useState(false);
   const[pendingAlertVisible ,setPendingAlertVisible]=useState(true)
-  const pendingOrders = orders?.filter(order => order.status === 'IN_PROGRESS');
+  const pendingOrders = orders?.filter(order => order.status === 'INCOMPLETE');
 
   useEffect(() => {
     getUserLocation(

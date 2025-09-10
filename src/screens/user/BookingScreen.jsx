@@ -8,7 +8,7 @@ import BookingCard from '../../components/userComponents/BookingCard';
 import { selectOrders } from '../../store/selector';
 import { Colors } from '../../styles/commonStyles';
 
-const PreviousBookings = ({ orders }) => {
+const ClosedBookings = ({ orders }) => {
   const completedOrders = orders?.filter(order => order.status === 'COMPLETED');
   return (
     <FlatList
@@ -21,7 +21,7 @@ const PreviousBookings = ({ orders }) => {
 };
 
 const OngoingBookings = ({ orders }) => {
-  const ongoingOrders = orders?.filter(order => order.status === 'NEW' || order.status === 'IN_PROGRESS');
+  const ongoingOrders = orders?.filter(order => order.status === 'ACTIVE' || order.status === 'INCOMPLETE');
   return (
     <FlatList
       data={ongoingOrders}
@@ -41,8 +41,8 @@ const BookingScreen = () => {
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
       <CommonAppBar navigation={navigation} label={'Bookings'} />
       <SwipableTabs
-        titles={['Ongoing Bookings', 'Previous Bookings']}
-        components={[<OngoingBookings orders={orders} />, <PreviousBookings orders={orders} />]}
+        titles={['Ongoing Bookings', 'Closed Bookings']}
+        components={[<OngoingBookings orders={orders} />, <ClosedBookings orders={orders} />]}
       />
     </View>
   );

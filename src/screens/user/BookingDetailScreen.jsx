@@ -274,24 +274,59 @@ const BookingDetailScreen = () => {
             </View>
           </>
         )}
-        {true ? (
-          <TouchableOpacity
-            onPress={() => setWarningVisible(true)}
-            style={[styles.cancelBtn, { borderColor: Colors.secondary }]}
-          >
-            <Text style={[styles.cancelBtnText, { color: Colors.secondary }]}>
-              Cancel Booking
-            </Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={[styles.cancelBtn, { borderColor: Colors.primary }]}
-          >
-            <Text style={[styles.cancelBtnText, { color: Colors.primary }]}>
-              Rate Now
-            </Text>
-          </TouchableOpacity>
-        )}
+       <View
+          style={{ flexDirection: 'row', justifyContent: 'center', gap: 2 }}
+        >
+          {/* Pending Order → show Complete + Cancel */}
+          {orderData?.status === 'INCOMPLETE'  && (
+            <>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('checkoutScreen',orderData)}
+                style={[styles.cancelBtn, { borderColor: Colors.primary }]}
+              >
+                <Text
+                  style={[styles.cancelBtnText, { color: Colors.primary }]}
+                >
+                  Complete Booking
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setWarningVisible(true)}
+                style={[styles.cancelBtn, { borderColor: Colors.secondary }]}
+              >
+                <Text
+                  style={[styles.cancelBtnText, { color: Colors.secondary }]}
+                >
+                  Cancel Booking
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          {/* New Order → only Cancel */}
+          {orderData?.status === 'ACTIVE' && (
+            <TouchableOpacity
+              onPress={() => setWarningVisible(true)}
+              style={[styles.cancelBtn, { borderColor: Colors.secondary }]}
+            >
+              <Text style={[styles.cancelBtnText, { color: Colors.secondary }]}>
+                Cancel Booking
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Completed Order → Rate Now */}
+          {orderData?.status === 'COMPLETED' && (
+            <TouchableOpacity
+              style={[styles.cancelBtn, { borderColor: Colors.primary }]}
+            >
+              <Text style={[styles.cancelBtnText, { color: Colors.primary }]}>
+                Rate Now
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         <FaddedIcon />
         <View style={{ height: 80 }} />

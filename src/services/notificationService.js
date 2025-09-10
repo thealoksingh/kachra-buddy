@@ -11,10 +11,10 @@ class NotificationService {
     // Fetch notifications immediately
     this.dispatch(fetchNotifications());
     
-    // Set up interval to fetch every 30 seconds
+    // Set up interval to fetch every 300 seconds
     this.intervalId = setInterval(() => {
       this.dispatch(fetchNotifications());
-    }, 30000);
+    }, 300000);
   }
 
   stop() {
