@@ -22,32 +22,37 @@ const filters = ['All', 'plastic', 'rubber', 'glass', 'aluminium', 'metal'];
 
 const SelectAdditionalItemScreen = () => {
   const route = useRoute();
-  const { onItemSelect } = route.params || {};
+  const { onItemSelect, currentOrderItems } = route.params || {};
+//   console.log('currentOrderItems ===>', currentOrderItems); 
+
+  const existingIds = new Set(currentOrderItems?.map(item => item.id));
+
+  const [selectedItem, setSelectedItem] = useState([]);
+
   const [searchText, setSearchText] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
-  const [selectedItem, setSelectedItem] = useState([]); // now holds item objects
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
   const items = useSelector(selectDriverItems);
 
   const handleSelect = () => {
-    console.log("selected items", selectedItem);
+    console.log('selected items', selectedItem);
     if (onItemSelect) {
-      onItemSelect(selectedItem); // ✅ pass full objects back
+      onItemSelect(selectedItem);
     }
     navigation.goBack();
   };
 
-  const toggleSelect = (item) => {
-    const exists = selectedItem.some((i) => i.id === item.id);
+  const toggleSelect = item => {
+    const exists = selectedItem.some(i => i.id === item.id);
     if (exists) {
-      setSelectedItem(selectedItem.filter((i) => i.id !== item.id));
+      setSelectedItem(selectedItem.filter(i => i.id !== item.id));
     } else {
       setSelectedItem([...selectedItem, item]);
     }
   };
 
-  const filteredProducts = (items || []).filter((item) => {
+  const filteredProducts = (items || []).filter(item => {
     if (!item) return false;
 
     const itemName = item.name || item.title || '';
@@ -63,6 +68,10 @@ const SelectAdditionalItemScreen = () => {
 
     return textMatch && filterMatch;
   });
+  const availableProducts = filteredProducts?.filter(
+    p => !existingIds.has(p.id),
+  );
+  console.log('availableProducts ===>', availableProducts);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor, padding: 10 }}>
@@ -91,7 +100,7 @@ const SelectAdditionalItemScreen = () => {
         showsHorizontalScrollIndicator={false}
         style={{ marginVertical: 10, maxHeight: 40 }}
       >
-        {filters.map((item) => (
+        {filters.map(item => (
           <TouchableOpacity
             key={item}
             style={[
@@ -120,10 +129,8 @@ const SelectAdditionalItemScreen = () => {
 
       {/* Product List */}
       <FlatList
-        data={filteredProducts}
-        keyExtractor={(item) =>
-          item?.id?.toString() || Math.random().toString()
-        }
+        data={availableProducts} // ✅ only non-duplicate products
+        keyExtractor={item => item?.id?.toString() || Math.random().toString()}
         numColumns={2}
         columnWrapperStyle={{ justifyContent: 'space-between' }}
         contentContainerStyle={{ paddingBottom: 20 }}
@@ -134,7 +141,7 @@ const SelectAdditionalItemScreen = () => {
           >
             <SelectItemCard
               product={item}
-              selected={selectedItem.some((i) => i.id === item.id)} // ✅ check by id
+              selected={selectedItem.some(i => i.id === item.id)}
             />
           </TouchableOpacity>
         )}
@@ -177,7 +184,6 @@ const SelectAdditionalItemScreen = () => {
     </View>
   );
 };
-
 
 export default SelectAdditionalItemScreen;
 

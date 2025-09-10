@@ -51,27 +51,8 @@ const FinalPickupScreen = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [updatedQuantities, setUpdatedQuantities] = useState({});
-  const [additionalItems, setAdditionalItems] = useState([
-    {
-      id: 1,
-      name: 'Plastic Bottles',
-      category: 'Plastic',
-      price: 5,
-      unit: 'kg',
-      image: 'https://images.unsplash.com/photo-1572776685600-aca8c3456337?w=150',
-      quantity: 0
-    },
-    {
-      id: 2,
-      name: 'Metal Cans',
-      category: 'Metal', 
-      price: 15,
-      unit: 'kg',
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=150',
-      quantity: 0
-    }
-  ]);
-
+  const [additionalItems, setAdditionalItems] = useState([]);
+  console.log('currentOrder?.orderItems prev ====>', currentOrder?.orderItems);
 
   //removable in future
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
@@ -121,6 +102,9 @@ const FinalPickupScreen = () => {
     setOtpLoading(true);
     try {
       await sendPickupOtpAPI(currentOrder.id);
+      await dispatch(
+        showSnackbar({ message: 'OTP sent successfully!', type: 'success' }),
+      );
       setOtpSent(true);
     } catch (error) {
       console.error('Error sending OTP:', error);
@@ -231,15 +215,18 @@ const FinalPickupScreen = () => {
         </View>
 
         <View style={styles.formCard}>
-          <Text style={styles.sectionLabel}>Additional Items</Text>
-       
+          <Text style={styles.sectionLabel}>Additional Items (Optional)</Text>
+
           {additionalItems.map((item, index) => (
             <AdditionalItemCard
               key={index}
               item={item}
               onQuantityChange={(itemId, quantity) => {
                 const updatedItems = [...additionalItems];
-                updatedItems[index] = { ...updatedItems[index], quantity: parseFloat(quantity) || 0 };
+                updatedItems[index] = {
+                  ...updatedItems[index],
+                  quantity: parseFloat(quantity) || 0,
+                };
                 setAdditionalItems(updatedItems);
               }}
               onRemove={() => removeAdditionalItem(index)}
@@ -247,9 +234,9 @@ const FinalPickupScreen = () => {
           ))}
           <TouchableOpacity
             style={styles.addItemBtn}
-              onPress={() =>
+            onPress={() =>
               navigation.navigate('selectAdditionalItemScreen', {
-                
+                currentOrderItems: currentOrder?.orderItems,
                 onItemSelect: items => setAdditionalItems(items),
               })
             }
@@ -365,7 +352,7 @@ const FinalPickupScreen = () => {
       {succesAlertVisible && (
         <LottieAlert
           type="success"
-          message="Order Updated Successfully"
+          message="Order Picked up Successfully"
           loop={false}
           onClose={() => {
             setSuccessAlertVisible(false);
@@ -384,7 +371,6 @@ const FinalPickupScreen = () => {
           autoClose={true}
         />
       )}
-
     </ScrollView>
   );
 };
