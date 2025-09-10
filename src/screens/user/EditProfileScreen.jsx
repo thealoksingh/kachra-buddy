@@ -17,7 +17,7 @@ import { showSnackbar } from '../../store/slices/snackbarSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Key from '../../constants/key';
 const EditProfileScreen = () => {
-  const { API_BASE_URL } = Key
+  const { API_BASE_URL } = Key;
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
@@ -25,8 +25,10 @@ const EditProfileScreen = () => {
   const [email, setEmail] = useState('');
   const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
   const user = useSelector(selectUser);
-  const [avatar, setAvatar] = useState(API_BASE_URL  + user?.avatarUrl);
-  console.log("avatar url", avatar)
+  const [avatar, setAvatar] = useState(
+    user?.avatarUrl ? API_BASE_URL + user.avatarUrl : null,
+  );
+  console.log('avatar url', avatar);
   const dispatch = useDispatch();
 
   const { openCamera, openGallery } = useImagePicker();
@@ -48,15 +50,15 @@ const EditProfileScreen = () => {
     }
   };
 
-  const uploadProfilePicture = async (imageData) => {
+  const uploadProfilePicture = async imageData => {
     setLoading(true);
     try {
-      const userId = await AsyncStorage.getItem("user_id");
+      const userId = await AsyncStorage.getItem('user_id');
       const data = {
         userId,
         uri: imageData.uri,
         type: imageData.type,
-        name: imageData.fileName || 'profile.jpg'
+        name: imageData.fileName || 'profile.jpg',
       };
 
       const response = await dispatch(updateProfilePic(data));
@@ -72,7 +74,8 @@ const EditProfileScreen = () => {
       } else {
         await dispatch(
           showSnackbar({
-            message: response?.payload?.message || 'Failed to update profile picture',
+            message:
+              response?.payload?.message || 'Failed to update profile picture',
             type: 'error',
             time: 5000,
           }),
@@ -80,7 +83,11 @@ const EditProfileScreen = () => {
       }
     } catch (error) {
       await dispatch(
-        showSnackbar({ message: 'Error uploading image', type: 'error', time: 3000 }),
+        showSnackbar({
+          message: 'Error uploading image',
+          type: 'error',
+          time: 3000,
+        }),
       );
     } finally {
       setLoading(false);
@@ -90,13 +97,13 @@ const EditProfileScreen = () => {
   const handleUpdateUser = async () => {
     setLoading(true);
     try {
-      const userId = await AsyncStorage.getItem("user_id");
+      const userId = await AsyncStorage.getItem('user_id');
       const data = {
         userId,
         fullName: name || user?.fullName,
         contactNumber: mobNumber || user?.contactNumber,
         role: user?.role,
-        status: user?.status  
+        status: user?.status,
       };
 
       const response = await dispatch(updateUser(data));
@@ -121,7 +128,11 @@ const EditProfileScreen = () => {
       }
     } catch (error) {
       await dispatch(
-        showSnackbar({ message: 'Error updating profile', type: 'error', time: 3000 }),
+        showSnackbar({
+          message: 'Error updating profile',
+          type: 'error',
+          time: 3000,
+        }),
       );
     } finally {
       setLoading(false);
@@ -133,17 +144,18 @@ const EditProfileScreen = () => {
       <CommonAppBar navigation={navigation} label="Edit Profile" />
 
       <View style={{ flex: 1, marginHorizontal: 16, marginTop: 50 }}>
-
         <View style={styles.avatarContainer}>
           {avatar ? (
             <>
-              <Image source={{
-                uri: avatar,
-                headers: {
-                  Authorization: `Bearer ${user?.accessToken}`,
-                },
-              }} style={styles.avatar} />
-
+              <Image
+                source={{
+                  uri: avatar,
+                  headers: {
+                    Authorization: `Bearer ${user?.accessToken}`,
+                  },
+                }}
+                style={styles.avatar}
+              />
             </>
           ) : (
             <TouchableOpacity
