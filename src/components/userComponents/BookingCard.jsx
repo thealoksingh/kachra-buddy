@@ -82,11 +82,7 @@ const BookingCard = ({ booking }) => {
           #{booking?.id || 'N/A'}
         </Text>
       </View>
-      <Text
-        style={[textStyles.small, { color: Colors.grayColor, marginTop: 2 }]}
-      >
-        {booking?.orderPickupAddress || booking?.pickupAddress || 'Address not provided'}
-      </Text>
+   
 
       {renderImages()}
 
