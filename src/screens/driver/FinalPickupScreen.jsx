@@ -23,12 +23,15 @@ import { LottieAlert } from '../../components/lottie/LottieAlert';
 import MyStatusBar from '../../components/MyStatusBar';
 import EditableOrderCard from '../../components/driverComponents/EditableOrderCard';
 import ItemSelectionModal from '../../components/driverComponents/ItemSelectionModal';
+import AdditionalItemCard from '../../components/driverComponents/AdditionalItemCard';
 import { sendPickupOtpAPI } from '../../utils/api/driverApi';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateDriverOrder, fetchAllItems, addItemsToOrder } from '../../store/thunks/driverThunk';
+import {
+  updateDriverOrder,
+  fetchAllItems,
+  addItemsToOrder,
+} from '../../store/thunks/driverThunk';
 import { selectDriverLoader, selectDriverItems } from '../../store/selector';
-
-
 
 const FinalPickupScreen = () => {
   const navigation = useNavigation();
@@ -49,7 +52,7 @@ const FinalPickupScreen = () => {
   const [isVerified, setIsVerified] = useState(false);
   const [updatedQuantities, setUpdatedQuantities] = useState({});
   const [additionalItems, setAdditionalItems] = useState([]);
-  const [showItemsModal, setShowItemsModal] = useState(false);
+  console.log('currentOrder?.orderItems prev ====>', currentOrder?.orderItems);
 
   //removable in future
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
@@ -65,32 +68,33 @@ const FinalPickupScreen = () => {
     const newItem = {
       item,
       quantity: parseFloat(quantity),
-      price: item.pricePerUnit * parseFloat(quantity)
+      price: item.pricePerUnit * parseFloat(quantity),
     };
     setAdditionalItems(prev => [...prev, newItem]);
   };
 
-  const removeAdditionalItem = (index) => {
+  const removeAdditionalItem = index => {
     setAdditionalItems(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleQuantityChange = (orderItemId, newQuantity) => {
     setUpdatedQuantities(prev => ({
       ...prev,
-      [orderItemId]: parseFloat(newQuantity) || 0
+      [orderItemId]: parseFloat(newQuantity) || 0,
     }));
   };
 
   const calculateTotalPrice = () => {
-    const originalTotal = currentOrder?.orderItems?.reduce((total, orderItem) => {
-      const quantity = updatedQuantities[orderItem.id] ?? orderItem.quantity;
-      return total + (quantity * orderItem.item.pricePerUnit);
-    }, 0) || 0;
-    
+    const originalTotal =
+      currentOrder?.orderItems?.reduce((total, orderItem) => {
+        const quantity = updatedQuantities[orderItem.id] ?? orderItem.quantity;
+        return total + quantity * orderItem.item.pricePerUnit;
+      }, 0) || 0;
+
     const additionalTotal = additionalItems.reduce((total, item) => {
       return total + item.price;
     }, 0);
-    
+
     return originalTotal + additionalTotal;
   };
 
@@ -98,6 +102,9 @@ const FinalPickupScreen = () => {
     setOtpLoading(true);
     try {
       await sendPickupOtpAPI(currentOrder.id);
+      await dispatch(
+        showSnackbar({ message: 'OTP sent successfully!', type: 'success' }),
+      );
       setOtpSent(true);
     } catch (error) {
       console.error('Error sending OTP:', error);
@@ -110,31 +117,35 @@ const FinalPickupScreen = () => {
   const submitOrder = async () => {
     const updatedOrderItems = currentOrder.orderItems.map(item => ({
       ...item,
-      quantity: updatedQuantities[item.id] ?? item.quantity
+      quantity: updatedQuantities[item.id] ?? item.quantity,
     }));
-    
+
     // Add additional items if any
     if (additionalItems.length > 0) {
-      await dispatch(addItemsToOrder({
-        orderId: currentOrder.id,
-        items: additionalItems
-      }));
+      await dispatch(
+        addItemsToOrder({
+          orderId: currentOrder.id,
+          items: additionalItems,
+        }),
+      );
     }
-    
+
     const orderData = {
       orderItems: [...updatedOrderItems, ...additionalItems],
       finalPrice: calculateTotalPrice(),
       remark: remark,
     };
-    
-    const result = await dispatch(updateDriverOrder({
-      orderId: currentOrder.id,
-      orderData,
-      postedBy: 'DRIVER',
-      otp: otpInput,
-      images
-    }));
-    
+
+    const result = await dispatch(
+      updateDriverOrder({
+        orderId: currentOrder.id,
+        orderData,
+        postedBy: 'DRIVER',
+        otp: otpInput,
+        images,
+      }),
+    );
+
     if (updateDriverOrder.fulfilled.match(result)) {
       setSuccessAlertVisible(true);
       setTimeout(() => {
@@ -196,35 +207,44 @@ const FinalPickupScreen = () => {
               quantity={orderItem.quantity}
               unit={orderItem.unit}
               orderItem={orderItem}
-              onQuantityChange={(newQuantity) => handleQuantityChange(orderItem.id, newQuantity)}
+              onQuantityChange={newQuantity =>
+                handleQuantityChange(orderItem.id, newQuantity)
+              }
             />
           ))}
         </View>
-        
+
         <View style={styles.formCard}>
-          <Text style={styles.sectionLabel}>Additional Items Found</Text>
-          <TouchableOpacity 
+          <Text style={styles.sectionLabel}>Additional Items (Optional)</Text>
+
+          {additionalItems.map((item, index) => (
+            <AdditionalItemCard
+              key={index}
+              item={item}
+              onQuantityChange={(itemId, quantity) => {
+                const updatedItems = [...additionalItems];
+                updatedItems[index] = {
+                  ...updatedItems[index],
+                  quantity: parseFloat(quantity) || 0,
+                };
+                setAdditionalItems(updatedItems);
+              }}
+              onRemove={() => removeAdditionalItem(index)}
+            />
+          ))}
+          <TouchableOpacity
             style={styles.addItemBtn}
-            onPress={() => setShowItemsModal(true)}
+            onPress={() =>
+              navigation.navigate('selectAdditionalItemScreen', {
+                currentOrderItems: currentOrder?.orderItems,
+                onItemSelect: items => setAdditionalItems(items),
+              })
+            }
           >
             <Text style={styles.addItemText}>+ Add Items</Text>
           </TouchableOpacity>
-          
-          {additionalItems.map((item, index) => (
-            <View key={index} style={styles.additionalItemRow}>
-              <Text style={styles.itemName}>{item.item.name}</Text>
-              <Text style={styles.itemQuantity}>Qty: {item.quantity}</Text>
-              <Text style={styles.itemPrice}>₹{item.price.toFixed(2)}</Text>
-              <TouchableOpacity onPress={() => removeAdditionalItem(index)}>
-                <Text style={styles.removeItemText}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
         </View>
-        
-        <View style={styles.priceCard}>
-          <Text style={styles.priceLabel}>Total Price: ₹{calculateTotalPrice().toFixed(2)}</Text>
-        </View>
+
         <View style={styles.formCard}>
           <InputBox
             value={givenAmount}
@@ -280,13 +300,25 @@ const FinalPickupScreen = () => {
             )}
           </View>
         </View>
+        <View style={styles.priceCard}>
+          <Text style={styles.priceLabel}>
+            Total Price: ₹{calculateTotalPrice().toFixed(2)}
+          </Text>
+        </View>
         {otpSent && !isVerified && (
           <View style={styles.formCard}>
             <Text style={styles.sectionLabel}>
-              Enter OTP sent to Customer mobile number
+              Enter OTP sent to Customer Whatsapp number
               <Text style={{ color: Colors.secondary }}>*</Text>
             </Text>
             <OtpFields otpInput={otpInput} setOtpInput={setOtpInput} />
+            <TouchableOpacity 
+              style={styles.resendBtn} 
+              onPress={sendOtp}
+              disabled={otpLoading}
+            >
+              <Text style={styles.resendText}>Resend OTP</Text>
+            </TouchableOpacity> 
           </View>
         )}
         <View style={{ marginHorizontal: 10, marginVertical: 10 }}>
@@ -296,6 +328,7 @@ const FinalPickupScreen = () => {
               loadingName="Sending OTP..."
               isLoading={otpLoading}
               method={sendOtp}
+              color={Colors.secondary}
             />
           )}
           {otpSent && !isVerified && (
@@ -326,7 +359,7 @@ const FinalPickupScreen = () => {
       {succesAlertVisible && (
         <LottieAlert
           type="success"
-          message="Order Updated Successfully"
+          message="Order Picked up Successfully"
           loop={false}
           onClose={() => {
             setSuccessAlertVisible(false);
@@ -345,13 +378,6 @@ const FinalPickupScreen = () => {
           autoClose={true}
         />
       )}
-      
-      <ItemSelectionModal 
-        visible={showItemsModal}
-        items={availableItems}
-        onClose={() => setShowItemsModal(false)}
-        onAddItem={addAdditionalItem}
-      />
     </ScrollView>
   );
 };
@@ -427,21 +453,25 @@ const styles = StyleSheet.create({
   priceCard: {
     margin: 12,
     padding: 16,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.whiteColor,
     borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 3,
     alignItems: 'center',
   },
   priceLabel: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Colors.whiteColor,
+    color: Colors.blackColor,
   },
   addItemBtn: {
     backgroundColor: Colors.primary,
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 10,
+    marginVertical: 10,
   },
   addItemText: {
     color: Colors.whiteColor,
@@ -477,5 +507,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 10,
+  },
+  resendBtn: {
+    alignSelf: 'flex-end',
+    backgroundColor: Colors.darkBlue,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    marginTop: 8,
+  },
+  resendText: {
+    color: Colors.whiteColor,
+    fontSize: 12,
+    fontWeight: '500',
   },
 });

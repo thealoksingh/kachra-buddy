@@ -7,10 +7,18 @@ import { useDispatch } from 'react-redux';
 import { removeItemFromCart } from '../../store/thunks/userThunk';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
 
-const CartCard = ({ cartItem, user }) => {
-  const [quantity, setQuantity] = useState(cartItem?.quantity?.toString() || '');
+const CartCard = ({ cartItem, user, onQuantityChange, currentQuantity }) => {
+  const [quantity, setQuantity] = useState(currentQuantity?.toString() || cartItem?.quantity?.toString() || '');
   const {API_BASE_URL} = Key;
   const dispatch = useDispatch();
+  
+  const handleQuantityChange = (newQuantity) => {
+    setQuantity(newQuantity);
+    const numericQuantity = parseFloat(newQuantity) || 0;
+    onQuantityChange?.(cartItem?.item?.id, numericQuantity);
+  };
+  
+  const calculatedPrice = (parseFloat(quantity) || 0) * cartItem?.item?.pricePerUnit;
   
   const handleRemoveItem = async () => {
     try {
@@ -65,7 +73,7 @@ const CartCard = ({ cartItem, user }) => {
         </Text>
 
         <Text style={styles.price}>
-          Total: ₹{cartItem?.price}
+          Total: ₹{calculatedPrice.toFixed(2)}
         </Text>
 
         {/* Input for quantity */}
@@ -75,7 +83,7 @@ const CartCard = ({ cartItem, user }) => {
           </Text>
           <TextInput
             value={quantity}
-            onChangeText={setQuantity}
+            onChangeText={handleQuantityChange}
             keyboardType="numeric"
             placeholder="0"
             style={styles.input}

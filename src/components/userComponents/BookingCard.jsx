@@ -82,11 +82,7 @@ const BookingCard = ({ booking }) => {
           #{booking?.id || 'N/A'}
         </Text>
       </View>
-      <Text
-        style={[textStyles.small, { color: Colors.grayColor, marginTop: 2 }]}
-      >
-        {booking?.orderPickupAddress || booking?.pickupAddress || 'Address not provided'}
-      </Text>
+   
 
       {renderImages()}
 
@@ -106,8 +102,8 @@ const BookingCard = ({ booking }) => {
                   : Colors.primary,
             },
           ]}
-        >
-          {booking?.status || 'N/A'}
+         >
+        {booking?.status || 'N/A'}
         </Text>
       </View>
 
@@ -123,10 +119,10 @@ const BookingCard = ({ booking }) => {
         <Text style={textStyles.small}>{pickupDate}</Text>
       </View>
 
-      <View style={commonStyles.rowSpaceBetween}>
+      {booking?.type=="general"&&(<View style={commonStyles.rowSpaceBetween}>
         <Text style={textStyles.smallBold}>Items</Text>
         <Text style={textStyles.small}>{itemCount}</Text>
-      </View>
+      </View>)}
 
       <View
         style={[commonStyles.rowSpaceBetween, { marginTop: Sizes.fixPadding }]}

@@ -30,8 +30,8 @@ import { FaddedIcon } from '../../components/commonComponents';
 import CurvedCard from '../../screens/driver/CurvedCard';
 import {fetchAddressFromCoordinates, getUserLocation} from "../../utils/CommonMethods";
 import { useSelector, useDispatch } from 'react-redux';
-import { selectUser } from '../../store/selector';
-import { fetchDriverOrders } from '../../store/thunks/driverThunk';
+import { selectUser, selectDriverItems, selectDriverLoading } from '../../store/selector';
+import { fetchAllItems, fetchDriverOrders } from '../../store/thunks/driverThunk';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -72,8 +72,11 @@ export const icons = [
 
 export default function DriverHome() {
   const user = useSelector(selectUser);
+  const driverItems = useSelector(selectDriverItems);
+  // const driverLoading = useSelector(selectDriverLoading);
   const dispatch = useDispatch();
   console.log("user in driver home", user);
+  console.log("driver items", driverItems);
   const navigation = useNavigation();
   const [userAddress, setUserAddress] = useState('Getting location...');
 
@@ -89,8 +92,9 @@ export default function DriverHome() {
       }
     );
     
-    // Fetch driver orders when user is present
+    // Fetch driver data when user is present
     if (user) {
+      dispatch(fetchAllItems());
       dispatch(fetchDriverOrders());
     }
   }, [user, dispatch]);
@@ -103,17 +107,34 @@ export default function DriverHome() {
       <MyStatusBar />
       <View style={styles.topBar}>
         <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={()=>navigation.navigate('driverProfileScreen')}
-        style={styles.profileSection}>
-          <Image
-            source={{
-              uri: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1170&auto=format&fit=crop',
-            }}
-            style={styles.profileImage}
-          />
-          <View>
-            <Text style={styles.userName}>{user?.fullName || 'Driver'}</Text>
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate('driverProfileScreen')}
+          style={styles.profileSection}
+        >
+            {user?.avatarUrl ? (
+              <Image
+              source={{
+                uri: API_BASE_URL + user.avatarUrl,
+                headers: {
+                  Authorization: `Bearer ${user?.accessToken}`,
+                },
+              }}
+              style={styles.profileImage}
+            />
+          ) : (
+             <View
+              style={{
+                ...styles.profileImage, 
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#e1e1e1', 
+              }}
+            >
+              <Ionicons name="person-outline" size={30} color="#666" />
+            </View>
+          )}
+           <View>
+            <Text style={styles.userName}>{user?.fullName}</Text>
             <Text
               style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
             >

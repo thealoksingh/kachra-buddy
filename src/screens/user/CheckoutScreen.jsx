@@ -1,4 +1,12 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  ScrollView,
+} from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
@@ -8,6 +16,7 @@ import { showSnackbar } from '../../store/slices/snackbarSlice';
 import {
   ButtonWithLoader,
   CommonAppBar,
+  FaddedIcon,
   InputBox,
   TextArea,
 } from '../../components/commonComponents';
@@ -15,25 +24,29 @@ import ImagePreviewModal from '../../components/ImagePreviewModal';
 import { useImagePicker } from '../../components/useImagePicker';
 import ImagePickerSheet from '../../components/ImagePickerSheet';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
+import DateTimePickerField from '../../components/userComponents/DateTimePickerField';
 
 const CheckoutScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  
+
   // Get order data from navigation params
   const { orderData } = route.params || {};
   console.log('Order Data received:', orderData);
-  
   const [failureAlertVisible, setFailureAlertVisible] = useState(false);
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
+  const [dateTime, setDateTime] = useState(null);
   const [name, setName] = useState(orderData?.user?.fullName || '');
-  const [mobNumber, setMobNUmber] = useState(orderData?.user?.contactNumber || '');
+  // console.log("date time is ",dateTime);
+  const [mobNumber, setMobNUmber] = useState(
+    orderData?.user?.contactNumber || '',
+  );
   const [address, setAddress] = useState(orderData?.orderPickupAddress || '');
   const [coordinate, setCoordinate] = useState({
     latitude: orderData?.orderPickupLatitude || 0,
-    longitude: orderData?.orderPickupLongitude || 0
+    longitude: orderData?.orderPickupLongitude || 0,
   });
 
   // Handle submit method
@@ -50,11 +63,11 @@ const CheckoutScreen = () => {
           orderPickupLongitude: coordinate?.longitude,
         },
         images: images,
-        postedBy: 'USER'
+        postedBy: 'USER',
       };
-      
+
       const response = await dispatch(updateOrder(updateData));
-      
+
       if (updateOrder.fulfilled.match(response)) {
         await dispatch(
           showSnackbar({
@@ -75,7 +88,11 @@ const CheckoutScreen = () => {
       }
     } catch (error) {
       await dispatch(
-        showSnackbar({ message: 'Error updating order', type: 'error', time: 3000 }),
+        showSnackbar({
+          message: 'Error updating order',
+          type: 'error',
+          time: 3000,
+        }),
       );
     } finally {
       setLoading(false);
@@ -124,7 +141,7 @@ const CheckoutScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
+    <ScrollView style={{ flex: 1, backgroundColor: Colors.whiteColor ,}}>
       <CommonAppBar navigation={navigation} label="Add More Detail" />
 
       <View style={{ flex: 1, marginBottom: 20, marginHorizontal: 10 }}>
@@ -154,17 +171,7 @@ const CheckoutScreen = () => {
                 },
               })
             }
-            style={{
-              borderColor: Colors.secondary,
-              borderWidth: 1,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              borderRadius: 6,
-              backgroundColor: Colors.whiteColor,
-              marginVertical: 10,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
+            style={styles.outlinedBtn}
           >
             <Text style={{ color: Colors.secondary, fontWeight: '600' }}>
               Pick Location
@@ -177,6 +184,10 @@ const CheckoutScreen = () => {
             placeholder={'Enter Address'}
             label={'Address'}
             optional={false}
+          />
+          <DateTimePickerField
+            value={dateTime}
+            onChange={newDate => setDateTime(newDate)}
           />
         </View>
 
@@ -262,7 +273,8 @@ const CheckoutScreen = () => {
           autoClose={true}
         />
       )}
-    </View>
+      <FaddedIcon/>
+    </ScrollView>
   );
 };
 
@@ -333,5 +345,16 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: Colors.primary,
     fontWeight: 'bold',
+  },
+  outlinedBtn: {
+    borderColor: Colors.secondary,
+    borderWidth: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    backgroundColor: Colors.whiteColor,
+    marginVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

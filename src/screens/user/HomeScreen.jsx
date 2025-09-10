@@ -16,7 +16,10 @@ import {
 } from '../../styles/commonStyles';
 import MyStatusBar from '../../components/MyStatusBar';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
-import { DottedBlackLoader, DottedWhiteLoader } from "../../components/lottie/loaderView"
+import {
+  DottedBlackLoader,
+  DottedWhiteLoader,
+} from '../../components/lottie/loaderView';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import MovingIcons from '../../components/userComponents/MovingIcons';
@@ -69,28 +72,27 @@ export const icons = [
 ];
 
 export default function HomeScreen() {
-
-  const {API_BASE_URL} = Key;
+  const { API_BASE_URL } = Key;
   const user = useSelector(selectUser);
   const userId = user?.id;
   const cart = useSelector(selectCart);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const items = useSelector(selectItems);
-  console.log("Items in home screen", items)
+  console.log('Items in home screen', items);
   const [userAddress, setUserAddress] = useState('Getting location...');
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     getUserLocation(
-      (locationData) => {
+      locationData => {
         setUserAddress(locationData.address);
         console.log('Address:', locationData.address);
       },
-      (error) => {
+      error => {
         setUserAddress('Unable to get location');
         console.log('Error:', error);
-      }
+      },
     );
   }, []);
   const fetchAllData = async () => {
@@ -126,35 +128,66 @@ export default function HomeScreen() {
     >
       <MyStatusBar />
       <View style={styles.topBar}>
-        <View style={styles.profileSection}>
-          <Image
-            source={{
-              uri: API_BASE_URL + user?.avatarUrl,
-              headers: {
-                Authorization: `Bearer ${user?.accessToken}`,
-              },
-            }}
-            style={styles.profileImage}
-          />
-          <View>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate('profileScreen')}
+          style={styles.profileSection}
+        >
+            {user?.avatarUrl ? (
+              <Image
+              source={{
+                uri: API_BASE_URL + user.avatarUrl,
+                headers: {
+                  Authorization: `Bearer ${user?.accessToken}`,
+                },
+              }}
+              style={styles.profileImage}
+            />
+          ) : (
+             <View
+              style={{
+                ...styles.profileImage, 
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#e1e1e1', 
+              }}
+            >
+              <Ionicons name="person-outline" size={30} color="#666" />
+            </View>
+          )}
+           <View>
             <Text style={styles.userName}>{user?.fullName}</Text>
-            <Text style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}>{userAddress}</Text>
+            <Text
+              style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
+            >
+              {userAddress}
+            </Text>
           </View>
-        </View>
-        <TouchableOpacity onPress={() => navigation.navigate("cart")} style={{ position: 'relative' }}>
-          <Ionicons name="cart-outline" size={28} color={Colors.whiteColor} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('notificationScreen')}
+          style={{ position: 'relative' }}
+        >
+          <Ionicons
+            name="notifications-outline"
+            size={28}
+            color={Colors.whiteColor}
+          />
 
           <View style={styles.badge}>
             <Text
               style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
             >
-              {cart?.cartItems?.length || 0}
+              0
             </Text>
           </View>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity onPress={() => navigation.navigate("searchScreen")} style={styles.searchBar}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('searchScreen')}
+        style={styles.searchBar}
+      >
         <Ionicons name="search-outline" size={20} color="#999" />
         <Text style={styles.searchText}>Search here...</Text>
       </TouchableOpacity>
@@ -166,7 +199,7 @@ export default function HomeScreen() {
         }
       >
         <MovingIcons icons={icons} />
-        <AdSlider data={addsData} type={"big"} />
+        <AdSlider data={addsData} type={'big'} />
 
         <View
           style={{
@@ -180,7 +213,7 @@ export default function HomeScreen() {
           <Text style={{ color: Colors.blackColor, ...textStyles.subHeading }}>
             Best Deals
           </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("searchScreen")}>
+          <TouchableOpacity onPress={() => navigation.navigate('searchScreen')}>
             <Text style={{ color: Colors.primary, ...textStyles.subHeading }}>
               See All
             </Text>
@@ -189,7 +222,7 @@ export default function HomeScreen() {
 
         <MiniProductScrollSection products={items} />
         <View style={{ marginVertical: 20 }}>
-          <AdSlider data={addsData} type={"small"} />
+          <AdSlider data={addsData} type={'small'} />
         </View>
 
         <View style={styles.scrapVehicleCard}>
@@ -200,7 +233,11 @@ export default function HomeScreen() {
             <Text style={{ fontSize: 14, color: '#666', marginBottom: 15 }}>
               Turn your old stuff into cash today.
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("scrapVehicleScreen")} activeOpacity={0.7} style={styles.sellnowButton}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('scrapVehicleScreen')}
+              activeOpacity={0.7}
+              style={styles.sellnowButton}
+            >
               <Text style={{ color: 'white', fontWeight: '600' }}>
                 Sell Now
               </Text>
@@ -219,9 +256,6 @@ export default function HomeScreen() {
         </View>
         <FaddedIcon />
       </ScrollView>
-
-
-
     </LinearGradient>
   );
 }

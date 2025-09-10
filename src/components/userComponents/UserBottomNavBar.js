@@ -11,6 +11,7 @@ import ProfileScreen from '../../screens/user/ProfileScreen';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import LocationPickerScreen from '../../screens/map/LocationPickerScreen';
+import Cart from '../../screens/user/Cart';
 
 const Tab = createBottomTabNavigator();
 
@@ -95,25 +96,26 @@ const UserBottomNavBar = ({ navigation }) => {
             tabBarLabel: 'Bookings',
           }}
         />
-        <Tab.Screen
-          name="Profile"
-          component={ProfileScreen}
+          <Tab.Screen
+          name="Cart"
+          component={Cart}
           options={{
             tabBarIcon: ({ focused }) =>
               focused ? (
                 // <View style={styles.selectedTabCircleStyle}>
-                <MaterialIcons name="person" size={25} color={Colors.primary} />
+                <MaterialIcons name="shopping-cart" size={25} color={Colors.primary} />
               ) : (
                 // </View>
                 <MaterialIcons
-                  name="person"
+                  name="shopping-cart"
                   size={25}
                   color={Colors.grayColor}
                 />
               ),
-            tabBarLabel: 'Profile',
+            tabBarLabel: 'Cart',
           }}
         />
+      
       </Tab.Navigator>
       {exitInfo()}
     </>

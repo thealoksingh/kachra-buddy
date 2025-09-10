@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
   StyleSheet,
@@ -9,40 +9,75 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
-import LargeProductCard from '../../components/userComponents/LargeProductCard';
+import SelectItemCard from '../../components/driverComponents/SelectItemCard';
 import { Colors, textStyles } from '../../styles/commonStyles';
 import { products } from '../../utils/dummyData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { ButtonWithLoader } from '../../components/commonComponents';
 import MyStatusBar from '../../components/MyStatusBar';
+import { ButtonWithLoader } from '../../components/commonComponents';
 import { useSelector } from 'react-redux';
-import { selectCart, selectItems, selectUser } from '../../store/selector';
+import { selectDriverItems } from '../../store/selector';
 
 const filters = ['All', 'plastic', 'rubber', 'glass', 'aluminium', 'metal'];
 
-const SearchScreen = () => {
-  const items = useSelector(selectItems);
-  const cart = useSelector(selectCart);
+const SelectAdditionalItemScreen = () => {
+  const route = useRoute();
+  const { onItemSelect, currentOrderItems } = route.params || {};
+//   console.log('currentOrderItems ===>', currentOrderItems); 
+
+  const existingIds = new Set(currentOrderItems?.map(item => item.id));
+
+  const [selectedItem, setSelectedItem] = useState([]);
+
   const [searchText, setSearchText] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+  const items = useSelector(selectDriverItems);
 
-  const filteredProducts = items.filter(item => {
-    const textMatch = item?.name
-      ?.toLowerCase()
-      .includes(searchText.toLowerCase());
+  const handleSelect = () => {
+    console.log('selected items', selectedItem);
+    if (onItemSelect) {
+      onItemSelect(selectedItem);
+    }
+    navigation.goBack();
+  };
+
+  const toggleSelect = item => {
+    const exists = selectedItem.some(i => i.id === item.id);
+    if (exists) {
+      setSelectedItem(selectedItem.filter(i => i.id !== item.id));
+    } else {
+      setSelectedItem([...selectedItem, item]);
+    }
+  };
+
+  const filteredProducts = (items || []).filter(item => {
+    if (!item) return false;
+
+    const itemName = item.name || item.title || '';
+    const itemCategory = item.category || item.type || item.material || '';
+
+    const textMatch =
+      itemName.toLowerCase().includes(searchText.toLowerCase()) ||
+      itemCategory.toLowerCase().includes(searchText.toLowerCase());
 
     const filterMatch =
       selectedFilter === 'All' ||
-      item?.name?.toLowerCase().includes(selectedFilter.toLowerCase());
+      itemCategory.toLowerCase() === selectedFilter.toLowerCase();
 
     return textMatch && filterMatch;
   });
+  const availableProducts = filteredProducts?.filter(
+    p => !existingIds.has(p.id),
+  );
+  console.log('availableProducts ===>', availableProducts);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor, padding: 10 }}>
       <MyStatusBar />
+
+      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <MaterialIcons
           name="search"
@@ -52,13 +87,14 @@ const SearchScreen = () => {
         />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search items to Sell..."
+          placeholder="Search items to add..."
           placeholderTextColor="#999"
           value={searchText}
           onChangeText={setSearchText}
         />
       </View>
 
+      {/* Filters */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -91,16 +127,23 @@ const SearchScreen = () => {
         ))}
       </ScrollView>
 
+      {/* Product List */}
       <FlatList
-        data={filteredProducts}
-        keyExtractor={(_, i) => i.toString()}
+        data={availableProducts} // ✅ only non-duplicate products
+        keyExtractor={item => item?.id?.toString() || Math.random().toString()}
         numColumns={2}
         columnWrapperStyle={{ justifyContent: 'space-between' }}
         contentContainerStyle={{ paddingBottom: 20 }}
         renderItem={({ item }) => (
-          <View style={styles.cardWrap}>
-            <LargeProductCard product={item} />
-          </View>
+          <TouchableOpacity
+            onPress={() => toggleSelect(item)}
+            activeOpacity={0.8}
+          >
+            <SelectItemCard
+              product={item}
+              selected={selectedItem.some(i => i.id === item.id)}
+            />
+          </TouchableOpacity>
         )}
         style={{ flex: 1 }}
         ListEmptyComponent={
@@ -110,7 +153,7 @@ const SearchScreen = () => {
         }
       />
 
-      {/* 🔹 Bottom Section */}
+      {/* Bottom Section */}
       <View
         style={{
           height: 100,
@@ -127,24 +170,22 @@ const SearchScreen = () => {
             }}
           >
             <Text style={{ textAlign: 'center', ...textStyles.small }}>
-              Total Selected Items to Sell : {cart?.cartItems?.length || 0}
+              Total Item Selected : {selectedItem.length}
             </Text>
           </View>
         </View>
         <ButtonWithLoader
-          name="Sell Now"
+          name="Select"
           loadingName="Processing..."
           isLoading={loading}
-          method={() => {
-            navigation.navigate('cart');
-          }}
+          method={handleSelect}
         />
       </View>
     </View>
   );
 };
 
-export default SearchScreen;
+export default SelectAdditionalItemScreen;
 
 const styles = StyleSheet.create({
   searchContainer: {
@@ -181,9 +222,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#555',
     textAlign: 'center',
-  },
-  cardWrap: {
-    width: '48%',
-    marginBottom: 12,
   },
 });

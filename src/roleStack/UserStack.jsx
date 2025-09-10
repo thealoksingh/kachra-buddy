@@ -13,20 +13,22 @@ import CheckoutScreen from '../screens/user/CheckoutScreen';
 import LocationPickerScreen from '../screens/map/LocationPickerScreen';
 import EditProfileScreen from "../screens/user/EditProfileScreen"
 import ErrorScreen from '../screens/ErrorScreen';
+import NotificationScreen from '../screens/NotificationScreen';
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="userBottomNavBar" component={UserBottomNavBar} />
+      <Stack.Screen name="checkoutScreen" component={CheckoutScreen} />
       <Stack.Screen name="homeScreen" component={HomeScreen} />
       <Stack.Screen name="cart" component={Cart} />
       <Stack.Screen name="scrapVehicleScreen" component={ScrapVehicleScreen} />
       <Stack.Screen name="bookingScreen" component={BookingScreen} />
+       <Stack.Screen name="notificationScreen" component={NotificationScreen} />
       <Stack.Screen name="bookingDetailScreen" component={BookingDetailScreen} />
       <Stack.Screen name="profileScreen" component={ProfileScreen} />
-      <Stack.Screen name="searchScreen" component={SearchScreen} />
-      <Stack.Screen name="checkoutScreen" component={CheckoutScreen} />
+      <Stack.Screen name="searchScreen" component={SearchScreen} />  
       <Stack.Screen name="locationPickerScreen" component={LocationPickerScreen} />
       <Stack.Screen name="editProfileScreen" component={EditProfileScreen} />
     </Stack.Navigator>

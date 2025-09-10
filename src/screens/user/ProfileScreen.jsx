@@ -83,8 +83,9 @@ const ProfileScreen = () => {
       <View style={styles.profileInfoWithOptionsWrapStyle}>
         <TouchableOpacity
           onPress={() => {
-            setPreviewImage(image);
-            setFullImageModalVisible(true);
+            if(avatar ){
+            setPreviewImage(API_BASE_URL+avatar);
+            setFullImageModalVisible(true);}
           }}
           style={{ alignItems: 'center' }}
         >
