@@ -25,3 +25,15 @@ export const selectDriverItems = (state) => state.driver.items;  // ✅ Get all 
 export const selectDriverLoader = (state) => state.driver.loading;  // ✅ Get driver loader data
 export const selectDriverError = (state) => state.driver.error;  // ✅ Get driver error data
 
+// Admin selectors
+export const selectAdminUsers = (state) => state.admin.users;
+export const selectAdminDrivers = (state) => state.admin.drivers;
+export const selectAdminItems = (state) => state.admin.items;
+export const selectAdminOrders = (state) => state.admin.orders;
+export const selectAllUsers = (state) => state.admin.users;
+
+// Notification selectors
+export const selectNotifications = (state) => state.auth.notifications;
+
+// Advertisement selectors
+export const selectAdvertisements = (state) => state.admin.advertisements;

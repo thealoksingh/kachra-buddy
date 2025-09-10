@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   StatusBar,
+  RefreshControl,
 } from 'react-native';
 import {
   appFonts,
@@ -31,6 +32,10 @@ import { products, addsData } from '../../utils/dummyData';
 import { FaddedIcon } from '../../components/commonComponents';
 import CurvedCard from '../../screens/driver/CurvedCard';
 import { getUserLocation } from '../../utils/CommonMethods';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectUser } from '../../store/selector';
+import { getUserById } from '../../store/thunks/userThunk';
+import Key from '../../constants/key';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -90,7 +95,7 @@ const adminCards = [
     description: 'Create and manage promotional campaigns',
     firstColor: '#00f2fe',
     secondColor: '#4facfe',
-    screen: 'postAd'
+    screen: 'allAdvertisementsScreen'
   },  
   {
     id: 3,
@@ -136,7 +141,25 @@ const adminCards = [
 
 export default function AdminHome() {
   const navigation = useNavigation();
-    const [userAddress, setUserAddress] = useState('Getting location...');
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const userId = user?.id;
+  const { API_BASE_URL } = Key;
+  const [userAddress, setUserAddress] = useState('Getting location...');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchAllData = async () => {
+    if (user && userId) {
+      await dispatch(getUserById({ userId }));
+    }
+  };
+
+  const onRefresh = async () => {
+    console.log("Refreshing admin data...");
+    setRefreshing(true);
+    await fetchAllData();
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     getUserLocation(
@@ -160,17 +183,20 @@ export default function AdminHome() {
       <View style={styles.topBar}>
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => navigation.navigate('driverProfileScreen')}
+          onPress={() => navigation.navigate('adminProfile')}
           style={styles.profileSection}
         >
           <Image
             source={{
-              uri: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1170&auto=format&fit=crop',
+              uri: user?.avatarUrl ? API_BASE_URL + user?.avatarUrl : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1170&auto=format&fit=crop',
+              headers: user?.avatarUrl ? {
+                Authorization: `Bearer ${user?.accessToken}`,
+              } : undefined,
             }}
             style={styles.profileImage}
           />
           <View>
-            <Text style={styles.userName}>Alok Singh</Text>
+            <Text style={styles.userName}>{user?.fullName || 'Admin'}</Text>
             <Text
               style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
             >
@@ -198,7 +224,12 @@ export default function AdminHome() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.mainSection}>
+      <ScrollView 
+        style={styles.mainSection}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <MovingIcons icons={icons} />
         <Graph />
         <AdSlider data={addsData} type={"big"} />

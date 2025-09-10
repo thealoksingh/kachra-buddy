@@ -12,7 +12,9 @@ import {
   Modal,
   ScrollView,
   StatusBar,
+  RefreshControl,
 } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Colors,
   screenWidth,
@@ -26,6 +28,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { CommonAppBar } from '../../components/commonComponents';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { fetchAllUsers } from '../../store/thunks/adminThunk';
+import { selectAllUsers } from '../../store/selector';
+import Key from '../../constants/key';
 
 // Dummy users data for UI
 const dummyUsers = [
@@ -63,26 +68,42 @@ const dummyUsers = [
 const AllUsersScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { API_BASE_URL } = Key;
   const { fromSelectUser, onUserSelect } = route.params || {};
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('both');
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   
- const filteredUsers = dummyUsers.filter((user) => {
+  const allUsers = useSelector(selectAllUsers);
+  console.log("All users from store", allUsers);
+
+  useEffect(() => {
+    dispatch(fetchAllUsers());
+  }, [dispatch]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await dispatch(fetchAllUsers());
+    setRefreshing(false);
+  };
+  
+ const filteredUsers = allUsers.filter((user) => {
   const matchesSearch =
     searchQuery === "" ||
-    user?.owner_legal_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user?.mobile_number?.includes(searchQuery);
+    user?.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user?.contactNumber?.includes(searchQuery);
 
   const matchesRole =
-    selectedRole === "both" || user?.role === selectedRole;
+    selectedRole === "both" || user?.role?.toLowerCase() === selectedRole;
 
   const matchesStatus =
-    selectedStatuses.length === 0 || selectedStatuses.includes(user?.status);
+    selectedStatuses.length === 0 || selectedStatuses.some(status => status.toLowerCase() === user?.status?.toLowerCase());
 
   const matchesFromSelect =
-    fromSelectUser === "both" || !fromSelectUser || user?.role === fromSelectUser;
+    fromSelectUser === "both" || !fromSelectUser || user?.role?.toLowerCase() === fromSelectUser.toLowerCase();
 
   return matchesSearch && matchesRole && matchesStatus && matchesFromSelect;
 });
@@ -112,6 +133,9 @@ const AllUsersScreen = () => {
         contentContainerStyle={styles.listContainer}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Icon name="account-search" size={60} color={Colors.grayColor} />
@@ -137,8 +161,14 @@ const AllUsersScreen = () => {
   function UserInfo({ user }) {
     return (
       <TouchableOpacity onPress={() => handleCardPress(user)} style={styles.userItem}>
-        {user?.avatar ? (
-          <Image source={{ uri: user?.avatar }} style={styles.avatar} />
+        {user?.avatarUrl ? (
+          <Image 
+            source={{ 
+              uri: API_BASE_URL + user.avatarUrl,
+              headers: { Authorization: `Bearer ${user?.accessToken}` }
+            }} 
+            style={styles.avatar} 
+          />
         ) : (
           <Icon
             name="account-circle"
@@ -149,8 +179,8 @@ const AllUsersScreen = () => {
         )}
 
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>{user?.owner_legal_name || 'N/A'}</Text>
-          <Text style={styles.userMobile}>{user?.mobile_number || 'N/A'}</Text>
+          <Text style={styles.userName}>{user?.fullName || 'N/A'}</Text>
+          <Text style={styles.userMobile}>{user?.contactNumber || 'N/A'}</Text>
           <Text style={[styles.userMobile, { color: Colors.blackColor }]}>
             Status:{' '}
             <Text
@@ -168,13 +198,13 @@ const AllUsersScreen = () => {
           </Text>
         </View>
 
-        <View style={[styles.roleBadge,{borderColor:user?.role==='user'?Colors.primary:Colors.secondaryLight}]}>
+        <View style={[styles.roleBadge,{borderColor:user?.role?.toLowerCase()==='user'?Colors.primary:Colors.secondaryLight}]}>
           <Text
             style={[
               styles.roleText,
               {
                 color:
-                  user?.role === 'user' ? Colors.primary :Colors.secondaryLight,
+                  user?.role?.toLowerCase() === 'user' ? Colors.primary :Colors.secondaryLight,
               },
             ]}
           >

@@ -2,16 +2,24 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { Colors, textStyles, commonStyles, screenWidth } from '../../styles/commonStyles';
+import Key from '../../constants/key';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../store/selector';
 
 const LargeProductCardAdmin = ({ product, isInCart = false, onToggleCart }) => {
     const navigation= useNavigation()
+    console.log("product in large product card admin", product);
+  const user = useSelector(selectUser);
+    const {API_BASE_URL}= Key;
 
   return (
-    <TouchableOpacity onPress={()=>navigation.navigate("updateProductScreen")} style={styles.card}>
+    <TouchableOpacity onPress={()=>navigation.navigate("updateProductScreen", { item: product })} style={styles.card}>
         <Image
         source={
-          product?.image
-            ? { uri: product.image }
+          product?.imageUrl
+            ? { uri: API_BASE_URL+product?.imageUrl,
+              headers: { Authorization: `Bearer ${user?.accessToken}` }
+             }
             : {
                 uri: 'https://t3.ftcdn.net/jpg/03/76/97/16/360_F_376971659_OSsR8oqHDuyoovcqqi2KNcHRKKVA9QqO.jpg',
               }
@@ -21,17 +29,17 @@ const LargeProductCardAdmin = ({ product, isInCart = false, onToggleCart }) => {
       />
 
         <Text style={styles.title} numberOfLines={1}>
-        {product?.title || 'Product Title'}
+        {product?.name || 'Product Title'}
       </Text>
 
        <Text style={styles.description} numberOfLines={2}>
-        Material : {product?.material}
+        Material : {product?.tags || 'N/A'}
       </Text>
 
        <Text style={styles.price}>
-        {product?.type === 'countable'
-          ? `₹ ${product?.price} / piece`
-          : `₹ ${product?.price} / kg`}
+        {product?.isCountable
+          ? `₹ ${product?.pricePerUnit} / piece`
+          : `₹ ${product?.pricePerUnit} / kg`}
       </Text>
 
     </TouchableOpacity>

@@ -1,4 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../store/selector';
 import UserBottomNavBar from '../components/userComponents/UserBottomNavBar';
 import HomeScreen from '../screens/user/HomeScreen';
 import ProfileScreen from '../screens/user/ProfileScreen';
@@ -39,7 +41,7 @@ function InactiveStack() {
   );
 }
 
-export function UserStack({ route }) {
-  const { user } = route.params;
-  return user?.status === 'Active' ? <ActiveStack /> : <InactiveStack />;
+export function UserStack() {
+  const user = useSelector(selectUser);
+  return user?.status === 'ACTIVE' ? <ActiveStack /> : <InactiveStack />;
 }

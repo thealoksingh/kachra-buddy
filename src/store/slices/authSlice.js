@@ -1,9 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { sendOtp, verifyOtp } from '../thunks/authThunk';
 import { completeUserProfile, getUserById, updateProfilePic, updateUser } from '../thunks/userThunk';
+import { updateAdminProfile, updateAdminProfilePic } from '../thunks/adminThunk';
+import { sendNotification, fetchNotifications } from '../thunks/notificationThunk';
 
 const initialState = {
   user: null,
+  notifications: [],
   loading: false,
   error: null,
 };
@@ -15,6 +18,7 @@ const authSlice = createSlice({
     logout: (state) => {
       
       state.user = null;
+      state.notifications = [];
       state.loading = false;
       state.error = null;
     },
@@ -103,6 +107,57 @@ const authSlice = createSlice({
         state.user = action?.payload?.data;
       })
       .addCase(updateUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action?.payload?.message;
+      })
+      // Update Admin Profile
+      .addCase(updateAdminProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateAdminProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action?.payload?.data;
+      })
+      .addCase(updateAdminProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action?.payload?.message;
+      })
+      // Update Admin Profile Picture
+      .addCase(updateAdminProfilePic.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateAdminProfilePic.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action?.payload?.data;
+      })
+      .addCase(updateAdminProfilePic.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action?.payload?.message;
+      })
+      // Send Notification
+      .addCase(sendNotification.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(sendNotification.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(sendNotification.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action?.payload?.message;
+      })
+      // Fetch Notifications
+      .addCase(fetchNotifications.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchNotifications.fulfilled, (state, action) => {
+        state.loading = false;
+        state.notifications = action?.payload?.data || [];
+      })
+      .addCase(fetchNotifications.rejected, (state, action) => {
         state.loading = false;
         state.error = action?.payload?.message;
       });

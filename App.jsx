@@ -13,29 +13,39 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from './src/styles/commonStyles';
 import store from "./src/store/store";
 import { Snackbar } from './src/components/Snackbar';
+import RoleBasedNavigator from './src/components/RoleBasedNavigator';
+import NotificationManager from './src/components/NotificationManager';
 const Stack = createNativeStackNavigator();
 
 function RootStack() {
-  const user = { name: 'alok', status: 'Active' };
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="splash" component={SplashScreen} />
       <Stack.Screen name="auth" component={AuthStack} />
-      <Stack.Screen
-        name="user"
-        component={UserStack}
-        initialParams={{ user }}
-      />
-      <Stack.Screen
-        name="driver"
-        component={DriverStack}
-        initialParams={{ user }}
-      />
-       <Stack.Screen
-        name="admin"
-        component={AdminStack}
-        initialParams={{ user }}
-      />
+      <Stack.Screen name="user">
+        {(props) => (
+          <>
+            <RoleBasedNavigator {...props} />
+            <UserStack {...props} />
+          </>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="driver">
+        {(props) => (
+          <>
+            <RoleBasedNavigator {...props} />
+            <DriverStack {...props} />
+          </>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="admin">
+        {(props) => (
+          <>
+            <RoleBasedNavigator {...props} />
+            <AdminStack {...props} />
+          </>
+        )}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
@@ -46,6 +56,7 @@ export default function App() {
     <SafeAreaView style={styles.safeArea}>
       <NavigationContainer>
          <Snackbar/>
+         <NotificationManager />
         <RootStack />
       </NavigationContainer>
     </SafeAreaView>

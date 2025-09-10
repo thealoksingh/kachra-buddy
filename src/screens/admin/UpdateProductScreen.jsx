@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 import { Colors } from '../../styles/commonStyles';
+import { updateItem } from '../../store/thunks/adminThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
 import {
   ButtonWithLoader,
   CommonAppBar,
@@ -12,24 +15,27 @@ import ImagePreviewModal from '../../components/ImagePreviewModal';
 import { useImagePicker } from '../../components/useImagePicker';
 import ImagePickerSheet from '../../components/ImagePickerSheet';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
-
-const dummyProduct = {
-  id: 1,
-  name: 'Plastic Bottles',
-  type: 'countable',
-  rate: '5',
-  image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150'
-};
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../store/selector';
+import Key from '../../constants/key';
 
 const UpdateProductScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const dispatch = useDispatch();
+  const item = route?.params?.item || {};
+  console.log("item in update product screen", item);
+  const user = useSelector(selectUser);
+  const { API_BASE_URL } = Key;
   const [loading, setLoading] = useState(false);
   const [failureAlertVisible, setFailureAlertVisible] = useState(false);
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
-  const [name, setName] = useState(dummyProduct.name);
-  const [rate, setRate] = useState(dummyProduct.rate);
-  const [type, setType] = useState(dummyProduct.type);
-  const [image, setImage] = useState(dummyProduct.image);
+  const [name, setName] = useState(item?.name || '');
+  const [rate, setRate] = useState(item?.pricePerUnit?.toString() || '');
+  const [type, setType] = useState(item?.isCountable ? 'countable' : 'non-countable');
+  const [tags, setTags] = useState(item?.tags || '');
+  console.log("item = ", tags);
+  const [image, setImage] = useState(item?.imageUrl || null);
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
   const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
@@ -60,6 +66,59 @@ const UpdateProductScreen = () => {
 
   const removeImage = () => {
     setImage(null);
+  };
+
+  const handleUpdateItem = async () => {
+    console.log('Updating item');
+    if (!name || !rate || !tags) {
+      dispatch(showSnackbar({
+        message: 'Please fill all required fields',
+        type: 'error',
+        time: 3000
+      }));
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const itemData = {
+        name,
+        pricePerUnit: parseFloat(rate),
+        unit: type === 'countable' ? 'PIECE' : 'KG',
+        tags,
+        countable: type === 'countable',
+        isCountable: type === 'countable'
+      };
+      
+      // Check if image is a new upload (local URI) or existing server image
+      const isNewImage = image && !image.includes(item.imageUrl);
+      const file = isNewImage ? image : null;
+      
+      const result = await dispatch(updateItem({ itemId: item.id, itemData, file }));
+      
+      if (updateItem.fulfilled.match(result)) {
+        dispatch(showSnackbar({
+          message: 'Item updated successfully',
+          type: 'success',
+          time: 3000
+        }));
+        navigation.goBack();
+      } else {
+        dispatch(showSnackbar({
+          message: 'Failed to update item',
+          type: 'error',
+          time: 3000
+        }));
+      }
+    } catch (error) {
+      dispatch(showSnackbar({
+        message: 'Failed to update item',
+        type: 'error',
+        time: 3000
+      }));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -124,6 +183,14 @@ const UpdateProductScreen = () => {
             optional={false}
             type={'phone-pad'}
           />
+          <InputBox
+            value={tags}
+            setter={setTags}
+            placeholder={'Enter tags (e.g., plastic, metal)'}
+            label={'Tags'}
+            optional={false}
+            type={'default'}
+          />
           <Text style={styles.sectionLabel}>
             Upload Image{' '}
             <Text style={{ color: Colors.secondary }}>*</Text>
@@ -137,7 +204,10 @@ const UpdateProductScreen = () => {
                     setFullImageModalVisible(true);
                   }}
                 >
-                  <Image source={{ uri: image }} style={styles.image} />
+                  <Image source={{
+                    uri: API_BASE_URL + item?.imageUrl,
+                    headers: { Authorization: `Bearer ${user?.accessToken}` }
+                  }} style={styles.image} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -165,13 +235,7 @@ const UpdateProductScreen = () => {
             name="Update"
             loadingName="Updating..."
             isLoading={loading}
-            method={() => {
-              setLoading(true);
-              console.log('Updated Product:', { name, type, rate, image });
-              setTimeout(() => {
-                setLoading(false);
-              }, 500);
-            }}
+            method={handleUpdateItem}
           />
         </View>
       </View>

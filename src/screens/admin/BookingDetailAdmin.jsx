@@ -12,7 +12,12 @@ import {
 import { CommonAppBar, FaddedIcon } from '../../components/commonComponents';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
 import { Colors, commonStyles, textStyles } from '../../styles/commonStyles';
-import { useNavigation } from '@react-navigation/native';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectUser } from '../../store/selector';
+import { assignDriver } from '../../store/thunks/adminThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
+import Key from '../../constants/key';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { WarningWithButton } from '../../components/lottie/WarningWithButton';
 import { DottedBlackLoader } from '../../components/lottie/loaderView';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
@@ -22,7 +27,12 @@ import MyStatusBar from '../../components/MyStatusBar';
 const { width } = Dimensions.get('window');
 const BookingDetailAdmin = () => {
   const navigation = useNavigation();
-  const[selectedDriver ,setSelectedDriver] =useState(null);
+  const route = useRoute();
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const { API_BASE_URL } = Key;
+  const booking = route.params?.booking || {};
+  const[selectedDriver ,setSelectedDriver] =useState(booking?.driver || null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
@@ -32,56 +42,44 @@ const BookingDetailAdmin = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const flatListRef = useRef();
 
-  const images = [
-    'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  ];
+  const images = booking?.orderImages?.map(img => API_BASE_URL + img.imageUrl) || [];
 
-  const items = [
-    {
-      id: 1,
-      image:
-        'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      title: 'Wooden Chair',
-      desc: 'Premium oak chair',
-      qty: 2,
-      weight: '15kg',
-    },
-    {
-      id: 2,
-      image:
-        'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      title: 'Table Lamp',
-      desc: 'White desk lamp',
-      qty: 1,
-      weight: '3kg',
-    },
-    {
-      id: 3,
-      image:
-        'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      title: 'Cardboard Boxes',
-      desc: 'Set of 10 packing boxes',
-      qty: 10,
-      weight: '20kg',
-    },
-  ];
+  const items = booking?.orderItems || [];
 
-  // Pickup images array
-  const pickupImages = [
-    {
-      id: 1,
-      uri: 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-    },
-    {
-      id: 2,
-      uri: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1158&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-    },
-    {
-      id: 3,
-      uri: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+  // Pickup images from driver
+  const pickupImages = booking?.orderImages?.filter(img => img.postedBy === 'DRIVER').map(img => ({
+    id: img.id,
+    uri: API_BASE_URL + img.imageUrl
+  })) || [];
+
+  const handleDriverSelect = async (driver) => {
+    setSelectedDriver(driver);
+    setIsLoading(true);
+    try {
+      const result = await dispatch(assignDriver({ orderId: booking.id, driverId: driver.id }));
+      if (assignDriver.fulfilled.match(result)) {
+        dispatch(showSnackbar({
+          message: 'Driver assigned successfully',
+          type: 'success',
+          time: 3000
+        }));
+      } else {
+        dispatch(showSnackbar({
+          message: 'Failed to assign driver',
+          type: 'error',
+          time: 3000
+        }));
+      }
+    } catch (error) {
+      dispatch(showSnackbar({
+        message: 'Failed to assign driver',
+        type: 'error',
+        time: 3000
+      }));
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
@@ -108,7 +106,13 @@ const BookingDetailAdmin = () => {
                 setPreviewVisible(true);
               }}
             >
-              <Image source={{ uri: item }} style={styles.image} />
+              <Image 
+                source={{ 
+                  uri: item,
+                  headers: { Authorization: `Bearer ${user?.accessToken}` }
+                }} 
+                style={styles.image} 
+              />
             </TouchableOpacity>
           )}
         />
@@ -127,13 +131,14 @@ const BookingDetailAdmin = () => {
         <View style={styles.userCard}>
           <Image
             source={{
-              uri: 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+              uri: booking?.user?.avatarUrl ? API_BASE_URL + booking.user.avatarUrl : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+              headers: booking?.user?.avatarUrl ? { Authorization: `Bearer ${user?.accessToken}` } : undefined
             }}
             style={styles.userImage}
           />
           <View style={{ marginLeft: 12 }}>
-            <Text style={styles.userName}>User name</Text>
-            <Text style={styles.userPhone}>+91 98765 43210</Text>
+            <Text style={styles.userName}>{booking?.user?.fullName || 'N/A'}</Text>
+            <Text style={styles.userPhone}>{booking?.user?.contactNumber || 'N/A'}</Text>
           </View>
         </View>
         {selectedDriver && (
@@ -143,25 +148,15 @@ const BookingDetailAdmin = () => {
             </View>
             <View style={styles.userCard}>
               <Image
-                source={{ uri: selectedDriver?.avatar }}
+                source={{ 
+                  uri: selectedDriver?.avatarUrl ? API_BASE_URL + selectedDriver.avatarUrl : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625',
+                  headers: selectedDriver?.avatarUrl ? { Authorization: `Bearer ${user?.accessToken}` } : undefined
+                }}
                 style={styles.userImage}
               />
               <View style={{ marginLeft: 12 }}>
-                <Text style={styles.userName}>{selectedDriver?.owner_legal_name}</Text>
-                <Text style={styles.userPhone}>{selectedDriver?.mobile_number}</Text>
-                <View style={{ flexDirection: 'row', marginTop: 1 }}>
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Text
-                      key={i}
-                      style={{
-                        color: i < selectedDriver?.rating ? '#FFD700' : '#ccc',
-                        fontSize: 16,
-                      }}
-                    >
-                      ★
-                    </Text>
-                  ))}
-                </View>
+                <Text style={styles.userName}>{selectedDriver?.fullName}</Text>
+                <Text style={styles.userPhone}>{selectedDriver?.contactNumber}</Text>
               </View>
             </View>
           </>
@@ -174,20 +169,20 @@ const BookingDetailAdmin = () => {
         <View style={styles.itemsSection}>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Items</Text>
-            <Text style={textStyles.small}>7</Text>
+            <Text style={textStyles.small}>{items.length}</Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Pickup Date Time</Text>
-            <Text style={textStyles.small}>7/10/25 10AM</Text>
+            <Text style={textStyles.small}>{booking?.pickupDate ? new Date(booking.pickupDate).toLocaleString() : 'N/A'}</Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Pickup Status</Text>
-            <Text style={textStyles.small}>Pending</Text>
+            <Text style={textStyles.smallBold}>Status</Text>
+            <Text style={textStyles.small}>{booking?.status || 'N/A'}</Text>
           </View>
 
           <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Expected Price</Text>
-            <Text style={textStyles.small}>₹120</Text>
+            <Text style={textStyles.smallBold}>Final Price</Text>
+            <Text style={textStyles.small}>₹{booking?.finalPrice || 0}</Text>
           </View>
         </View>
         <View style={styles.headingSection}>
@@ -196,11 +191,11 @@ const BookingDetailAdmin = () => {
         <View style={{ padding: 10 }}>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Customer Name</Text>
-            <Text style={textStyles.small}> Ravi KUmar</Text>
+            <Text style={textStyles.small}>{booking?.sellerName || booking?.user?.fullName || 'N/A'}</Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Customer Mobile Number</Text>
-            <Text style={textStyles.small}>+91 9708571269</Text>
+            <Text style={textStyles.small}>{booking?.sellerContactNo || booking?.user?.contactNumber || 'N/A'}</Text>
           </View>
 
           <Text
@@ -219,8 +214,7 @@ const BookingDetailAdmin = () => {
             ]}
           >
             <Text style={textStyles.smallBold}>Address: </Text>
-            221B Baker Street, London 221B Baker Street, London 221B Baker
-            Street, London 221B Baker Street, London 221B Baker Street, London
+            {booking?.pickupAddress || booking?.orderPickupAddress || 'N/A'}
           </Text>
 
           <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
@@ -277,8 +271,8 @@ const BookingDetailAdmin = () => {
         </View>
         <View style={{ padding: 10 }}>
           <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Amount Recived</Text>
-            <Text style={textStyles.small}> ₹ 500 </Text>
+            <Text style={textStyles.smallBold}>Amount Received</Text>
+            <Text style={textStyles.small}>₹{booking?.finalPrice || 0}</Text>
           </View>
           <Text
             style={[
@@ -300,7 +294,10 @@ const BookingDetailAdmin = () => {
                 }}
               >
                 <Image
-                  source={{ uri: image.uri }}
+                  source={{ 
+                    uri: image.uri,
+                    headers: { Authorization: `Bearer ${user?.accessToken}` }
+                  }}
                   style={styles.pickupImage}
                 />
               </TouchableOpacity>
@@ -314,14 +311,20 @@ const BookingDetailAdmin = () => {
         <View style={styles.itemsSection}>
           {items.map(item => (
             <View key={item.id} style={styles.itemCard}>
-              <Image source={{ uri: item.image }} style={styles.itemImage} />
+              <Image 
+                source={{ 
+                  uri: item.item?.imageUrl ? API_BASE_URL + item.item.imageUrl : 'https://via.placeholder.com/60',
+                  headers: item.item?.imageUrl ? { Authorization: `Bearer ${user?.accessToken}` } : undefined
+                }} 
+                style={styles.itemImage} 
+              />
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.itemTitle}>{item.title}</Text>
+                <Text style={styles.itemTitle}>{item.item?.name || 'N/A'}</Text>
                 <Text style={styles.itemInfo}>
-                 Orders Qty: {item.qty} | {item.weight}
+                 Quantity: {item.quantity} {item.unit}
                 </Text>
                  <Text style={styles.itemInfo}>
-                 Recieved Qty: {item.qty} | {item.weight}
+                 Price: ₹{item.price}
                 </Text>
               </View>
             </View>
@@ -339,7 +342,7 @@ const BookingDetailAdmin = () => {
              onPress={() =>
               navigation.navigate('allUsersScreen', {
                 fromSelectUser: 'driver',
-                onUserSelect: user => setSelectedDriver(user),
+                onUserSelect: handleDriverSelect,
               })
             }
             style={[styles.outlinedBtn, { borderColor: Colors.primary }]}

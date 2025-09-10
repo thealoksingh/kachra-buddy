@@ -4,6 +4,7 @@ import { logout } from '../slices/authSlice';
 import { resetUserState } from '../slices/userSlice';
 import { resetDriverState } from '../slices/driverSlice';
 import { resetAdminState } from '../slices/adminSlice';
+import { clearSnackbar } from '../slices/snackbarSlice';
 
 export const performLogout = createAsyncThunk(
   'auth/performLogout',
@@ -22,6 +23,7 @@ export const performLogout = createAsyncThunk(
       dispatch(resetUserState());
       dispatch(resetDriverState());
       dispatch(resetAdminState());
+      dispatch(clearSnackbar());
       
       return { success: true };
     } catch (error) {

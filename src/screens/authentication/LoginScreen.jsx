@@ -148,13 +148,14 @@ const LoginScreen = () => {
           String(response?.payload?.data?.accessToken)
         );
         console.log("user id and accessToken stored in async storage");
-        setIsActive(status.toLowerCase() === 'active');
         if (status.toLowerCase() === 'active') {
+          setIsActive(true);
           navigation.replace(role.toLowerCase());
           return;
+        } else {
+          setIsVerified(true);
+          setIsActive(false);
         }
-
-        setIsVerified(true);
         await dispatch(
           showSnackbar({
             message: response?.payload?.message,
@@ -190,8 +191,11 @@ const LoginScreen = () => {
     try {
       const response = await dispatch(completeUserProfile(data));
       console.log("response from completeUserProfile", response?.payload);
-        const role = response?.payload?.data?.role;
+      
       if (completeUserProfile.fulfilled.match(response)) {
+        const role = response?.payload?.data?.role;
+        const status = response?.payload?.data?.status;
+        
         await dispatch(
           showSnackbar({
             message: 'Profile completed successfully!',
@@ -199,7 +203,10 @@ const LoginScreen = () => {
             time: 3000,
           }),
         );
-        navigation.replace(role.toLowerCase());
+        
+        if (status.toLowerCase() === 'active') {
+          navigation.replace(role.toLowerCase());
+        }
       } else {
         await dispatch(
           showSnackbar({

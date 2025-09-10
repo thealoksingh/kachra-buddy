@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,31 +8,53 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 import LargeProductCardAdmin from '../../components/adminComponents/LargeProductCardAdmin';
 import { Colors, textStyles } from '../../styles/commonStyles';
-import { products } from '../../utils/dummyData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ButtonWithLoader } from '../../components/commonComponents';
 import MyStatusBar from '../../components/MyStatusBar';
+import { fetchAllItems } from '../../store/thunks/adminThunk';
+import { selectAdminItems, selectItems } from '../../store/selector';
 
 const filters = ['All', 'plastic', 'rubber', 'glass', 'aluminium', 'metal'];
 
 const AllProductsScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
-  const [loading, setLoading] = useState(false);
+  const [localLoading, setLocalLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const items = useSelector(selectAdminItems);
+  console.log("items in all products screen", items);
 
- 
-  const filteredProducts = products.filter(item => {
+  useEffect(() => {
+    const fetchData = async () => {
+      setLocalLoading(true);
+      await dispatch(fetchAllItems());
+      setLocalLoading(false);
+    };
+    fetchData();
+  }, [dispatch]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await dispatch(fetchAllItems());
+    setRefreshing(false);
+  };
+
+  const filteredProducts = items.filter(item => {
     const textMatch =
-      item.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      item.type.toLowerCase().includes(searchText.toLowerCase());
+      item.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+      item.tags?.toLowerCase().includes(searchText.toLowerCase());
 
     const filterMatch =
       selectedFilter === 'All' ||
-      item.material.toLowerCase() === selectedFilter.toLowerCase();
+      item.tags?.toLowerCase().includes(selectedFilter.toLowerCase());
 
     return textMatch && filterMatch;
   });
@@ -88,24 +110,34 @@ const AllProductsScreen = () => {
         ))}
       </ScrollView>
 
-      <FlatList
-        data={filteredProducts}
-        keyExtractor={(_, i) => i.toString()}
-        numColumns={2}
-        columnWrapperStyle={{ justifyContent: 'space-between' }}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        renderItem={({ item }) => (
-          <View style={styles.cardWrap}>
-            <LargeProductCardAdmin product={item} />
-          </View>
-        )}
-        style={{ flex: 1 }}
-        ListEmptyComponent={
-          <Text style={{ textAlign: 'center', marginTop: 20, color: '#888' }}>
-            No products found
-          </Text>
-        }
-      />
+      {localLoading ? (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <Text style={styles.loadingText}>Loading items...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredProducts}
+          keyExtractor={(_, i) => i.toString()}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: 'space-between' }}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          renderItem={({ item }) => (
+            <View style={styles.cardWrap}>
+              <LargeProductCardAdmin product={item} />
+            </View>
+          )}
+          style={{ flex: 1 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          ListEmptyComponent={
+            <Text style={{ textAlign: 'center', marginTop: 20, color: '#888' }}>
+              No products found
+            </Text>
+          }
+        />
+      )}
       
       <TouchableOpacity
         activeOpacity={0.8}
@@ -182,5 +214,15 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: Colors.whiteColor,
     fontWeight: 'bold',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: Colors.grayColor,
   },
 });

@@ -1,7 +1,11 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 import { Colors, screenWidth, Sizes } from '../../styles/commonStyles';
+import { updateUser } from '../../store/thunks/adminThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
+import Key from '../../constants/key';
 import {
   ButtonWithLoader,
   CommonAppBar,
@@ -23,14 +27,19 @@ const dummyUser = {
 
 const UpdateUserScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const dispatch = useDispatch();
+  const { API_BASE_URL } = Key;
+  const user = route.params?.user || {};
+  
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState(dummyUser.name);
-  const [mobNumber, setMobNumber] = useState(dummyUser.mobNumber);
-  const [email, setEmail] = useState(dummyUser.email);
-  const [role, setRole] = useState(dummyUser.role);
-  const [status, setStatus] = useState(dummyUser.status);
-  const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
-  const [avatar, setAvatar] = useState(dummyUser.avatar);
+  const [name, setName] = useState(user.fullName || '');
+  const [mobNumber, setMobNumber] = useState(user.contactNumber || '');
+  // const [email, setEmail] = useState(user.email || ''); // Commented out as not required
+  const [role, setRole] = useState(user.role || 'USER');
+  const [status, setStatus] = useState(user.status || 'ACTIVE');
+  // const [pickerSheetVisible, setPickerSheetVisible] = useState(false); // Commented out as not required
+  // const [avatar, setAvatar] = useState(user.avatarUrl ? API_BASE_URL + user.avatarUrl : null); // Commented out as not required
 
   const { openCamera, openGallery } = useImagePicker();
 
@@ -49,8 +58,49 @@ const UpdateUserScreen = () => {
       setPickerSheetVisible(false);
     }
   };
-  const handleUpdateUser = () => {
-    console.log('Updated user:', { name, mobNumber, email, role, status, avatar });
+  const handleUpdateUser = async () => {
+    if (!name) {
+      dispatch(showSnackbar({
+        message: 'Please fill all required fields',
+        type: 'error',
+        time: 3000
+      }));
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const userData = {
+        fullName: name,
+        role,
+        status
+      };
+      
+      const result = await dispatch(updateUser({ userId: user.id, userData }));
+      
+      if (updateUser.fulfilled.match(result)) {
+        dispatch(showSnackbar({
+          message: 'User updated successfully',
+          type: 'success',
+          time: 3000
+        }));
+        navigation.goBack();
+      } else {
+        dispatch(showSnackbar({
+          message: 'Failed to update user',
+          type: 'error',
+          time: 3000
+        }));
+      }
+    } catch (error) {
+      dispatch(showSnackbar({
+        message: 'Failed to update user',
+        type: 'error',
+        time: 3000
+      }));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,6 +108,7 @@ const UpdateUserScreen = () => {
       <CommonAppBar navigation={navigation} label="Update User" />
 
       <View style={{ flex: 1, marginHorizontal: 16, marginTop: 20 }}>
+        {/* Avatar upload commented out as not required
         <View style={styles.avatarContainer}>
           {avatar ? (
             <Image source={{ uri: avatar }} style={styles.avatar} />
@@ -88,6 +139,7 @@ const UpdateUserScreen = () => {
             </TouchableOpacity>
           )}
         </View>
+        */}
 
         <View style={styles.formCard}>
           <InputBox
@@ -102,7 +154,9 @@ const UpdateUserScreen = () => {
             placeholder="Enter Contact Number"
             label="Contact No."
             type="phone-pad"
+            editable={false}
           />
+          {/* Email field commented out as not required
           <InputBox
             value={email}
             setter={setEmail}
@@ -110,6 +164,7 @@ const UpdateUserScreen = () => {
             label="Email"
             type="email"
           />
+          */}
 
           <View style={styles.roleSelector}>
             <Text style={styles.sectionLabel}>
@@ -120,14 +175,14 @@ const UpdateUserScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.roleButton,
-                  role === 'user' && styles.selectedRole,
+                  role === 'USER' && styles.selectedRole,
                 ]}
-                onPress={() => setRole('user')}
+                onPress={() => setRole('USER')}
               >
                 <Text
                   style={[
                     styles.roleText,
-                    role === 'user' && styles.selectedRoleText,
+                    role === 'USER' && styles.selectedRoleText,
                   ]}
                 >
                   User
@@ -136,14 +191,14 @@ const UpdateUserScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.roleButton,
-                  role === 'driver' && styles.selectedRole,
+                  role === 'DRIVER' && styles.selectedRole,
                 ]}
-                onPress={() => setRole('driver')}
+                onPress={() => setRole('DRIVER')}
               >
                 <Text
                   style={[
                     styles.roleText,
-                    role === 'driver' && styles.selectedRoleText,
+                    role === 'DRIVER' && styles.selectedRoleText,
                   ]}
                 >
                   Driver
@@ -161,14 +216,14 @@ const UpdateUserScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.statusButton,
-                  status === 'active' && styles.selectedStatus,
+                  status === 'ACTIVE' && styles.selectedStatus,
                 ]}
-                onPress={() => setStatus('active')}
+                onPress={() => setStatus('ACTIVE')}
               >
                 <Text
                   style={[
                     styles.statusText,
-                    status === 'active' && styles.selectedStatusText,
+                    status === 'ACTIVE' && styles.selectedStatusText,
                   ]}
                 >
                   Active
@@ -177,14 +232,14 @@ const UpdateUserScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.statusButton,
-                  status === 'inactive' && styles.selectedStatus,
+                  status === 'INACTIVE' && styles.selectedStatus,
                 ]}
-                onPress={() => setStatus('inactive')}
+                onPress={() => setStatus('INACTIVE')}
               >
                 <Text
                   style={[
                     styles.statusText,
-                    status === 'inactive' && styles.selectedStatusText,
+                    status === 'INACTIVE' && styles.selectedStatusText,
                   ]}
                 >
                   Inactive
@@ -193,14 +248,14 @@ const UpdateUserScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.statusButton,
-                  status === 'blocked' && styles.selectedStatus,
+                  status === 'BLOCKED' && styles.selectedStatus,
                 ]}
-                onPress={() => setStatus('blocked')}
+                onPress={() => setStatus('BLOCKED')}
               >
                 <Text
                   style={[
                     styles.statusText,
-                    status === 'blocked' && styles.selectedStatusText,
+                    status === 'BLOCKED' && styles.selectedStatusText,
                   ]}
                 >
                   Blocked
@@ -209,14 +264,14 @@ const UpdateUserScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.statusButton,
-                  status === 'rejected' && styles.selectedStatus,
+                  status === 'REJECTED' && styles.selectedStatus,
                 ]}
-                onPress={() => setStatus('rejected')}
+                onPress={() => setStatus('REJECTED')}
               >
                 <Text
                   style={[
                     styles.statusText,
-                    status === 'rejected' && styles.selectedStatusText,
+                    status === 'REJECTED' && styles.selectedStatusText,
                   ]}
                 >
                   Rejected
@@ -236,12 +291,14 @@ const UpdateUserScreen = () => {
         </View>
       </View>
 
+      {/* Image picker commented out as not required
       <ImagePickerSheet
         visible={pickerSheetVisible}
         onClose={() => setPickerSheetVisible(false)}
         onCamera={() => pickImage('camera')}
         onGallery={() => pickImage('gallery')}
       />
+      */}
     </View>
   );
 };

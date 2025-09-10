@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import {
   appFonts,
@@ -26,7 +27,7 @@ import { products, addsData } from '../../utils/dummyData';
 import { FaddedIcon } from '../../components/commonComponents';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCart, selectItems, selectUser } from '../../store/selector';
-import { fetchItems, fetchCart, fetchOrders } from '../../store/thunks/userThunk';
+import { fetchItems, fetchCart, fetchOrders, getUserById } from '../../store/thunks/userThunk';
 import Key from '../../constants/key';
 import { getUserLocation } from '../../utils/CommonMethods';
 
@@ -71,12 +72,14 @@ export default function HomeScreen() {
 
   const {API_BASE_URL} = Key;
   const user = useSelector(selectUser);
+  const userId = user?.id;
   const cart = useSelector(selectCart);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const items = useSelector(selectItems);
   console.log("Items in home screen", items)
   const [userAddress, setUserAddress] = useState('Getting location...');
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     getUserLocation(
@@ -90,13 +93,29 @@ export default function HomeScreen() {
       }
     );
   }, []);
+  const fetchAllData = async () => {
+    if (user && userId) {
+      await Promise.all([
+        dispatch(getUserById({ userId })),
+        dispatch(fetchItems()),
+        dispatch(fetchCart()),
+        dispatch(fetchOrders())
+      ]);
+    }
+  };
+
+  const onRefresh = async () => {
+    console.log("Refreshing data...");
+
+    setRefreshing(true);
+    await fetchAllData();
+    setRefreshing(false);
+  };
+
   useEffect(() => {
     if (user) {
-      // Fetch items when user is present
       dispatch(fetchItems());
-      // Fetch user's cart when user is present
       dispatch(fetchCart());
-      // Fetch all orders when user is present
       dispatch(fetchOrders());
     }
   }, [user, dispatch]);
@@ -140,7 +159,12 @@ export default function HomeScreen() {
         <Text style={styles.searchText}>Search here...</Text>
       </TouchableOpacity>
 
-      <ScrollView style={styles.mainSection}>
+      <ScrollView 
+        style={styles.mainSection}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <MovingIcons icons={icons} />
         <AdSlider data={addsData} type={"big"} />
 

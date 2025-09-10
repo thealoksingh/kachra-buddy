@@ -2,38 +2,60 @@ import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import React from 'react';
+import { useSelector } from 'react-redux';
 import {
   Colors,
   commonStyles,
   Sizes,
   textStyles,
 } from '../../styles/commonStyles';
+import { selectUser } from '../../store/selector';
+import Key from '../../constants/key';
 
 const BookingCardAdmin = ({ booking }) => {
   const navigation = useNavigation();
-  const {
-    address,
-    status,
-    pickupStatus,
-    driverStatus,
-    pickupDateTime,
-    items,
-    expectedPrice,
-    images,
-  } = booking;
+  const user = useSelector(selectUser);
+  const { API_BASE_URL } = Key;
+  
+  const address = booking?.pickupAddress || booking?.orderPickupAddress || 'N/A';
+  const status = booking?.status || 'N/A';
+  const pickupDate = booking?.pickupDate ? new Date(booking.pickupDate).toLocaleDateString() : 'N/A';
+  const driverName = booking?.driver?.fullName || 'Not Assigned';
+  const userName = booking?.user?.fullName || 'N/A';
+  const finalPrice = booking?.finalPrice || 0;
+  const orderItems = booking?.orderItems || [];
+  const images = booking?.orderImages?.map(img => API_BASE_URL + img.imageUrl) || [];
+  const itemsCount = orderItems.length;
 
   const maxVisible = 3;
-  const visibleImages = images.slice(0, maxVisible);
-  const extraCount = images.length - maxVisible;
+  const visibleImages = images?.slice(0, maxVisible);
+  const extraCount = images?.length - maxVisible;
 
   const renderImages = () => {
+    if (!images || images.length === 0) return null;
+    
     if (images.length === 1) {
-      return <Image source={{ uri: images[0] }} style={styles.singleImage} />;
+      return (
+        <Image 
+          source={{ 
+            uri: images[0],
+            headers: { Authorization: `Bearer ${user?.accessToken}` }
+          }} 
+          style={styles.singleImage} 
+        />
+      );
     } else if (images.length === 2) {
       return (
         <View style={styles.twoImageRow}>
           {images.map((uri, index) => (
-            <Image key={index} source={{ uri }} style={styles.twoImage} />
+            <Image 
+              key={index} 
+              source={{ 
+                uri,
+                headers: { Authorization: `Bearer ${user?.accessToken}` }
+              }} 
+              style={styles.twoImage} 
+            />
           ))}
         </View>
       );
@@ -41,7 +63,14 @@ const BookingCardAdmin = ({ booking }) => {
       return (
         <View style={styles.imageRow}>
           {visibleImages.map((uri, index) => (
-            <Image key={index} source={{ uri }} style={styles.imageThumb} />
+            <Image 
+              key={index} 
+              source={{ 
+                uri,
+                headers: { Authorization: `Bearer ${user?.accessToken}` }
+              }} 
+              style={styles.imageThumb} 
+            />
           ))}
           {extraCount > 0 && (
             <View style={styles.extraImages}>
@@ -56,14 +85,14 @@ const BookingCardAdmin = ({ booking }) => {
 
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate('bookingDetailAdmin')}
+      onPress={() => navigation.navigate('bookingDetailAdmin', { booking })}
       activeOpacity={0.7}
       style={[styles.card, commonStyles.shadow]}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={textStyles.subHeading}>Booking</Text>
+        <Text style={textStyles.subHeading}>Order #{booking?.id}</Text>
         <Text style={[textStyles.subHeading, { color: Colors.secondaryLight }]}>
-          #GRB45859
+          {userName}
         </Text>
       </View>
       <Text
@@ -77,59 +106,47 @@ const BookingCardAdmin = ({ booking }) => {
       <View style={styles.divider} />
 
       <View style={commonStyles.rowSpaceBetween}>
-        <Text style={textStyles.smallBold}>Pickup Status</Text>
+        <Text style={textStyles.smallBold}>Status</Text>
         <Text
           style={[
             textStyles.small,
             {
               color:
-                pickupStatus === 'Completed'
+                status === 'DELIVERED'
                   ? Colors.greenColor
+                  : status === 'CANCELLED'
+                  ? Colors.secondary
                   : Colors.yellowColor,
             },
           ]}
         >
-          {pickupStatus}
-        </Text>
-      </View>
-      <View style={commonStyles.rowSpaceBetween}>
-        <Text style={textStyles.smallBold}>Booking status</Text>
-        <Text
-          style={[
-            textStyles.small,
-            {
-              color:
-                status === 'cancelled' ? Colors.secondary : Colors.greenColor,
-            },
-          ]}
-        >
-          {pickupStatus}
+          {status}
         </Text>
       </View>
 
       <View style={commonStyles.rowSpaceBetween}>
         <Text style={textStyles.smallBold}>Driver</Text>
         <Text style={[textStyles.small, { color: Colors.primary }]}>
-          {driverStatus}
+          {driverName}
         </Text>
       </View>
 
       <View style={commonStyles.rowSpaceBetween}>
         <Text style={textStyles.smallBold}>Pickup Date</Text>
-        <Text style={textStyles.small}>{pickupDateTime}</Text>
+        <Text style={textStyles.small}>{pickupDate}</Text>
       </View>
 
       <View style={commonStyles.rowSpaceBetween}>
         <Text style={textStyles.smallBold}>Items</Text>
-        <Text style={textStyles.small}>{items}</Text>
+        <Text style={textStyles.small}>{itemsCount} items</Text>
       </View>
 
       <View
         style={[commonStyles.rowSpaceBetween, { marginTop: Sizes.fixPadding }]}
       >
-        <Text style={textStyles.smallBold}>Expected Price</Text>
+        <Text style={textStyles.smallBold}>Final Price</Text>
         <Text style={[textStyles.smallBold, { color: Colors.greenColor }]}>
-          {expectedPrice}
+          ₹{finalPrice}
         </Text>
       </View>
     </TouchableOpacity>

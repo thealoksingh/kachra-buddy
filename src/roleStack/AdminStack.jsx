@@ -1,4 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../store/selector';
 import AdminBottomNavBar from '../components/adminComponents/AdminBottomNavBar';
 import ErrorScreen from '../screens/ErrorScreen';
 import AdminHome from '../screens/admin/AdminHome';
@@ -19,6 +21,8 @@ import PostAd from '../screens/admin/PostAd';
 import AllBestDealProducts from '../screens/admin/AllBestDealProducts';
 import AllSupportIssues from '../screens/admin/AllSupportIssues';
 import SupportIssueDetail from '../screens/admin/SupportIssueDetail';
+import AllAdvertisementsScreen from '../screens/admin/AllAdvertisementsScreen';
+import AdvertisementDetailScreen from '../screens/admin/AdvertisementDetailScreen';
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
@@ -29,6 +33,8 @@ function ActiveStack() {
       <Stack.Screen name="allSupportIssues" component={AllSupportIssues} />
        <Stack.Screen name="supportIssueDetail" component={SupportIssueDetail} />
        <Stack.Screen name="allBestDealProducts" component={AllBestDealProducts} />
+       <Stack.Screen name="allAdvertisementsScreen" component={AllAdvertisementsScreen} />
+       <Stack.Screen name="advertisementDetail" component={AdvertisementDetailScreen} />
        <Stack.Screen name="postAd" component={PostAd} />
       <Stack.Screen name="sendNotificationScreen" component={SendNotificationScreen} />
       <Stack.Screen name="updateUserScreen" component={UpdateUserScreen} />
@@ -56,7 +62,7 @@ function InactiveStack() {
   );
 }
 
-export function AdminStack({ route }) {
-  const { user } = route.params;
-  return user?.status === 'Active' ? <ActiveStack /> : <InactiveStack />;
+export function AdminStack() {
+  const user = useSelector(selectUser);
+  return user?.status === 'ACTIVE' ? <ActiveStack /> : <InactiveStack />;
 }

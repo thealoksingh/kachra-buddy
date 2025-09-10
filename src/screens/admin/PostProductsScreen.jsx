@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 import { Colors } from '../../styles/commonStyles';
+import { createItem } from '../../store/thunks/adminThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
 import {
   ButtonWithLoader,
   CommonAppBar,
@@ -15,12 +18,14 @@ import { LottieAlert } from '../../components/lottie/LottieAlert';
 
 const PostProductsScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [failureAlertVisible, setFailureAlertVisible] = useState(false);
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
-  const [name, setName] = useState(null);
-  const [rate, setRate] = useState(null);
+  const [name, setName] = useState('');
+  const [rate, setRate] = useState('');
   const [type, setType] = useState('countable');
+  const [tags, setTags] = useState('');
   const [image, setImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
@@ -52,6 +57,54 @@ const PostProductsScreen = () => {
 
   const removeImage = () => {
     setImage(null);
+  };
+
+  const handleCreateItem = async () => {
+    if (!name || !rate || !image || !tags) {
+      dispatch(showSnackbar({
+        message: 'Please fill all required fields',
+        type: 'error',
+        time: 3000
+      }));
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const itemData = {
+        name,
+        pricePerUnit: parseFloat(rate),
+        unit: type === 'countable' ? 'PIECE' : 'KG',
+        tags,
+        countable: type === 'countable',
+        isCountable: type === 'countable'
+      };
+      
+      const result = await dispatch(createItem({ itemData, file: image }));
+      
+      if (createItem.fulfilled.match(result)) {
+        dispatch(showSnackbar({
+          message: 'Item created successfully',
+          type: 'success',
+          time: 3000
+        }));
+        navigation.goBack();
+      } else {
+        dispatch(showSnackbar({
+          message: 'Failed to create item',
+          type: 'error',
+          time: 3000
+        }));
+      }
+    } catch (error) {
+      dispatch(showSnackbar({
+        message: 'Failed to create item',
+        type: 'error',
+        time: 3000
+      }));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -116,6 +169,14 @@ const PostProductsScreen = () => {
             optional={false}
             type={'phone-pad'}
           />
+          <InputBox
+            value={tags}
+            setter={setTags}
+            placeholder={'Enter tags (e.g., plastic, metal)'}
+            label={'Tags'}
+            optional={false}
+            type={'default'}
+          />
           <Text style={styles.sectionLabel}>
             Upload Image{' '}
             <Text style={{ color: Colors.secondary }}>*</Text>
@@ -157,13 +218,7 @@ const PostProductsScreen = () => {
             name="Submit"
             loadingName="Processing..."
             isLoading={loading}
-            method={() => {
-              setLoading(true);
-              setTimeout(() => {
-                setLoading(false);
-              
-              }, 500);
-            }}
+            method={handleCreateItem}
           />
         </View>
       </View>

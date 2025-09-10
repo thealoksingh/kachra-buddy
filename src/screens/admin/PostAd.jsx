@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 import { Colors } from '../../styles/commonStyles';
 import {
   ButtonWithLoader,
@@ -12,15 +13,20 @@ import ImagePreviewModal from '../../components/ImagePreviewModal';
 import { useImagePicker } from '../../components/useImagePicker';
 import ImagePickerSheet from '../../components/ImagePickerSheet';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
+import { createAdvertisement } from '../../store/thunks/adminThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
 
 const PostAd = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [failureAlertVisible, setFailureAlertVisible] = useState(false);
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
-  const [adSize, setAdSize] = useState('small');
-  const [adCards, setAdCards] = useState([]);
-  const [currentTitle, setCurrentTitle] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [redirectUrl, setRedirectUrl] = useState('');
+  const [adSize, setAdSize] = useState('SMALL');
+  const [displayOrder, setDisplayOrder] = useState('');
   const [currentImage, setCurrentImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
@@ -44,31 +50,59 @@ const PostAd = () => {
     }
   };
 
-  const addCard = () => {
-    if (!currentTitle || !currentImage) return;
-    
-    const newCard = { title: currentTitle, url: currentImage };
-    setAdCards([...adCards, newCard]);
-    
-    setCurrentTitle('');
-    setCurrentImage(null);
-  };
+  const handleSubmit = async () => {
+    if (!title || !description || !currentImage) {
+      dispatch(showSnackbar({
+        message: 'Please fill all required fields',
+        type: 'error',
+        time: 3000
+      }));
+      return;
+    }
 
-  const removeCard = (index) => {
-    const updated = adCards.filter((_, i) => i !== index);
-    setAdCards(updated);
-  };
-
-  const handleSubmit = () => {
     setLoading(true);
-    const adData = {
-      type: adSize,
-      cards: adCards
-    };
-    console.log('Posting Ad:', adData);
-    setTimeout(() => {
+    try {
+      const advertisementData = {
+        title,
+        description,
+        redirectUrl,
+        status: 'ACTIVE',
+        adSize,
+        displayOrder: displayOrder ? parseInt(displayOrder) : 1
+      };
+
+      const result = await dispatch(createAdvertisement({ advertisementData, file: currentImage }));
+      
+      if (createAdvertisement.fulfilled.match(result)) {
+        dispatch(showSnackbar({
+          message: 'Advertisement created successfully',
+          type: 'success',
+          time: 3000
+        }));
+        setTitle('');
+        setDescription('');
+        setRedirectUrl('');
+        setDisplayOrder('');
+        setCurrentImage(null);
+        setSuccessAlertVisible(true);
+      } else {
+        dispatch(showSnackbar({
+          message: 'Failed to create advertisement',
+          type: 'error',
+          time: 3000
+        }));
+        setFailureAlertVisible(true);
+      }
+    } catch (error) {
+      dispatch(showSnackbar({
+        message: 'Failed to create advertisement',
+        type: 'error',
+        time: 3000
+      }));
+      setFailureAlertVisible(true);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   return (
@@ -84,6 +118,27 @@ const PostAd = () => {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.formCard}>
+          <InputBox
+            value={title}
+            setter={setTitle}
+            placeholder={'Enter Ad Title'}
+            label={'Title'}
+          />
+
+          <TextArea
+            value={description}
+            setter={setDescription}
+            placeholder={'Enter Ad Description'}
+            label={'Description'}
+          />
+
+          <InputBox
+            value={redirectUrl}
+            setter={setRedirectUrl}
+            placeholder={'Enter Redirect URL (Optional)'}
+            label={'Redirect URL'}
+          />
+
           <View style={styles.sizeSelector}>
             <Text style={styles.sectionLabel}>
               Ad Size
@@ -93,14 +148,14 @@ const PostAd = () => {
               <TouchableOpacity
                 style={[
                   styles.sizeButton,
-                  adSize === 'small' && styles.selectedSize,
+                  adSize === 'SMALL' && styles.selectedSize,
                 ]}
-                onPress={() => setAdSize('small')}
+                onPress={() => setAdSize('SMALL')}
                >
                 <Text
                   style={[
                     styles.sizeText,
-                    adSize === 'small' && styles.selectedSizeText,
+                    adSize === 'SMALL' && styles.selectedSizeText,
                   ]}
                 >
                   Small
@@ -109,29 +164,28 @@ const PostAd = () => {
               <TouchableOpacity
                 style={[
                   styles.sizeButton,
-                  adSize === 'big' && styles.selectedSize,
+                  adSize === 'LARGE' && styles.selectedSize,
                 ]}
-                onPress={() => setAdSize('big')}
+                onPress={() => setAdSize('LARGE')}
               >
                 <Text
                   style={[
                     styles.sizeText,
-                    adSize === 'big' && styles.selectedSizeText,
+                    adSize === 'LARGE' && styles.selectedSizeText,
                   ]}
                 >
-                  Big
+                  Large
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
 
           <InputBox
-            value={currentTitle}
-            setter={setCurrentTitle}
-            placeholder={'Enter Ad Title'}
-            label={'Ad Title'}
-            optional={false}
-            type={'default'}
+            value={displayOrder}
+            setter={setDisplayOrder}
+            placeholder={'Enter Display Order (Optional)'}
+            label={'Display Order'}
+            type={'numeric'}
           />
 
           <Text style={styles.sectionLabel}>
@@ -165,28 +219,7 @@ const PostAd = () => {
             )}
           </View>
 
-          <TouchableOpacity style={styles.addCardButton} onPress={addCard}>
-            <Text style={styles.addCardText}>Add</Text>
-          </TouchableOpacity>
-       
         </View>
-         {adCards.length > 0 && (<View style={styles.formCard}>
-            {adCards.map((card, index) => (
-              <View key={index} style={styles.cardItem}>
-                <Image
-                  source={{ uri: card.url }}
-                  style={styles.cardImage}
-                />
-                <Text style={styles.cardTitle}>{card.title}</Text>
-                <TouchableOpacity
-                  style={styles.removeCardBtn}
-                  onPress={() => removeCard(index)}
-                >
-                  <Text style={styles.removeText}>✕</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>)}
         <View style={{ marginHorizontal: 10, marginVertical: 10 }}>
           <ButtonWithLoader
             name="Post Ad"
@@ -214,7 +247,7 @@ const PostAd = () => {
       {succesAlertVisible && (
         <LottieAlert
           type="success"
-          message="Order Cancelled Successfuly"
+          message="Advertisement Created Successfully"
           loop={false}
           onClose={() => {
             setSuccessAlertVisible(false);
@@ -225,7 +258,7 @@ const PostAd = () => {
       {failureAlertVisible && (
         <LottieAlert
           type="failure"
-          message="Order Cancellation Failed ,Try Again "
+          message="Advertisement Creation Failed, Try Again"
           loop={false}
           onClose={() => {
             setFailureAlertVisible(false);

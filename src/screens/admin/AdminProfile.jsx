@@ -21,16 +21,20 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MyStatusBar from '../../components/MyStatusBar';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUser } from '../../store/selector';
 import { performLogout } from '../../store/thunks/logoutThunk';
+import Key from '../../constants/key';
 
 const AdminProfile = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
   const [showLogoutSheet, setshowLogoutSheet] = useState(false);
-  const [avatar, setAvatar] = useState(null);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const { API_BASE_URL } = Key;
+  const avatar = user?.avatarUrl ? API_BASE_URL + user.avatarUrl : null;
 
   const handleLogout = async () => {
     try {
@@ -77,13 +81,21 @@ const AdminProfile = () => {
       <View style={styles.profileInfoWithOptionsWrapStyle}>
         <TouchableOpacity
           onPress={() => {
-            setPreviewImage(image);
+            setPreviewImage(avatar);
             setFullImageModalVisible(true);
           }}
           style={{ alignItems: 'center' }}
         >
           {avatar ? (
-            <Image source={{ uri: avatar }} style={styles.userImageStyle} />
+            <Image 
+              source={{ 
+                uri: avatar,
+                headers: {
+                  Authorization: `Bearer ${user?.accessToken}`,
+                }
+              }} 
+              style={styles.userImageStyle} 
+            />
           ) : (
             <View style={styles.userIconStyle}>
               <Icon name="person-off" size={60} color="#e0e0eb" />
@@ -98,8 +110,8 @@ const AdminProfile = () => {
             marginBottom: Sizes.fixPadding,
           }}
         >
-          <Text style={{ ...Fonts.blackColor18SemiBold }}>Alok Singh</Text>
-          <Text style={{ ...Fonts.grayColor16Medium }}>+91 985678876</Text>
+          <Text style={{ ...Fonts.blackColor18SemiBold }}>{user?.fullName || 'Admin'}</Text>
+          <Text style={{ ...Fonts.grayColor16Medium }}>+91 {user?.contactNumber || 'N/A'}</Text>
         </View>
         <View>
           {profileOption({

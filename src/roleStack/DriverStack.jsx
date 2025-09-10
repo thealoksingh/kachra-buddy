@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
+import { useSelector } from 'react-redux';
+import { selectUser } from '../store/selector';
 import ErrorScreen from '../screens/ErrorScreen';
 import PickupRequests from '../screens/driver/PickupRequests';
 import PickupRequestDetail from '../screens/driver/PickupRequestDetail';
@@ -38,7 +39,7 @@ function InactiveStack() {
   );
 }
 
-export function DriverStack({ route }) {
-  const { user } = route.params;
-  return user?.status === 'Active' ? <ActiveStack /> : <InactiveStack />;
+export function DriverStack() {
+  const user = useSelector(selectUser);
+  return user?.status === 'ACTIVE' ? <ActiveStack /> : <InactiveStack />;
 }

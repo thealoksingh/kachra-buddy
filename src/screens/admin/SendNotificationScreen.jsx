@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 import { Colors, screenWidth } from '../../styles/commonStyles';
 import {
   ButtonWithLoader,
@@ -19,75 +20,75 @@ import {
   InputBox,
 } from '../../components/commonComponents';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { sendNotification } from '../../store/thunks/notificationThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
 
 const SendNotificationScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [notificationType, setNotificationType] = useState('global');
-  const [selectedUserType, setSelectedUserType] = useState('user');
+  const [notificationType, setNotificationType] = useState('ORDER');
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState('');
-  const [titel, setTitle] = useState(null);
-  const [showUserList, setShowUserList] = useState(false);
+  const [title, setTitle] = useState('');
+  const [sendWhatsApp, setSendWhatsApp] = useState(true);
+  const [sendSMS, setSendSMS] = useState(true);
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
 
   const maxChars = 100;
   const remainingChars = maxChars - message.length;
 
-  const handleSendNotification = () => {
+  const handleSendNotification = async () => {
+    if (!title || !message) {
+      dispatch(showSnackbar({
+        message: 'Please fill all required fields',
+        type: 'error',
+        time: 3000
+      }));
+      return;
+    }
+
     setLoading(true);
+    try {
+      const notificationData = {
+        userId: selectedUser?.id || 0,
+        title,
+        message,
+        type: notificationType,
+        sendWhatsApp,
+        sendSMS
+      };
+
+      const result = await dispatch(sendNotification(notificationData));
+      
+      if (sendNotification.fulfilled.match(result)) {
+        dispatch(showSnackbar({
+          message: 'Notification sent successfully',
+          type: 'success',
+          time: 3000
+        }));
+        setTitle('');
+        setMessage('');
+        setSelectedUser(null);
+      } else {
+        dispatch(showSnackbar({
+          message: 'Failed to send notification',
+          type: 'error',
+          time: 3000
+        }));
+      }
+    } catch (error) {
+      dispatch(showSnackbar({
+        message: 'Failed to send notification',
+        type: 'error',
+        time: 3000
+      }));
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const selectUser = () => (
-    <>
-      {notificationType === 'personalized' && (
-        <View style={styles.userSelector}>
-          <Text style={styles.sectionLabel}>
-            Select User Or Driver
-            <Text style={{ color: Colors.secondary }}>*</Text>
-          </Text>
-          <TouchableOpacity
-            style={styles.selectUserButton}
-            onPress={() =>
-              navigation.navigate('allUsersScreen', {
-                fromSelectUser: 'both',
-                onUserSelect: user => setSelectedUser(user),
-              })
-            }
-          >
-            {selectedUser ? (
-              <View style={styles.selectedUserDisplay}>
-                {selectedUser.avatar ? (
-                  <Image
-                    source={{ uri: selectedUser.avatar }}
-                    style={styles.selectedUserAvatar}
-                  />
-                ) : (
-                  <View style={styles.selectedAvatarPlaceholder}>
-                    <Icon name="person" size={20} color={Colors.grayColor} />
-                  </View>
-                )}
-                <View style={styles.selectedUserInfo}>
-                  <Text style={styles.selectedUserName}>
-                    {selectedUser.owner_legal_name}
-                  </Text>
-                  <Text style={styles.selectedUserMobile}>
-                    {selectedUser.mobile_number}
-                  </Text>
-                </View>
-              </View>
-            ) : (
-              <Text style={styles.selectUserText}>Select User</Text>
-            )}
-            <Icon
-              name="keyboard-arrow-down"
-              size={24}
-              color={Colors.grayColor}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
-    </>
-  );
+
 
   return (
     <KeyboardAvoidingView
@@ -106,59 +107,74 @@ const SendNotificationScreen = () => {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.formCard}>
-          <View style={styles.typeSelector}>
+          <InputBox
+            value={title}
+            setter={setTitle}
+            placeholder="Enter notification title"
+            label="Title"
+          />
+
+          <View style={styles.dropdownContainer}>
             <Text style={styles.sectionLabel}>
               Notification Type
               <Text style={{ color: Colors.secondary }}>*</Text>
             </Text>
-            <View style={styles.typeButtons}>
-              <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  notificationType === 'global' && styles.selectedType,
-                ]}
-                onPress={() => setNotificationType('global')}
-              >
-                <Text
-                  style={[
-                    styles.typeText,
-                    notificationType === 'global' && styles.selectedTypeText,
-                  ]}
-                >
-                  Global
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  notificationType === 'personalized' && styles.selectedType,
-                ]}
-                onPress={() => setNotificationType('personalized')}
-              >
-                <Text
-                  style={[
-                    styles.typeText,
-                    notificationType === 'personalized' &&
-                      styles.selectedTypeText,
-                  ]}
-                >
-                  Personalized
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={styles.dropdown}
+              onPress={() => setShowTypeDropdown(!showTypeDropdown)}
+            >
+              <Text style={styles.dropdownText}>{notificationType}</Text>
+              <Icon name="keyboard-arrow-down" size={24} color={Colors.grayColor} />
+            </TouchableOpacity>
+            {showTypeDropdown && (
+              <View style={styles.dropdownList}>
+                {['ORDER', 'PROMOTION', 'GENERAL', 'SYSTEM'].map(type => (
+                  <TouchableOpacity
+                    key={type}
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setNotificationType(type);
+                      setShowTypeDropdown(false);
+                    }}
+                  >
+                    <Text style={styles.dropdownItemText}>{type}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
 
-          {selectUser()}
+
+          <TouchableOpacity
+            style={styles.selectUserButton}
+            onPress={() =>
+              navigation.navigate('allUsersScreen', {
+                fromSelectUser: 'both',
+                onUserSelect: user => setSelectedUser(user),
+              })
+            }
+          >
+            {selectedUser ? (
+              <View style={styles.selectedUserDisplay}>
+                <View style={styles.selectedAvatarPlaceholder}>
+                  <Icon name="person" size={20} color={Colors.grayColor} />
+                </View>
+                <View style={styles.selectedUserInfo}>
+                  <Text style={styles.selectedUserName}>
+                    {selectedUser.fullName}
+                  </Text>
+                  <Text style={styles.selectedUserMobile}>
+                    {selectedUser.contactNumber}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <Text style={styles.selectUserText}>Select Target User (Optional)</Text>
+            )}
+            <Icon name="keyboard-arrow-down" size={24} color={Colors.grayColor} />
+          </TouchableOpacity>
 
           <View style={styles.messageContainer}>
-            <InputBox
-              value={titel}
-              setter={setTitle}
-              placeholder={'Enter titel of Notification'}
-              label={'Titel'}
-              optional={false}
-              type={'default'}
-            />
             <Text style={styles.sectionLabel}>
               Message
               <Text style={{ color: Colors.secondary }}>*</Text>
@@ -176,13 +192,40 @@ const SendNotificationScreen = () => {
               style={[
                 styles.charCount,
                 {
-                  color:
-                    remainingChars >= 0 ? Colors.primary : Colors.secondary,
+                  color: remainingChars >= 0 ? Colors.primary : Colors.secondary,
                 },
               ]}
             >
               {remainingChars} characters remaining
             </Text>
+          </View>
+
+          <View style={styles.communicationOptions}>
+            <Text style={styles.sectionLabel}>Communication Channels</Text>
+            <View style={styles.checkboxContainer}>
+              <TouchableOpacity
+                style={styles.checkbox}
+                onPress={() => setSendWhatsApp(!sendWhatsApp)}
+              >
+                <Icon
+                  name={sendWhatsApp ? 'check-box' : 'check-box-outline-blank'}
+                  size={24}
+                  color={sendWhatsApp ? Colors.primary : Colors.grayColor}
+                />
+                <Text style={styles.checkboxText}>Send WhatsApp</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.checkbox}
+                onPress={() => setSendSMS(!sendSMS)}
+              >
+                <Icon
+                  name={sendSMS ? 'check-box' : 'check-box-outline-blank'}
+                  size={24}
+                  color={sendSMS ? Colors.primary : Colors.grayColor}
+                />
+                <Text style={styles.checkboxText}>Send SMS</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -317,5 +360,58 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'right',
     marginTop: 4,
+  },
+  dropdownContainer: {
+    marginBottom: 16,
+  },
+  dropdown: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    borderWidth: 1,
+    borderColor: Colors.extraLightGrayColor,
+    borderRadius: 8,
+    backgroundColor: '#f6f6f6ff',
+  },
+  dropdownText: {
+    fontSize: 12,
+    color: Colors.blackColor,
+  },
+  dropdownList: {
+    borderWidth: 1,
+    borderColor: Colors.extraLightGrayColor,
+    borderRadius: 8,
+    backgroundColor: Colors.whiteColor,
+    marginTop: 4,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  dropdownItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.extraLightGrayColor,
+  },
+  dropdownItemText: {
+    fontSize: 12,
+    color: Colors.blackColor,
+  },
+  communicationOptions: {
+    marginBottom: 16,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    gap: 20,
+  },
+  checkbox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  checkboxText: {
+    fontSize: 12,
+    color: Colors.blackColor,
   },
 });
