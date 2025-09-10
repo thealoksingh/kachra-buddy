@@ -23,26 +23,26 @@ import { LottieAlert } from '../../components/lottie/LottieAlert';
 const { width } = Dimensions.get('window');
 
 const BookingDetailScreen = () => {
-  console.log("Rendering BookingDetailScreen");
+  console.log('Rendering BookingDetailScreen');
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const { API_BASE_URL } = Key;
-  
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
-  const[failureAlertVisible,setFailureAlertVisible]=useState(false);
-  const[succesAlertVisible,setSuccessAlertVisible]=useState(false);
+  const [failureAlertVisible, setFailureAlertVisible] = useState(false);
+  const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [orderData, setOrderData] = useState(null);
   const flatListRef = useRef();
-  
+
   // Get order ID from route params
   const { orderId } = route?.params || {};
-  
+
   // Fetch order by ID when component renders
   useEffect(() => {
     if (orderId) {
@@ -51,7 +51,7 @@ const BookingDetailScreen = () => {
         try {
           const response = await dispatch(getOrderById(orderId));
           if (getOrderById.fulfilled.match(response)) {
-            console.log("Fetched order data:", response?.payload?.data );
+            console.log('Fetched order data:', response?.payload?.data);
             setOrderData(response?.payload?.data || response?.payload);
           }
         } catch (error) {
@@ -97,14 +97,14 @@ const BookingDetailScreen = () => {
                 setPreviewVisible(true);
               }}
             >
-              <Image 
-                source={{ 
+              <Image
+                source={{
                   uri: item,
                   headers: {
                     Authorization: `Bearer ${user?.accessToken}`,
-                  }
-                }} 
-                style={styles.image} 
+                  },
+                }}
+                style={styles.image}
               />
             </TouchableOpacity>
           )}
@@ -126,16 +126,22 @@ const BookingDetailScreen = () => {
             <View style={styles.driverCard}>
               <Image
                 source={{
-                  uri: orderData?.driver?.avatarUrl ? API_BASE_URL + orderData.driver.avatarUrl : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                  uri: orderData?.driver?.avatarUrl
+                    ? API_BASE_URL + orderData.driver.avatarUrl
+                    : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
                   headers: {
                     Authorization: `Bearer ${user?.accessToken}`,
-                  }
+                  },
                 }}
                 style={styles.driverImage}
               />
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.driverName}>{orderData?.driver?.fullName || 'Driver name'}</Text>
-                <Text style={styles.driverPhone}>{orderData?.driver?.contactNumber || '+91 98765 43210'}</Text>
+                <Text style={styles.driverName}>
+                  {orderData?.driver?.fullName || 'Driver name'}
+                </Text>
+                <Text style={styles.driverPhone}>
+                  {orderData?.driver?.contactNumber || '+91 98765 43210'}
+                </Text>
                 <View style={{ flexDirection: 'row', marginTop: 4 }}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Text
@@ -158,13 +164,14 @@ const BookingDetailScreen = () => {
         </View>
 
         <View style={styles.itemsSection}>
-          <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Items</Text>
-            <Text style={textStyles.small}>{items.length}</Text>
-          </View>
+         
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Pickup Date Time</Text>
-            <Text style={textStyles.small}>{orderData?.pickupDate ? new Date(orderData.pickupDate).toLocaleDateString() : 'N/A'}</Text>
+            <Text style={textStyles.small}>
+              {orderData?.pickupDate
+                ? new Date(orderData.pickupDate).toLocaleDateString()
+                : 'N/A'}
+            </Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Order Status</Text>
@@ -172,45 +179,101 @@ const BookingDetailScreen = () => {
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Driver Allocation</Text>
-            <Text style={textStyles.small}>{orderData?.driver ? 'Allocated' : 'Not Allocated'}</Text>
-          </View>
-          <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Pickup Address</Text>
-            <Text style={[textStyles.small, { flex: 1, textAlign: 'right' }]}>
-              {orderData?.orderPickupAddress || orderData?.pickupAddress || 'N/A'}
+            <Text style={textStyles.small}>
+              {orderData?.driver ? 'Allocated' : 'Not Allocated'}
             </Text>
           </View>
-          <View style={commonStyles.rowSpaceBetween}>
+           {orderData?.type == 'general' && (
+            <>
+            <View style={commonStyles.rowSpaceBetween}>
+              <Text style={textStyles.smallBold}>Items</Text>
+              <Text style={textStyles.small}>{items.length}</Text>
+            </View>
+            <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Final Price</Text>
-            <Text style={textStyles.small}>₹{orderData?.finalPrice || 0}</Text>
+            <Text style={[textStyles.small,{color:Colors.primary}]}>₹{orderData?.finalPrice || 0}</Text>
+          </View>
+            </>
+          )}
+          <View style={commonStyles.rowSpaceBetween}>
+            <Text
+              style={[
+                textStyles.small,
+                { flex: 1, textAlign: 'justify', marginTop: 8 },
+              ]}
+            >
+              <Text style={textStyles.smallBold}>Address: </Text>
+              {orderData?.orderPickupAddress ||
+                orderData?.pickupAddress ||
+                'N/A'}
+            </Text>
           </View>
         </View>
-
-        <View style={styles.headingSection}>
-          <Text style={styles.sectionTitle}>Item In this Booking</Text>
-        </View>
-        <View style={styles.itemsSection}>
-          {items.map(item => (
-            <View key={item.id} style={styles.itemCard}>
-              <Image 
-                source={{ 
-                  uri: API_BASE_URL + item?.item?.imageUrl,
-                  headers: {
-                    Authorization: `Bearer ${user?.accessToken}`,
-                  }
-                }} 
-                style={styles.itemImage} 
-              />
-              <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.itemTitle}>{item?.item?.name || 'Item'}</Text>
-                <Text style={styles.itemDesc}>₹{item?.item?.pricePerUnit} / {item?.item?.unit?.toLowerCase()}</Text>
-                <Text style={styles.itemInfo}>
-                  Qty: {item?.quantity} | {item?.unit} | ₹{item?.price}
-                </Text>
-              </View>
+        <>
+          <View style={styles.headingSection}>
+            <Text style={styles.sectionTitle}>Vehicle Details</Text>
+          </View>
+          <View style={styles.itemsSection}>
+           
+            <View style={commonStyles.rowSpaceBetween}>
+              <Text style={textStyles.smallBold}>Vehicle Type</Text>
+              <Text style={textStyles.small}>
+               Cargo Vehicle
+              </Text>
             </View>
-          ))}
-        </View>
+            <View style={commonStyles.rowSpaceBetween}>
+              <Text style={textStyles.smallBold}>Vehicle Brand</Text>
+              <Text style={textStyles.small}>TATA</Text>
+            </View>
+            <View style={commonStyles.rowSpaceBetween}>
+              <Text style={textStyles.smallBold}>Vehicle Number</Text>
+              <Text style={textStyles.small}>
+                MH14FE4940
+              </Text>
+            </View>
+            <View style={commonStyles.rowSpaceBetween}>
+              <Text style={textStyles.smallBold}>Final Price</Text>
+              <Text style={textStyles.small}>
+                ₹{orderData?.finalPrice || 0}
+              </Text>
+            </View>
+          
+          </View>
+        </>
+        {orderData?.type == 'general' && (
+          <>
+            <View style={styles.headingSection}>
+              <Text style={styles.sectionTitle}>Item In this Booking</Text>
+            </View>
+            <View style={styles.itemsSection}>
+              {items.map(item => (
+                <View key={item.id} style={styles.itemCard}>
+                  <Image
+                    source={{
+                      uri: API_BASE_URL + item?.item?.imageUrl,
+                      headers: {
+                        Authorization: `Bearer ${user?.accessToken}`,
+                      },
+                    }}
+                    style={styles.itemImage}
+                  />
+                  <View style={{ flex: 1, marginLeft: 12 }}>
+                    <Text style={styles.itemTitle}>
+                      {item?.item?.name || 'Item'}
+                    </Text>
+                    <Text style={styles.itemDesc}>
+                      ₹{item?.item?.pricePerUnit} /{' '}
+                      {item?.item?.unit?.toLowerCase()}
+                    </Text>
+                    <Text style={styles.itemInfo}>
+                      Qty: {item?.quantity} | {item?.unit} | ₹{item?.price}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
         {true ? (
           <TouchableOpacity
             onPress={() => setWarningVisible(true)}
@@ -253,22 +316,26 @@ const BookingDetailScreen = () => {
         />
       )}
       {isLoading && <DottedBlackLoader />}
-      { succesAlertVisible&& (
+      {succesAlertVisible && (
         <LottieAlert
           type="success"
           message="Order Cancelled Successfuly"
           loop={false}
-          onClose={() => {setSuccessAlertVisible(false)}}
-          autoClose = {true}
+          onClose={() => {
+            setSuccessAlertVisible(false);
+          }}
+          autoClose={true}
         />
       )}
-      {failureAlertVisible&& (
+      {failureAlertVisible && (
         <LottieAlert
           type="failure"
           message="Order Cancellation Failed ,Try Again "
           loop={false}
-          onClose={() => {setFailureAlertVisible(false)}}
-          autoClose = {true}
+          onClose={() => {
+            setFailureAlertVisible(false);
+          }}
+          autoClose={true}
         />
       )}
     </View>

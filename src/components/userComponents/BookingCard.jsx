@@ -106,8 +106,8 @@ const BookingCard = ({ booking }) => {
                   : Colors.primary,
             },
           ]}
-        >
-          {booking?.status || 'N/A'}
+         >
+        {booking?.status || 'N/A'}
         </Text>
       </View>
 
@@ -123,10 +123,10 @@ const BookingCard = ({ booking }) => {
         <Text style={textStyles.small}>{pickupDate}</Text>
       </View>
 
-      <View style={commonStyles.rowSpaceBetween}>
+      {booking?.type=="general"&&(<View style={commonStyles.rowSpaceBetween}>
         <Text style={textStyles.smallBold}>Items</Text>
         <Text style={textStyles.small}>{itemCount}</Text>
-      </View>
+      </View>)}
 
       <View
         style={[commonStyles.rowSpaceBetween, { marginTop: Sizes.fixPadding }]}
