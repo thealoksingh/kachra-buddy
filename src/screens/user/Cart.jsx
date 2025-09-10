@@ -17,11 +17,25 @@ const Cart = () => {
   const cart = useSelector(selectCart);
   const dispatch = useDispatch();
 
-  // Calculate totals dynamically
-  const subtotal = cart?.cartItems?.reduce((sum, item) => sum + (item.price || 0), 0) || 0;
+  // Calculate totals dynamically based on current quantities
+  const [cartQuantities, setCartQuantities] = useState({});
+  
+  const calculateItemPrice = (item) => {
+    const currentQuantity = cartQuantities[item.item.id] || item.quantity;
+    return currentQuantity * item.item.pricePerUnit;
+  };
+  
+  const subtotal = cart?.cartItems?.reduce((sum, item) => sum + calculateItemPrice(item), 0) || 0;
   const gstRate = 0.18; // 18% GST
   const gstAmount = subtotal * gstRate;
   const total = subtotal + gstAmount;
+  
+  const handleQuantityChange = (itemId, newQuantity) => {
+    setCartQuantities(prev => ({
+      ...prev,
+      [itemId]: parseFloat(newQuantity) || 0
+    }));
+  };
 
   // Handle checkout method
   const handleCheckout = async () => {
@@ -66,7 +80,13 @@ const Cart = () => {
       <ScrollView contentContainerStyle={{ paddingBottom: 150 }}>
         <View style={styles.itemsContainer}>
           {cart?.cartItems?.map((item, index) => (
-            <CartCard key={index} cartItem={item} user={user} />
+            <CartCard 
+              key={index} 
+              cartItem={item} 
+              user={user}
+              onQuantityChange={handleQuantityChange}
+              currentQuantity={cartQuantities[item.item.id] || item.quantity}
+            />
           ))}
         </View>
       </ScrollView>
