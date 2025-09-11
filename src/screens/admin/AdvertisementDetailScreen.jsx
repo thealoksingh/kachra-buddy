@@ -41,11 +41,14 @@ const AdvertisementDetailScreen = () => {
 
   const { openCamera, openGallery } = useImagePicker();
 
-  const pickImage = async source => {
+   const pickImage = async source => {
     try {
       let result = null;
-      if (source === 'camera') result = await openCamera();
-      else result = await openGallery();
+      const aspectRatio = adSize === 'SMALL' ? '3.33:1' : '1.67:1';
+      const quality = 1;
+      
+      if (source === 'camera') result = await openCamera(aspectRatio, quality);
+      else result = await openGallery(aspectRatio, quality);
 
       if (result?.uri) {
         setCurrentImage(result.uri);
@@ -137,7 +140,7 @@ const AdvertisementDetailScreen = () => {
               style={styles.editImageButton}
               onPress={() => setPickerSheetVisible(true)}
             >
-              <Icon name="camera-alt" size={20} color={Colors.whiteColor} />
+              <Icon name="edit" size={20} color={Colors.whiteColor} />
             </TouchableOpacity>
           )}
         </View>

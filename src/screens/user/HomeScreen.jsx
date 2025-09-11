@@ -29,12 +29,13 @@ import { useNavigation } from '@react-navigation/native';
 import { products, addsData } from '../../utils/dummyData';
 import { FaddedIcon } from '../../components/commonComponents';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectCart, selectItems, selectUnreadNotifications, selectOrders, selectUser } from '../../store/selector';
+import { selectCart, selectItems, selectUnreadNotifications, selectOrders, selectUser, selectAdvertisementsByDisplayOrder, selectAdvertisements } from '../../store/selector';
 import { fetchItems, fetchCart, fetchOrders, getUserById } from '../../store/thunks/userThunk';
 import { fetchNotifications } from '../../store/thunks/notificationThunk';
 import Key from '../../constants/key';
 import { PendingOrderAlert } from '../../components/userComponents/PendingOrderAlert';
 import { getUserLocation } from '../../utils/CommonMethods';
+import { fetchAllAdvertisements } from '../../store/thunks/adminThunk';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -82,13 +83,16 @@ export default function HomeScreen() {
   const dispatch = useDispatch();
   const items = useSelector(selectItems);
   const orders = useSelector(selectOrders);
-  console.log('Items in home screen', items);
+  const advertisement  = useSelector(selectAdvertisementsByDisplayOrder);
+  // console.log('Items in home screen', items);
   const [userAddress, setUserAddress] = useState('Getting location...');
   const [refreshing, setRefreshing] = useState(false);
   const [pendingAlertVisible, setPendingAlertVisible] = useState(true);
   const pendingOrders = orders?.filter(order => order.status === 'INCOMPLETE');
   const unreadNotifications = useSelector(selectUnreadNotifications);
-  console.log('Unread Notifications:', unreadNotifications);
+  const bigSizeAdv = advertisement?.filter((ad) => ad.adSize === 'BIG') || [];
+  const smallSizeAdv = advertisement?.filter((ad) => ad.adSize === 'SMALL') || [];
+  console.log('advertisement==>:', advertisement);
 
   useEffect(() => {
     getUserLocation(
@@ -102,12 +106,13 @@ export default function HomeScreen() {
       },
     );
   }, []);
+
   const fetchAllData = async () => {
     if (user && userId) {
       await Promise.all([
         dispatch(getUserById({ userId })),
         dispatch(fetchItems()),
-        dispatch(fetchCart()),
+            dispatch(fetchCart()),
         dispatch(fetchOrders()),
         dispatch(fetchNotifications(userId))
       ]);
@@ -126,6 +131,7 @@ export default function HomeScreen() {
     if (user && userId) {
       setPendingAlertVisible(pendingOrders.length > 0);
       dispatch(fetchItems());
+       dispatch(fetchAllAdvertisements()),
       dispatch(fetchCart());
       dispatch(fetchOrders());
       dispatch(fetchNotifications(userId));
@@ -209,7 +215,7 @@ export default function HomeScreen() {
         }
       >
         <MovingIcons icons={icons} />
-        <AdSlider data={addsData} type={'big'} />
+        <AdSlider data={bigSizeAdv} type={'big'} />
 
         <View
           style={{
@@ -232,7 +238,7 @@ export default function HomeScreen() {
 
         <MiniProductScrollSection products={items} />
         <View style={{ marginVertical: 20 }}>
-          <AdSlider data={addsData} type={'small'} />
+          <AdSlider data={smallSizeAdv} type={'small'} />
         </View>
 
         <View style={styles.scrapVehicleCard}>

@@ -47,11 +47,11 @@ const OngoingBookings = ({ orders, isLoading }) => {
 
 
 const BookingScreen = () => {
-  console.log("Rendering BookingScreen");
+  // console.log("Rendering BookingScreen");
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const orders = useSelector(selectOrders);
-  console.log("orders in booking screen", orders);
+  // console.log("orders in booking screen", orders);
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
       <CommonAppBar navigation={navigation} label={'Bookings'} />

@@ -30,8 +30,9 @@ import { FaddedIcon } from '../../components/commonComponents';
 import CurvedCard from '../../screens/driver/CurvedCard';
 import {fetchAddressFromCoordinates, getUserLocation} from "../../utils/CommonMethods";
 import { useSelector, useDispatch } from 'react-redux';
-import { selectUser, selectDriverItems, selectDriverLoading } from '../../store/selector';
+import { selectUser, selectDriverItems, selectDriverLoading, selectAdvertisementsByDisplayOrder } from '../../store/selector';
 import { fetchAllItems, fetchDriverOrders } from '../../store/thunks/driverThunk';
+import { fetchAllAdvertisements } from '../../store/thunks/adminThunk';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -73,12 +74,15 @@ export const icons = [
 export default function DriverHome() {
   const user = useSelector(selectUser);
   const driverItems = useSelector(selectDriverItems);
-  // const driverLoading = useSelector(selectDriverLoading);
+  const advertisement = useSelector(selectAdvertisementsByDisplayOrder);
   const dispatch = useDispatch();
   console.log("user in driver home", user);
   console.log("driver items", driverItems);
   const navigation = useNavigation();
   const [userAddress, setUserAddress] = useState('Getting location...');
+  
+  const bigSizeAdv = advertisement?.filter((ad) => ad.adSize === 'BIG') || [];
+  const smallSizeAdv = advertisement?.filter((ad) => ad.adSize === 'SMALL') || [];
 
   useEffect(() => {
     getUserLocation(
@@ -96,6 +100,7 @@ export default function DriverHome() {
     if (user) {
       dispatch(fetchAllItems());
       dispatch(fetchDriverOrders());
+      dispatch(fetchAllAdvertisements());
     }
   }, [user, dispatch]);
 
@@ -164,7 +169,7 @@ export default function DriverHome() {
 
       <ScrollView style={styles.mainSection}>
         <MovingIcons icons={icons} />
-        <AdSlider data={addsData} type={"big"} />
+        <AdSlider data={bigSizeAdv} type={"big"} />
         <View
           style={{
             flexDirection: 'row',
@@ -203,7 +208,7 @@ export default function DriverHome() {
           </TouchableOpacity>
         </View>
         <View style={{ marginVertical: 20 }}>
-          <AdSlider data={addsData} type={"small"}/>
+          <AdSlider data={smallSizeAdv} type={"small"}/>
         </View>
 
         <FaddedIcon />

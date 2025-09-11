@@ -97,8 +97,9 @@ const Cart = () => {
             <Text style={styles.emptyTitle}>Your cart is empty</Text>
             <Text style={styles.emptySubtitle}>Add some items to get started</Text>
             <TouchableOpacity 
+              activeOpacity={0.7}
               style={styles.shopButton}
-              onPress={() => navigation.navigate('home')}
+              onPress={() => navigation.replace('userBottomNavBar')}
             >
               <Text style={styles.shopButtonText}>Start Shopping</Text>
             </TouchableOpacity>
