@@ -40,3 +40,13 @@ export const deleteNotificationAPI = async (notificationId) => {
     accessToken,
   });
 };
+
+export const registerFCMTokenAPI = async (token) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiPostRequest({
+    apiUrl: `${API_BASE_URL}/api/notifications/register-token`,
+    content_type: "application/x-www-form-urlencoded",
+    data: `token=${token}&deviceType=ANDROID`,
+    accessToken,
+  });
+};

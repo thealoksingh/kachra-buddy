@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider } from 'react-redux';
@@ -16,6 +16,7 @@ import { Snackbar } from './src/components/Snackbar';
 import RoleBasedNavigator from './src/components/RoleBasedNavigator';
 import NotificationManager from './src/components/NotificationManager';
 import NoInternetScreen from './src/screens/NoInternetScreen';
+import { initializeFCM, setupForegroundListener } from './src/services/fcmService';
 // import ErrorScreen from './src/screens/ErrorScreen'; // you can add later if needed
 
 const Stack = createNativeStackNavigator();
@@ -60,7 +61,15 @@ export default function App() {
     const unsubscribe = NetInfo.addEventListener(state => {
       setIsConnected(state.isConnected && state.isInternetReachable !== false);
     });
-    return () => unsubscribe();
+    
+    initializeFCM();
+    
+    const unsubscribeMessage = setupForegroundListener();
+
+    return () => {
+      unsubscribe();
+      unsubscribeMessage();
+    };
   }, []);
 
   return (
