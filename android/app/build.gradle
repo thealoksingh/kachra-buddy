@@ -133,10 +133,6 @@ dependencies {
     // 🔹 Firebase dependencies
     implementation platform("com.google.firebase:firebase-bom:34.2.0")
     implementation "com.google.firebase:firebase-analytics"
-
-    // 👉 Add more Firebase modules here if you need them, e.g.:
-    // implementation "com.google.firebase:firebase-auth"
-    // implementation "com.google.firebase:firebase-firestore"
-    // implementation "com.google.firebase:firebase-storage"
+    implementation "com.google.firebase:firebase-messaging"
 }
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"

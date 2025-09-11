@@ -1,4 +1,4 @@
-import messaging from '@react-native-firebase/messaging';
+import messaging, { AuthorizationStatus } from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { registerFCMTokenAPI } from '../utils/api/notificationApi';
 
@@ -6,8 +6,8 @@ export const initializeFCM = async () => {
   try {
     const authStatus = await messaging().requestPermission();
     const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      authStatus === AuthorizationStatus.AUTHORIZED ||
+      authStatus === AuthorizationStatus.PROVISIONAL;
 
     if (enabled) {
       console.log('Notification permission enabled');

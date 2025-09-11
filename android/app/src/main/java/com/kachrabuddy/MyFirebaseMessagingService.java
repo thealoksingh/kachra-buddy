@@ -10,6 +10,7 @@ import android.util.Log;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.Context;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -29,7 +30,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void showNotification(String title, String message) {
         NotificationManager notificationManager = 
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(

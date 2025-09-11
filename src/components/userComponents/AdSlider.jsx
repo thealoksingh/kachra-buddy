@@ -103,7 +103,7 @@ const AdSlider = ({ data, type }) => {
                 style={styles.image}
                 resizeMode="cover"
                 onError={(error) => console.log('Image load error:', error)}
-                onLoad={() => console.log('Image loaded successfully')}
+               
               />
               <View style={styles.adLabel}>
                 <Text style={styles.adText}>Ad</Text>
