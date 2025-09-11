@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
 import { CommonAppBar, FaddedIcon } from '../../components/commonComponents';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
@@ -29,6 +30,7 @@ const PickupRequestDetail = () => {
   
   const [currentOrder, setCurrentOrder] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
@@ -36,23 +38,40 @@ const PickupRequestDetail = () => {
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const flatListRef = useRef();
+
   
-  const fetchOrderDetails = async () => {
+  
+  const fetchOrderDetails = async (isRefresh = false) => {
     if (!orderId) return;
     
-    setLoading(true);
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+    
     try {
       const response = await getOrderByIdAPI(orderId);
       setCurrentOrder(response?.data?.data || response?.data);
     } catch (error) {
       console.error('Error fetching order:', error);
     } finally {
-      setLoading(false);
+      if (isRefresh) {
+        setRefreshing(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
+
+  const onRefresh = () => {
+    fetchOrderDetails(true);
+  };
+
   
   useEffect(() => {
     fetchOrderDetails();
+
   }, [orderId]);
 
   const images = currentOrder?.orderImages?.map(img => `${Key.API_BASE_URL}${img.imageUrl}`) || [];
@@ -71,7 +90,12 @@ const PickupRequestDetail = () => {
       <MyStatusBar/>
       <CommonAppBar navigation={navigation} label="Pickup Request Detail" />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {images.length > 0 ? (
           <FlatList
             ref={flatListRef}
@@ -257,7 +281,7 @@ const PickupRequestDetail = () => {
           ))}
         </View>
 
-        <TouchableOpacity
+       {currentOrder?.status !== 'COMPLETED' && <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => navigation.navigate('finalPickupScreen', { currentOrder })}
           style={[styles.outlinedBtn, { borderColor: Colors.primary }]}
@@ -265,7 +289,7 @@ const PickupRequestDetail = () => {
           <Text style={[styles.outlinedBtnText, { color: Colors.primary }]}>
             Pickup Order
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> }
 
         <FaddedIcon />
         <View style={{ height: 80 }} />

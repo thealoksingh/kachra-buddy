@@ -115,6 +115,7 @@ const FinalPickupScreen = () => {
 
   const submitOrder = async () => {
     console.log('Submitting order with OTP:', otpInput);
+    
     // Prepare updated order items with new quantities
     const updatedOrderItems = currentOrder.orderItems.map(orderItem => ({
       id: orderItem.id,
@@ -125,37 +126,57 @@ const FinalPickupScreen = () => {
     }));
 
     console.log('Updated Order Items:', updatedOrderItems);
+    console.log('Raw Additional Items:', additionalItems);
 
     // Prepare additional items in correct format
-    const formattedAdditionalItems = additionalItems.map(item => ({
-      itemId: item.item.id,
-      quantity: item.quantity,
-      price: item.price,
-      unit: item.item.unit
-    }));
+    let formattedAdditionalItems = [];
+    try {
+      formattedAdditionalItems = additionalItems.map(item => ({
+        itemId: item.item.id,
+        quantity: item.quantity,
+        price: item.price,
+        unit: item.item.unit
+      }));
+      console.log('Formatted Additional Items SUCCESS:', formattedAdditionalItems);
+    } catch (error) {
+      console.log('ERROR formatting additional items:', error);
+      console.log('Additional items causing error:', additionalItems);
+    }
 
-    console.log('Formatted Additional Items:', formattedAdditionalItems);
+    // Prepare order DTO matching API structure (without images, otp, postedBy)
+    const orderDto = {
+      id: currentOrder.id,
+      orderItems: [...updatedOrderItems, ...formattedAdditionalItems],
+      finalPrice: calculateTotalPrice(),
+      givenAmount: parseFloat(givenAmount) || 0,
+      remark: remark || '',
+      
+    };
 
-    // Prepare final order data matching API structure
-    const orderUpdateData =  {
-        id: currentOrder.id,
-        orderItems: [...updatedOrderItems, ...formattedAdditionalItems],
-        finalPrice: calculateTotalPrice(),
-        givenAmount: parseFloat(givenAmount) || 0,
-        remark: remark || '',
-        images: images,
-        otp: otpInput,
-        postedBy: 'DRIVER',
-        updatedAt: new Date().toISOString()
-      };
+    // Prepare API payload matching multipart/form-data structure
+    const apiPayload = {
+      orderId: currentOrder.id,
+      orderJson: orderDto,
+      postedBy: 'DRIVER',
+      otp: otpInput,
+      files: images // Array of image URIs
+    };
+
+    console.log('=== DEBUGGING ORDER SUBMISSION ===');
+    console.log('Order DTO:', JSON.stringify(orderDto, null, 2));
+    console.log('API Payload:', apiPayload);
+    console.log('Total Items Count:', orderDto.orderItems.length);
+    console.log('=== END DEBUG ===');
+
+    const result = await dispatch(updateDriverOrder(apiPayload));
 
     if (updateDriverOrder.fulfilled.match(result)) {
-      dispatch(showLottieAlert({ type: 'success', message: 'Order Picked up Successfully', autoClose: true }));
+      dispatch(showLottieAlert({ type: 'success', message:  'Order Picked up Successfully', autoClose: true }));
       setTimeout(() => {
-        navigation.pop(2); // Go back 2 steps
+        navigation.pop(2);
       }, 2000);
     } else {
-      dispatch(showLottieAlert({ type: 'failure', message: 'Operation Failed, Try Again', autoClose: true }));
+      dispatch(showLottieAlert({ type: 'failure', message: result?.payload?.message || 'Operation Failed, Try Again', autoClose: true }));
     }
   };
 
