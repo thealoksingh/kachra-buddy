@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { sendNotificationAPI, fetchNotificationsAPI } from '../../utils/api/notificationApi';
+import { sendNotificationAPI, fetchNotificationsAPI, markNotificationAsReadAPI } from '../../utils/api/notificationApi';
 import { handleAxiosError } from '../../utils/handleAxiosError';
 
 export const sendNotification = createAsyncThunk(
@@ -16,10 +16,22 @@ export const sendNotification = createAsyncThunk(
 
 export const fetchNotifications = createAsyncThunk(
   'notification/fetchNotifications',
-  async (_, thunkAPI) => {
+  async (userId, thunkAPI) => {
     try {
-      const response = await fetchNotificationsAPI();
+      const response = await fetchNotificationsAPI(userId);
       return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+export const markNotificationAsRead = createAsyncThunk(
+  'notification/markAsRead',
+  async (notificationId, thunkAPI) => {
+    try {
+      const response = await markNotificationAsReadAPI(notificationId);
+      return { id: notificationId, ...response?.data };
     } catch (error) {
       return handleAxiosError(error, thunkAPI);
     }

@@ -29,18 +29,9 @@ import { useNavigation } from '@react-navigation/native';
 import { products, addsData } from '../../utils/dummyData';
 import { FaddedIcon } from '../../components/commonComponents';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  selectCart,
-  selectItems,
-  selectOrders,
-  selectUser,
-} from '../../store/selector';
-import {
-  fetchItems,
-  fetchCart,
-  fetchOrders,
-  getUserById,
-} from '../../store/thunks/userThunk';
+import { selectCart, selectItems, selectUnreadNotifications, selectOrders, selectUser } from '../../store/selector';
+import { fetchItems, fetchCart, fetchOrders, getUserById } from '../../store/thunks/userThunk';
+import { fetchNotifications } from '../../store/thunks/notificationThunk';
 import Key from '../../constants/key';
 import { PendingOrderAlert } from '../../components/userComponents/PendingOrderAlert';
 import { getUserLocation } from '../../utils/CommonMethods';
@@ -95,7 +86,9 @@ export default function HomeScreen() {
   const [userAddress, setUserAddress] = useState('Getting location...');
   const [refreshing, setRefreshing] = useState(false);
   const [pendingAlertVisible, setPendingAlertVisible] = useState(true);
-  const pendingOrders = orders?.filter(order => order.status === 'INCOPLETE');
+  const pendingOrders = orders?.filter(order => order.status === 'INCOMPLETE');
+  const unreadNotifications = useSelector(selectUnreadNotifications);
+  console.log('Unread Notifications:', unreadNotifications);
 
   useEffect(() => {
     getUserLocation(
@@ -116,6 +109,7 @@ export default function HomeScreen() {
         dispatch(fetchItems()),
         dispatch(fetchCart()),
         dispatch(fetchOrders()),
+        dispatch(fetchNotifications(userId))
       ]);
     }
   };
@@ -134,8 +128,9 @@ export default function HomeScreen() {
       dispatch(fetchItems());
       dispatch(fetchCart());
       dispatch(fetchOrders());
+      dispatch(fetchNotifications(userId));
     }
-  }, [user, dispatch]);
+  }, [user, dispatch, userId]);
   return (
     <LinearGradient
       colors={[Colors.primary, Colors.whiteColor]}
@@ -190,10 +185,10 @@ export default function HomeScreen() {
           />
 
           <View style={styles.badge}>
-            <Text
+            <Text 
               style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
             >
-              0
+              {unreadNotifications?.length}
             </Text>
           </View>
         </TouchableOpacity>

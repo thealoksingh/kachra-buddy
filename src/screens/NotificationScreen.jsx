@@ -1,61 +1,76 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  RefreshControl,
 } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import { Colors } from '../styles/commonStyles';
 import { CommonAppBar } from '../components/commonComponents';
 import { useNavigation } from '@react-navigation/native';
+import { fetchNotifications, markNotificationAsRead } from '../store/thunks/notificationThunk';
+import { selectAuthLoader, selectNotificationsReversed, selectUser } from '../store/selector';
 
 export default function NotificationScreen() {
-    const navigation =useNavigation();
-  const [notifications, setNotifications] = useState([
-    {
-      id: '1',
-      title: 'Pickup Request',
-      description: 'You have a New Pickup Request',
-      time: '2m ago',
-    },
-    {
-      id: '2',
-      title: 'Pickup Succesfull',
-      description: 'Congatulations You have picked u 40 orders',
-      time: '10m ago',
-    },
-     {
-      id: '3',
-      title: 'Pickup Succesfull',
-      description: 'Congatulations You have picked u 40 orders',
-      time: '10m ago',
-    },
-     {
-      id: '4',
-      title: 'Pickup Succesfull',
-      description: 'Congatulations You have picked u 40 orders',
-      time: '10m ago',
-    },
-  ]);
+    const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const notifications = useSelector(selectNotificationsReversed);
+  const loading = useSelector(selectAuthLoader);
+
+  const formatTime = (createdAt) => {
+    const now = new Date();
+    const created = new Date(createdAt);
+    const diffMs = now - created;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffMins < 1) return 'now';
+    if (diffMins < 60) return `${diffMins} min ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  };
+
+  const onRefresh = () => {
+    if (user?.id) {
+      dispatch(fetchNotifications(user.id));
+    }
+  };
+
+
+
+  const handleCardPress = (item) => {
+    if (item.status === 'UNREAD') {
+      dispatch(markNotificationAsRead(item.id));
+    }
+  };
 
   const handleDelete = id => {
-    setNotifications(prev => prev.filter(item => item.id !== id));
+    console.log('Delete notification:', id);
   };
   //Colors.darkBlue
   //Colors.primary
   //Colors.secondary
   const renderItem = ({ item }) => (
-    <View style={[styles.card, { borderLeftColor: Colors.primary }]}>
+    <TouchableOpacity 
+      style={[styles.card, { 
+        borderLeftColor: item.status === 'UNREAD' ? Colors.primary : Colors.grayColor 
+      }]}
+      onPress={() => handleCardPress(item)}
+    >
       <View style={{ flex: 1 }}>
         <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.desc}>{item.description}</Text>
-        <Text style={styles.time}>{item.time}</Text>
+        <Text style={styles.desc}>{item.message}</Text>
+        <Text style={styles.time}>{formatTime(item.createdAt)}</Text>
       </View>
       <TouchableOpacity onPress={() => handleDelete(item.id)}>
         <Text style={styles.delete}>✕</Text>
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -65,6 +80,9 @@ export default function NotificationScreen() {
       data={notifications}
       renderItem={renderItem}
       keyExtractor={item => item.id}
+      refreshControl={
+        <RefreshControl refreshing={loading} onRefresh={onRefresh} />
+      }
     />
     </View>
   );
