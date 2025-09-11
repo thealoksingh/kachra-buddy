@@ -4,6 +4,7 @@ import { apiPostRequest } from "../http/post";
 import {apiGetRequest} from '../http/get';
 import { apiPutRequest } from "../http/put";
 import { apiDeleteRequest } from "../http/delete";
+import { apiPatchRequest } from "../http/patch";
 
 const { API_BASE_URL } = Key;
 
@@ -186,6 +187,23 @@ export const updateAdvertisementAPI = async (advertisementId, advertisementData,
     apiUrl: `${API_BASE_URL}/api/advertisements/${advertisementId}`,
     content_type: "multipart/form-data",
     data: formData,
+    accessToken,
+  });
+};
+
+
+export const fetchAllTicketsAPI = async () => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiGetRequest({
+    apiUrl: `${API_BASE_URL}/api/support-tickets`,
+    accessToken,
+  });
+};
+
+export const updateTicketAPI = async (ticketId) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiPutRequest({
+    apiUrl: `${API_BASE_URL}/api/support-tickets/${ticketId}`,
     accessToken,
   });
 };

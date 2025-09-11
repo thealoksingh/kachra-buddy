@@ -49,6 +49,7 @@ function InactiveStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="errorScreen" component={ErrorScreen} />
       <Stack.Screen name="helpScreen" component={HelpScreen} />
+      <Stack.Screen name="raisedTickets" component={RaisedTickets} />
     </Stack.Navigator>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { FaddedIcon } from '../../components/commonComponents';
+import { fetchAllTickets } from '../../store/thunks/adminThunk';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectAllTickets } from '../../store/selector';
 
 // Support Tickets Data
 const supportTickets = [
@@ -79,26 +82,32 @@ const supportTickets = [
 
 const AllSupportIssues = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const allTickets = useSelector(selectAllTickets);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('both');
   const [selectedTicketStatuses, setSelectedTicketStatuses] = useState([]);
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
+  console.log('allTickets at admin', allTickets);
+  useEffect(() => {
+    dispatch(fetchAllTickets());
+  }, [dispatch]);
 
-  const filteredTickets = supportTickets.filter(ticket => {
+  const filteredTickets = allTickets.filter(ticket => {
     const matchesSearch =
       searchQuery === '' ||
-      ticket?.owner_legal_name
+      ticket?.userName
         ?.toLowerCase()
         .includes(searchQuery.toLowerCase()) ||
-      ticket?.ticketTitle?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ticket?.mobile_number?.includes(searchQuery);
+      ticket?.subject?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ticket?.userContact?.includes(searchQuery);
 
     const matchesRole =
-      selectedRole === 'both' || ticket?.role === selectedRole;
+      selectedRole === 'both' || ticket?.type?.toLowerCase() === selectedRole;
 
     const matchesTicketStatus =
       selectedTicketStatuses.length === 0 ||
-      selectedTicketStatuses.includes(ticket?.ticketStatus);
+      selectedTicketStatuses.includes(ticket?.status);
 
     return matchesSearch && matchesRole && matchesTicketStatus;
   });
@@ -111,42 +120,34 @@ function TicketCard({ ticket }) {
    
    
     const getStatusColor = status => {
-      switch (status) {
-        case 'Open':
+      switch (status?.toUpperCase()) {
+        case 'OPEN':
           return '#FF6B6B';
-        case 'In Progress':
+        case 'IN_PROGRESS':
           return '#4ECDC4';
-        case 'Resolved':
+        case 'RESOLVED':
           return '#45B7D1';
-        case 'Closed':
+        case 'CLOSED':
           return '#96CEB4';
+        case 'CANCELLED':
+          return '#FF4757';
         default:
           return Colors.grayColor;
       }
     };
 
     const getPriorityColor = priority => {
-      switch (priority) {
-        case 'High':
+      switch (priority?.toUpperCase()) {
+        case 'HIGH':
+        case 'URGENT':
           return '#FF4757';
-        case 'Medium':
+        case 'MEDIUM':
           return '#FFA726';
-        case 'Low':
+        case 'LOW':
           return '#66BB6A';
         default:
           return Colors.grayColor;
       }
-    };
-
-    const renderStars = rating => {
-      return Array.from({ length: 5 }, (_, i) => (
-        <Icon
-          key={i}
-          name={i < rating ? 'star' : 'star-outline'}
-          size={14}
-          color="#FFD700"
-        />
-      ));
     };
 
     return (
@@ -165,8 +166,8 @@ function TicketCard({ ticket }) {
               </View>
             )}
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>{ticket?.owner_legal_name}</Text>
-              <Text style={styles.userMobile}>{ticket?.mobile_number}</Text>
+              <Text style={styles.userName}>{ticket?.userName}</Text>
+              <Text style={styles.userMobile}>{ticket?.userContact}</Text>
             </View>
           </View>
 
@@ -175,8 +176,8 @@ function TicketCard({ ticket }) {
               style={[
                 styles.roleBadge,
                 {
-                  borderColor:ticket?.role === 'user' ? '#1976D2' : '#F57C00',
-                  backgroundColor:ticket?.role === 'user' ? '#E3F2FD' : '#FFF3E0',
+                  borderColor: ticket?.type === 'TECHNICAL' ? '#1976D2' : '#F57C00',
+                  backgroundColor: ticket?.type === 'TECHNICAL' ? '#E3F2FD' : '#FFF3E0',
                 },
               ]}
             >
@@ -184,11 +185,11 @@ function TicketCard({ ticket }) {
                 style={[
                   styles.roleText,
                   {
-                    color: ticket?.role === 'user' ? '#1976D2' : '#F57C00',
+                    color: ticket?.type === 'TECHNICAL' ? '#1976D2' : '#F57C00',
                   },
                 ]}
               >
-                {ticket?.role?.toUpperCase()}
+                {ticket?.type||"TICKET TYPE"}
               </Text>
             </View>
           </View>
@@ -196,10 +197,10 @@ function TicketCard({ ticket }) {
 
         <View style={styles.ticketContent}>
           <Text style={styles.ticketTitle} numberOfLines={1}>
-            {ticket?.ticketTitle}
+            {ticket?.subject}
           </Text>
           <Text style={styles.ticketDescription} numberOfLines={2}>
-            {ticket?.ticketDescription}
+            {ticket?.description}
           </Text>
         </View>
 
@@ -209,8 +210,8 @@ function TicketCard({ ticket }) {
               style={[
                 styles.statusBadge,
                 {
-                  backgroundColor: getStatusColor(ticket?.ticketStatus) + '20',
-                  borderColor: getStatusColor(ticket?.ticketStatus),
+                  backgroundColor: getStatusColor(ticket?.status) + '20',
+                  borderColor: getStatusColor(ticket?.status),
                 },
               ]}
             >
@@ -218,11 +219,11 @@ function TicketCard({ ticket }) {
                 style={[
                   styles.statusText,
                   {
-                    color: getStatusColor(ticket?.ticketStatus),
+                    color: getStatusColor(ticket?.status),
                   },
                 ]}
               >
-                {ticket?.ticketStatus}
+                {ticket?.status||"STATUS"}
               </Text>
             </View>
 
@@ -243,16 +244,20 @@ function TicketCard({ ticket }) {
                   },
                 ]}
               >
-                {ticket?.priority}
+                {ticket?.priority||"PRIORITY"}
               </Text>
             </View>
           </View>
 
-         <View style={styles.ratingSection}>
-            {ticket?.role === 'driver'&&( <View style={styles.starsContainer}>
-              {renderStars(ticket?.rating)}
-            </View>)}
-            <Text style={styles.dateText}>{ticket?.createdAt}</Text>
+          <View style={styles.dateSection}>
+            <Text style={styles.dateText}>
+              Created: {ticket?.createdAt ? new Date(ticket.createdAt).toLocaleDateString() : 'N/A'}
+            </Text>
+            {ticket?.updatedAt && ticket?.updatedAt !== ticket?.createdAt && (
+              <Text style={styles.dateText}>
+                Updated: {new Date(ticket.updatedAt).toLocaleDateString()}
+              </Text>
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -260,7 +265,7 @@ function TicketCard({ ticket }) {
   }
 
   function roleFilter() {
-    const roles = ['both', 'user', 'driver'];
+    const roles = ['both', 'technical', 'general'];
 
     return (
       <View style={styles.filterSection}>
@@ -297,7 +302,7 @@ function TicketCard({ ticket }) {
   }
 
   function ticketStatusFilter() {
-    const ticketStatuses = ['Open', 'In Progress', 'Resolved', 'Closed'];
+    const ticketStatuses = ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED', 'CANCELLED'];
 
     const toggleTicketStatus = status => {
       if (selectedTicketStatuses.includes(status)) {
@@ -417,7 +422,7 @@ function TicketCard({ ticket }) {
       {searchBar()}
 
       <FlatList
-        data={filteredTickets}
+        data={filteredTickets.reverse()}
         renderItem={({ item }) => <TicketCard ticket={item} />}
         keyExtractor={item => item?.id?.toString()}
         contentContainerStyle={styles.listContainer}
@@ -586,9 +591,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 4,
   },
+  dateSection: {
+    alignItems: 'flex-end',
+  },
   dateText: {
-    fontSize: 11,
+    fontSize: 10,
     color: Colors.grayColor,
+    textAlign: 'right',
   },
   emptyContainer: {
     flex: 1,

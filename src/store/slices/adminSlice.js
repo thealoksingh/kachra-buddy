@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchAllItems, createItem, updateItem, fetchAllOrders, fetchAllUsers, createUser, updateUser, assignDriver, createAdvertisement, fetchAllAdvertisements, updateAdvertisement } from '../thunks/adminThunk';
+import { fetchAllItems, createItem, updateItem, fetchAllOrders, fetchAllUsers, createUser, updateUser, assignDriver, createAdvertisement, fetchAllAdvertisements, updateAdvertisement, fetchAllTickets, updateTicket } from '../thunks/adminThunk';
 
 const initialState = {
   users: [],
@@ -9,6 +9,7 @@ const initialState = {
   items: [],
   orders: [],
   advertisements: [],
+  allTickets: [],
   
   loading: false,
   error: null,
@@ -191,6 +192,34 @@ const adminSlice = createSlice({
         }
       })
       .addCase(updateAdvertisement.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message;
+      })
+      .addCase(fetchAllTickets.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllTickets.fulfilled, (state, action) => {
+        state.loading = false;
+        state.allTickets = action.payload?.data || [];
+      })
+      .addCase(fetchAllTickets.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message;
+      })
+      .addCase(updateTicket.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateTicket.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedTicket = action.payload?.data;
+        const index = state.allTickets.findIndex(ticket => ticket.id === updatedTicket.id);
+        if (index !== -1) {
+          state.allTickets[index] = updatedTicket;
+        }
+      })
+      .addCase(updateTicket.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message;
       });

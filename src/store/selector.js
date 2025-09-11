@@ -109,3 +109,11 @@ export const selectSupportTickets = createSelector(
   [selectSupportTicketsRaw],
   (tickets) => [...tickets].reverse()
 );
+
+// All tickets selector for admin
+const selectAllTicketsRaw = (state) => state.admin.allTickets || [];
+
+export const selectAllTickets = createSelector(
+  [selectAllTicketsRaw],
+  (tickets) => [...tickets].reverse()
+);

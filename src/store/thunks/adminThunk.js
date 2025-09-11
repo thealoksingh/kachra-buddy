@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setLoading, setUsers, setDrivers, setRequests, setAnalytics, setError } from '../slices/adminSlice';
-import { updateAdminProfileAPI, updateAdminProfilePicAPI, fetchAllItemsAPI, createItemAPI, updateItemAPI, fetchAllOrdersAPI, fetchAllUsersAPI, createUserAPI, updateUserAPI, assignDriverAPI, createAdvertisementAPI, fetchAllAdvertisementsAPI, updateAdvertisementAPI } from '../../utils/api/adminApi';
+import { updateAdminProfileAPI, updateAdminProfilePicAPI, fetchAllItemsAPI, createItemAPI, updateItemAPI, fetchAllOrdersAPI, fetchAllUsersAPI, createUserAPI, updateUserAPI, assignDriverAPI, createAdvertisementAPI, fetchAllAdvertisementsAPI, updateAdvertisementAPI, fetchAllTicketsAPI, updateTicketAPI } from '../../utils/api/adminApi';
 import { handleAxiosError } from '../../utils/handleAxiosError';
 
 
@@ -195,6 +195,31 @@ export const updateAdvertisement = createAsyncThunk(
   async ({ advertisementId, advertisementData, file }, thunkAPI) => {
     try {
       const response = await updateAdvertisementAPI(advertisementId, advertisementData, file);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+
+export const fetchAllTickets = createAsyncThunk(
+  'admin/fetchAllTickets',
+  async (_, thunkAPI) => {
+    try {
+      const response = await fetchAllTicketsAPI();
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+export const updateTicket = createAsyncThunk(
+  'admin/updateTicket',
+  async ({ ticketId, ticketData }, thunkAPI) => {
+    try {
+      const response = await updateTicketAPI(ticketId, ticketData);
       return response?.data;
     } catch (error) {
       return handleAxiosError(error, thunkAPI);
