@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { sendOtp, verifyOtp } from '../thunks/authThunk';
 import { completeUserProfile, getUserById, updateProfilePic, updateUser } from '../thunks/userThunk';
 import { updateAdminProfile, updateAdminProfilePic } from '../thunks/adminThunk';
-import { sendNotification, fetchNotifications } from '../thunks/notificationThunk';
+import { sendNotification, fetchNotifications, markNotificationAsRead } from '../thunks/notificationThunk';
 
 const initialState = {
   user: null,
@@ -160,6 +160,15 @@ const authSlice = createSlice({
       .addCase(fetchNotifications.rejected, (state, action) => {
         state.loading = false;
         state.error = action?.payload?.message;
+      })
+      // Mark Notification as Read
+      .addCase(markNotificationAsRead.fulfilled, (state, action) => {
+        const notificationId = action.payload.id;
+        const index = state.notifications.findIndex(n => n.id === notificationId);
+        if (index !== -1) {
+          state.notifications[index].status = 'READ';
+          state.notifications[index].readAt = new Date().toISOString();
+        }
       });
     }
 });

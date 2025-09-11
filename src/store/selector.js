@@ -33,7 +33,17 @@ export const selectAdminOrders = (state) => state.admin.orders ? [...state.admin
 export const selectAllUsers = (state) => state.admin.users ? [...state.admin.users].reverse() : [];
 
 // Notification selectors
-export const selectNotifications = (state) => state.auth.notifications ? [...state.auth.notifications].reverse() : [];
+export const selectNotifications = (state) => state.auth.notifications || [];
+
+export const selectNotificationsReversed = createSelector(
+  [selectNotifications],
+  (notifications) => [...notifications].reverse()
+);
+
+export const selectUnreadNotifications = createSelector(
+  [selectNotifications],
+  (notifications) => notifications.filter(notification => notification?.status === 'UNREAD')
+);
 
 // Advertisement selectors
 export const selectAdvertisements = (state) => state.admin.advertisements ? [...state.admin.advertisements].reverse() : [];
