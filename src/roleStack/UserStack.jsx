@@ -14,6 +14,7 @@ import LocationPickerScreen from '../screens/map/LocationPickerScreen';
 import EditProfileScreen from "../screens/user/EditProfileScreen"
 import ErrorScreen from '../screens/ErrorScreen';
 import NotificationScreen from '../screens/NotificationScreen';
+import HelpScreen from '../screens/HelpScreen';
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
@@ -31,6 +32,7 @@ function ActiveStack() {
       <Stack.Screen name="searchScreen" component={SearchScreen} />  
       <Stack.Screen name="locationPickerScreen" component={LocationPickerScreen} />
       <Stack.Screen name="editProfileScreen" component={EditProfileScreen} />
+      <Stack.Screen name="helpScreen" component={HelpScreen} />
     </Stack.Navigator>
   );
 }

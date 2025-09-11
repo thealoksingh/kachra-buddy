@@ -27,3 +27,10 @@ export const pingServerAPI = () =>
     content_type: "application/json",
     data: null,
 });
+//post query
+export const supportTicketAPI = (data) =>
+  apiPostRequest({
+    apiUrl: `${API_BASE_URL}/api/auth/verify-otp`,
+    content_type: "application/json",
+    data: data,
+});
