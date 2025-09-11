@@ -13,6 +13,7 @@ import { useDispatch } from 'react-redux';
 import { Colors } from '../../styles/commonStyles';
 import { updateOrder } from '../../store/thunks/userThunk';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
+import { showLottieAlert } from '../../store/slices/lottieAlertSlice';
 import {
   ButtonWithLoader,
   CommonAppBar,
@@ -35,8 +36,7 @@ const CheckoutScreen = () => {
   // Get order data from navigation params
   const { orderData } = route.params || {};
   console.log('Order Data received:', orderData);
-  const [failureAlertVisible, setFailureAlertVisible] = useState(false);
-  const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
+
   const [dateTime, setDateTime] = useState(null);
   const [name, setName] = useState(orderData?.user?.fullName || '');
   // console.log("date time is ",dateTime);
@@ -49,8 +49,42 @@ const CheckoutScreen = () => {
     longitude: orderData?.orderPickupLongitude || 0,
   });
 
+  const validateForm = () => {
+    if (!name.trim()) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'Name is required', autoClose: true }));
+      return false;
+    }
+    if (!mobNumber.trim()) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'Mobile number is required', autoClose: true }));
+      return false;
+    }
+    if (mobNumber.length !== 10) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'Mobile number must be 10 digits', autoClose: true }));
+      return false;
+    }
+    if (!address.trim()) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'Address is required', autoClose: true }));
+      return false;
+    }
+    if (!coordinate?.latitude || !coordinate?.longitude || (coordinate.latitude === 0 && coordinate.longitude === 0)) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'Please pick location from map', autoClose: true }));
+      return false;
+    }
+    if (!dateTime) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'Pickup date & time is required', autoClose: true }));
+      return false;
+    }
+    if (images.length === 0) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'At least one image is required', autoClose: true }));
+      return false;
+    }
+    return true;
+  };
+
   // Handle submit method
   const handleSubmit = async () => {
+    if (!validateForm()) return;
+    
     setLoading(true);
     try {
       const updateData = {
@@ -72,35 +106,20 @@ const CheckoutScreen = () => {
       const response = await dispatch(updateOrder(updateData));
 
       if (updateOrder.fulfilled.match(response)) {
-        await dispatch(
-          showSnackbar({
-            message: 'Order updated successfully!',
-            type: 'success',
-            time: 3000,
-          }),
-        );
-        navigation.pop(2);
+        dispatch(showLottieAlert({ type: 'success', message: 'Order updated successfully!', autoClose: true }));
+        setTimeout(() => {
+          navigation.replace("userBottomNavBar");
+        }, 2500);
       } else {
-        await dispatch(
-          showSnackbar({
-            message: response?.payload?.message || 'Failed to update order',
-            type: 'error',
-            time: 5000,
-          }),
-        );
+        dispatch(showLottieAlert({ type: 'failure', message: response?.payload?.message || 'Failed to update order', autoClose: true }));
       }
     } catch (error) {
-      await dispatch(
-        showSnackbar({
-          message: 'Error updating order',
-          type: 'error',
-          time: 3000,
-        }),
-      );
+      dispatch(showLottieAlert({ type: 'failure', message: 'Error updating order', autoClose: true }));
     } finally {
       setLoading(false);
     }
   };
+  
   const [images, setImages] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
@@ -254,28 +273,7 @@ const CheckoutScreen = () => {
         onCamera={() => pickImage('camera')}
         onGallery={() => pickImage('gallery')}
       />
-      {succesAlertVisible && (
-        <LottieAlert
-          type="success"
-          message="Order Cancelled Successfuly"
-          loop={false}
-          onClose={() => {
-            setSuccessAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
-      {failureAlertVisible && (
-        <LottieAlert
-          type="failure"
-          message="Order Cancellation Failed ,Try Again "
-          loop={false}
-          onClose={() => {
-            setFailureAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
+      <LottieAlert />
       <FaddedIcon/>
     </ScrollView>
   );

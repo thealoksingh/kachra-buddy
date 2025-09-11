@@ -4,6 +4,7 @@ import userSlice from './slices/userSlice';
 import driverReducer from './slices/driverSlice';
 import adminSlice from './slices/adminSlice';
 import snackbarSlice from './slices/snackbarSlice';
+import lottieAlertReducer from './slices/lottieAlertSlice';
 import snackbarReducer, { showSnackbar } from "../store/slices/snackbarSlice";
 import authReducer from "../store/slices/authSlice";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,6 +18,7 @@ export const store = configureStore({
     driver: driverReducer,
     admin: adminSlice,
     snackbar: snackbarReducer,
+    lottieAlert: lottieAlertReducer,
   },
    middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),

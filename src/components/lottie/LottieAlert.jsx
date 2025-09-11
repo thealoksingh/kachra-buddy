@@ -1,10 +1,31 @@
 import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, Modal } from "react-native";
 import LottieView from "lottie-react-native";
+import { useSelector, useDispatch } from 'react-redux';
+import { hideLottieAlert } from '../../store/slices/lottieAlertSlice';
 
-export const LottieAlert = ({ type, message, onClose, autoClose = true, loop = true, visible }) => {
+export const LottieAlert = ({ type, message, onClose, autoClose = true, loop, visible }) => {
+  const dispatch = useDispatch();
+  const lottieAlert = useSelector(state => state.lottieAlert);
+  
+  // Use Redux state if no props provided
+  const alertType = type || lottieAlert.type;
+  const alertMessage = message || lottieAlert.message;
+  const alertVisible = visible !== undefined ? visible : lottieAlert.visible;
+  const alertAutoClose = autoClose !== undefined ? autoClose : lottieAlert.autoClose;
+  
+  // Auto loop logic: success = false, failure/warning = true
+  const alertLoop = loop !== undefined ? loop : (alertType === 'success' ? false : true);
+  
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      dispatch(hideLottieAlert());
+    }
+  };
   const getSource = () => {
-    switch (type) {
+    switch (alertType) {
       case "success": return require("./success.json");
       case "failure": return require("./failure.json");
       case "warning": return require("./warning.json");
@@ -13,14 +34,16 @@ export const LottieAlert = ({ type, message, onClose, autoClose = true, loop = t
   };
 
   useEffect(() => {
-    if (autoClose && visible) {
-      const timer = setTimeout(() => onClose?.(), 2000);
+    if (alertAutoClose && alertVisible) {
+      const timer = setTimeout(() => handleClose(), 2000);
       return () => clearTimeout(timer);
     }
-  }, [visible]);
+  }, [alertVisible, alertAutoClose]);
 
+  if (!alertVisible) return null;
+  
   return (
-    <Modal transparent animationType="fade" visible={visible}>
+    <Modal transparent animationType="fade" visible={alertVisible}>
       <View
         style={{
           flex: 1,
@@ -40,7 +63,7 @@ export const LottieAlert = ({ type, message, onClose, autoClose = true, loop = t
           }}
         >
           <TouchableOpacity
-            onPress={onClose}
+            onPress={handleClose}
             style={{ position: "absolute", top: 8, right: 8 }}
           >
             <Text style={{ fontSize: 30, fontWeight: "500", marginRight: 6 }}>×</Text>
@@ -49,12 +72,12 @@ export const LottieAlert = ({ type, message, onClose, autoClose = true, loop = t
           <LottieView
             source={getSource()}
             autoPlay
-            loop={loop}
+            loop={alertLoop}
             style={{ width: 100, height: 100 }}
           />
 
           <Text style={{ marginTop: 10, fontSize: 16, fontWeight: "600", textAlign: "center" }}>
-            {message}
+            {alertMessage}
           </Text>
         </View>
       </View>

@@ -32,6 +32,8 @@ import {
   addItemsToOrder,
 } from '../../store/thunks/driverThunk';
 import { selectDriverLoader, selectDriverItems } from '../../store/selector';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
+import { showLottieAlert } from '../../store/slices/lottieAlertSlice';
 
 const FinalPickupScreen = () => {
   const navigation = useNavigation();
@@ -41,8 +43,7 @@ const FinalPickupScreen = () => {
   const loading = useSelector(selectDriverLoader);
   const availableItems = useSelector(selectDriverItems);
   const [otpLoading, setOtpLoading] = useState(false);
-  const [failureAlertVisible, setFailureAlertVisible] = useState(false);
-  const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
+
   const [givenAmount, setGivenAmount] = useState(null);
   const [remark, setRemark] = useState(null);
   const [images, setImages] = useState([]);
@@ -102,13 +103,11 @@ const FinalPickupScreen = () => {
     setOtpLoading(true);
     try {
       await sendPickupOtpAPI(currentOrder.id);
-      await dispatch(
-        showSnackbar({ message: 'OTP sent successfully!', type: 'success' }),
-      );
+      dispatch(showSnackbar({ message: 'OTP sent successfully!', type: 'success' }));
       setOtpSent(true);
     } catch (error) {
       console.error('Error sending OTP:', error);
-      setFailureAlertVisible(true);
+      dispatch(showLottieAlert({ type: 'failure', message: 'Failed to send OTP', autoClose: true }));
     } finally {
       setOtpLoading(false);
     }
@@ -147,12 +146,12 @@ const FinalPickupScreen = () => {
     );
 
     if (updateDriverOrder.fulfilled.match(result)) {
-      setSuccessAlertVisible(true);
+      dispatch(showLottieAlert({ type: 'success', message: 'Order Picked up Successfully', autoClose: true }));
       setTimeout(() => {
         navigation.pop(2); // Go back 2 steps
       }, 2000);
     } else {
-      setFailureAlertVisible(true);
+      dispatch(showLottieAlert({ type: 'failure', message: 'Operation Failed, Try Again', autoClose: true }));
     }
   };
 
@@ -356,28 +355,7 @@ const FinalPickupScreen = () => {
         onCamera={() => pickImage('camera')}
         onGallery={() => pickImage('gallery')}
       />
-      {succesAlertVisible && (
-        <LottieAlert
-          type="success"
-          message="Order Picked up Successfully"
-          loop={false}
-          onClose={() => {
-            setSuccessAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
-      {failureAlertVisible && (
-        <LottieAlert
-          type="failure"
-          message="Operation Failed, Try Again"
-          loop={false}
-          onClose={() => {
-            setFailureAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
+      <LottieAlert />
     </ScrollView>
   );
 };

@@ -18,13 +18,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Key from '../../constants/key';
 const EditProfileScreen = () => {
   const { API_BASE_URL } = Key;
+  const user = useSelector(selectUser);
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState('');
-  const [mobNumber, setMobNumber] = useState('');
+  const [name, setName] = useState(user?.fullName);
+  const [mobNumber, setMobNumber] = useState(user?.contactNumber);
   const [email, setEmail] = useState('');
   const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
-  const user = useSelector(selectUser);
   const [avatar, setAvatar] = useState(
     user?.avatarUrl ? API_BASE_URL + user.avatarUrl : null,
   );
@@ -185,25 +185,20 @@ const EditProfileScreen = () => {
 
         <View style={styles.formCard}>
           <InputBox
-            value={user?.fullName || name}
+            value={name}
             setter={setName}
             placeholder="Enter Your Name"
             label="Name"
           />
           <InputBox
-            value={user?.contactNumber || mobNumber}
+            value={mobNumber}
             setter={setMobNumber}
             placeholder="Enter Contact Number"
             label="Contact No."
+            editable={false}
             type="phone-pad"
           />
-          {/* <InputBox
-            value={email}
-            setter={setEmail}
-            placeholder="Enter Your Email Id"
-            label="Email"
-            type="email"
-          /> */}
+         
         </View>
 
         <View style={{ marginTop: 20 }}>

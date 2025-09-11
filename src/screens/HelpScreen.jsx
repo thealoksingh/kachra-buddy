@@ -26,13 +26,13 @@ import { supportTicket } from '../store/thunks/authThunk';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../store/selector';
 import { showSnackbar } from '../store/slices/snackbarSlice';
+import { showLottieAlert } from '../store/slices/lottieAlertSlice';
 import { LottieAlert } from '../components/lottie/LottieAlert';
 
 const HelpScreen = () => {
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
-  const [failureAlertVisible, setFailureAlertVisible] = useState(false);
-  const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
+
 
   const [subject, setSubject] = useState('');
   const [name, setName] = useState(user?.fullName || '');
@@ -80,14 +80,14 @@ const HelpScreen = () => {
       const response = await dispatch(supportTicket(ticketBody));
       console.log('ticket response==>', response);
       if (response.type.endsWith('/fulfilled')) {
-        setSuccessAlertVisible(true);
+        dispatch(showLottieAlert({ type: 'success', message: 'Ticket Created Successfully', autoClose: true }));
         setSubject('');
         setDescription('');
       } else {
-        setFailureAlertVisible(true);
+        dispatch(showLottieAlert({ type: 'failure', message: 'Something went wrong, Try Again', autoClose: true }));
       }
     } catch (error) {
-      setFailureAlertVisible(true);
+      dispatch(showLottieAlert({ type: 'failure', message: 'Error submitting ticket', autoClose: true }));
     } finally {
       setIsLoading(false);
     }
@@ -145,22 +145,7 @@ const HelpScreen = () => {
         </ScrollView>
       </View>
 
-      <LottieAlert
-        type="success"
-        message="Ticket Created Successfully"
-        loop={false}
-        visible={succesAlertVisible}
-        onClose={() => setSuccessAlertVisible(false)}
-        autoClose={true}
-      />
-      <LottieAlert
-        type="failure"
-        message="oops!! Something went wrong ,Try Again "
-        loop={false}
-        visible={failureAlertVisible}
-        onClose={() => setFailureAlertVisible(false)}
-        autoClose={true}
-      />
+      <LottieAlert />
     </View>
   );
 

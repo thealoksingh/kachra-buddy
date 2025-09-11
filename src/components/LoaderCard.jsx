@@ -1,16 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-} from "react-native";
-import { Colors } from '../styles/commonStyles';
-export function LoaderCard({ count = 1, cardHeight = 80 }) {
+import { View, StyleSheet, Animated } from "react-native";
+import { Colors } from "../styles/commonStyles";
 
-    const shimmerValue = useRef(new Animated.Value(0)).current;
+export const LoaderCard = ({ count = 1 ,cardHeight=80 }) => {
+  const shimmerValue = useRef(new Animated.Value(0)).current;
 
-  useEffect (() => {
+  useEffect(() => {
     Animated.loop(
       Animated.timing(shimmerValue, {
         toValue: 1,
@@ -27,41 +22,73 @@ export function LoaderCard({ count = 1, cardHeight = 80 }) {
     }),
   };
 
-  const renderPlaceholder = (width = "80%", height = cardHeight, marginBottom = 8) => (
+  const renderPlaceholder = (width, height = 12, marginVertical = 4) => (
     <Animated.View
-      key={Math.random().toString()}
       style={[
         {
           width,
           height,
           backgroundColor: Colors.extraLightGrayColor,
           borderRadius: 4,
-          marginBottom,
+          marginVertical,
         },
         shimmerStyle,
       ]}
     />
   );
 
-  const renderSkeletonCard = () => (
-    <View
-      style={[styles.userItem, { height: cardHeight, justifyContent: "center" }]}
-      key={Math.random().toString()}
-    >
-      {renderPlaceholder("90%", cardHeight * 0.6)} 
-      {renderPlaceholder("60%", cardHeight * 0.5)}
-      {renderPlaceholder("40%", cardHeight * 0.2)}
+  const renderCard = (_, index) => (
+    <View key={index} style={styles.card}>
+      {renderPlaceholder("70%", 12)}
+      {renderPlaceholder("90%")}
+      {renderPlaceholder("80%")}
+      <View style={styles.divider} />
+      {renderPlaceholder("60%")}
+      {renderPlaceholder("65%")}
+      <View style={styles.divider} />
+      {renderPlaceholder("50%")}
+      <View style={styles.bottomContainer}>
+        <View
+          style={[
+            styles.button,
+            { backgroundColor: Colors.extraLightGrayColor },
+          ]}
+        >
+          {renderPlaceholder("60%", 12, 0)}
+        </View>
+        {renderPlaceholder("25%", 12, 0)}
+      </View>
     </View>
   );
 
-  return <>{Array.from({ length: count }, renderSkeletonCard)}</>;
-}
+  return <>{Array.from({ length: count }).map(renderCard)}</>;
+};
 
 const styles = StyleSheet.create({
-  userItem: {
+  card: {
+    backgroundColor: Colors.whiteColor,
+    borderRadius: 12,
     padding: 16,
-    backgroundColor: '#fff',
+    margin: 4,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: Colors.extraLightGrayColor,
     marginVertical: 4,
+  },
+  bottomContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  button: {
     borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
   },
 });
