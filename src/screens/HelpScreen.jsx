@@ -132,7 +132,7 @@ const HelpScreen = () => {
           <TextArea
             value={description}
             setter={setDescription}
-            placeholder={'PLease Describe Your Query'}
+            placeholder={'Describe your query here...'}
             label={'Query'}
             optional={false}
           />

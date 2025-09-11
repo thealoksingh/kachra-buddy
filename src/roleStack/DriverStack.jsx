@@ -12,22 +12,26 @@ import SelectAdditionalItemScreen from '../screens/driver/SelectAdditionalItemSc
 import HelpScreen from '../screens/HelpScreen';
 import RaisedTickets from "../screens/RaisedTickets"
 import NotificationScreen from "../screens/NotificationScreen";
+import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
+import TermsConditionsScreen from '../screens/TermsConditionsScreen';
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-       <Stack.Screen name="driverHome" component={DriverHome} />
-         <Stack.Screen name="selectAdditionalItemScreen" component={SelectAdditionalItemScreen} />
-    
+      <Stack.Screen name="driverHome" component={DriverHome} />
+      <Stack.Screen name="selectAdditionalItemScreen" component={SelectAdditionalItemScreen} />
+
       <Stack.Screen name="pickupRequests" component={PickupRequests} />
-       <Stack.Screen name="pickupRequestDetail" component={PickupRequestDetail} />
+      <Stack.Screen name="pickupRequestDetail" component={PickupRequestDetail} />
       <Stack.Screen name="driverProfileScreen" component={DriverProfileScreen} />
       <Stack.Screen name="driverEditProfileScreen" component={DriverEditProfileScreen} />
-        <Stack.Screen name="finalPickupScreen" component={FinalPickupScreen} />
+      <Stack.Screen name="finalPickupScreen" component={FinalPickupScreen} />
       <Stack.Screen name="helpScreen" component={HelpScreen} />
       <Stack.Screen name="raisedTickets" component={RaisedTickets} />
-     <Stack.Screen name="notificationScreen" component={NotificationScreen} />
+      <Stack.Screen name="notificationScreen" component={NotificationScreen} />
+      <Stack.Screen name="privacyPolicyScreen" component={PrivacyPolicyScreen} />
+      <Stack.Screen name="termsConditionsScreen" component={TermsConditionsScreen} />
 
     </Stack.Navigator>
   );

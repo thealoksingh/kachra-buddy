@@ -123,13 +123,13 @@ const AdminProfile = () => {
           {profileOption({
             option: 'Terms & Conditions',
             iconName: 'list-alt',
-            onPress: () => navigation.navigate('editAdminProfile'),
+            onPress: () => navigation.navigate('termsConditionsScreen'),
           })}
 
           {profileOption({
             option: 'Privacy Policy',
             iconName: 'privacy-tip',
-            onPress: () => navigation.navigate('editAdminProfile'),
+            onPress: () => navigation.navigate('privacyPolicyScreen'),
           })}
 
           {logoutInfo()}

@@ -50,7 +50,7 @@ const AdditionalItemCard = ({ item, onQuantityChange, onRemove }) => {
             {item?.category || 'Category'}
           </Text> */}
           <Text style={styles.itemPrice}>
-            ₹{item?.price || 0}/{item?.unit || 'kg'}
+            ₹{item?.pricePerUnit || 0}/{item?.unit || 'kg'}
           </Text>
         </View>
 

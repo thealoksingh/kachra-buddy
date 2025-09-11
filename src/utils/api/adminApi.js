@@ -153,7 +153,7 @@ export const createAdvertisementAPI = async (advertisementData, file) => {
   }
   
   return apiPostRequest({
-    apiUrl: `${API_BASE_URL}/api/advertisement`,
+    apiUrl: `${API_BASE_URL}/api/advertisements`,
     content_type: "multipart/form-data",
     data: formData,
     accessToken,
@@ -163,7 +163,7 @@ export const createAdvertisementAPI = async (advertisementData, file) => {
 export const fetchAllAdvertisementsAPI = async () => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiGetRequest({
-    apiUrl: `${API_BASE_URL}/api/advertisement`,
+    apiUrl: `${API_BASE_URL}/api/advertisements`,
     accessToken,
   });
 };
@@ -183,7 +183,7 @@ export const updateAdvertisementAPI = async (advertisementId, advertisementData,
   }
   
   return apiPutRequest({
-    apiUrl: `${API_BASE_URL}/api/advertisement/${advertisementId}`,
+    apiUrl: `${API_BASE_URL}/api/advertisements/${advertisementId}`,
     content_type: "multipart/form-data",
     data: formData,
     accessToken,

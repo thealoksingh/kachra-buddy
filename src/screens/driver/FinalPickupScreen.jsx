@@ -53,6 +53,7 @@ const FinalPickupScreen = () => {
   const [isVerified, setIsVerified] = useState(false);
   const [updatedQuantities, setUpdatedQuantities] = useState({});
   const [additionalItems, setAdditionalItems] = useState([]);
+  const [resendTimer, setResendTimer] = useState(0);
   console.log('currentOrder?.orderItems prev ====>', currentOrder?.orderItems);
 
   //removable in future
@@ -64,6 +65,19 @@ const FinalPickupScreen = () => {
   React.useEffect(() => {
     dispatch(fetchAllItems());
   }, [dispatch]);
+
+  // Timer effect for resend OTP
+  React.useEffect(() => {
+    let interval = null;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer(timer => timer - 1);
+      }, 1000);
+    } else if (resendTimer === 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const addAdditionalItem = (item, quantity) => {
     const newItem = {
@@ -79,9 +93,14 @@ const FinalPickupScreen = () => {
   };
 
   const handleQuantityChange = (orderItemId, newQuantity) => {
+    const quantity = parseFloat(newQuantity);
+    if (isNaN(quantity) || quantity < 0) {
+      dispatch(showSnackbar({ message: 'Please enter a valid positive number', type: 'error' }));
+      return;
+    }
     setUpdatedQuantities(prev => ({
       ...prev,
-      [orderItemId]: parseFloat(newQuantity) || 0,
+      [orderItemId]: quantity,
     }));
   };
 
@@ -89,11 +108,13 @@ const FinalPickupScreen = () => {
     const originalTotal =
       currentOrder?.orderItems?.reduce((total, orderItem) => {
         const quantity = updatedQuantities[orderItem.id] ?? orderItem.quantity;
-        return total + quantity * orderItem.item.pricePerUnit;
+        const price = (parseFloat(quantity) || 0) * (parseFloat(orderItem.item.pricePerUnit) || 0);
+        return total + price;
       }, 0) || 0;
 
     const additionalTotal = additionalItems.reduce((total, item) => {
-      return total + item.price;
+      const itemPrice = parseFloat(item.price) || 0;
+      return total + itemPrice;
     }, 0);
 
     return originalTotal + additionalTotal;
@@ -105,6 +126,7 @@ const FinalPickupScreen = () => {
       await sendPickupOtpAPI(currentOrder.id);
       dispatch(showSnackbar({ message: 'OTP sent successfully!', type: 'success' }));
       setOtpSent(true);
+      setResendTimer(30); // Start 30-second timer
     } catch (error) {
       console.error('Error sending OTP:', error);
       dispatch(showLottieAlert({ type: 'failure', message: 'Failed to send OTP', autoClose: true }));
@@ -113,8 +135,66 @@ const FinalPickupScreen = () => {
     }
   };
 
+  const validateForm = () => {
+    // Validate given amount
+    if (!givenAmount || givenAmount.trim() === '') {
+      dispatch(showSnackbar({ message: 'Please enter given amount', type: 'error' }));
+      return false;
+    }
+    
+    const amount = parseFloat(givenAmount);
+    if (isNaN(amount) || amount < 0) {
+      dispatch(showSnackbar({ message: 'Please enter a valid positive amount', type: 'error' }));
+      return false;
+    }
+
+    // Validate remark
+    if (!remark || remark.trim() === '') {
+      dispatch(showSnackbar({ message: 'Please enter a remark', type: 'error' }));
+      return false;
+    }
+
+    // Validate images
+    if (images.length === 0) {
+      dispatch(showSnackbar({ message: 'Please upload at least one image', type: 'error' }));
+      return false;
+    }
+
+    // Validate OTP
+    if (!otpInput || otpInput.trim() === '') {
+      dispatch(showSnackbar({ message: 'Please enter OTP', type: 'error' }));
+      return false;
+    }
+
+    // Validate quantities in original order items
+    for (const orderItem of currentOrder?.orderItems || []) {
+      const quantity = updatedQuantities[orderItem.id] ?? orderItem.quantity;
+      const numQuantity = parseFloat(quantity);
+      if (isNaN(numQuantity) || numQuantity < 0) {
+        dispatch(showSnackbar({ message: `Invalid quantity for ${orderItem.item.name}`, type: 'error' }));
+        return false;
+      }
+    }
+
+    // Validate additional items quantities
+    for (const item of additionalItems) {
+      const numQuantity = parseFloat(item.quantity);
+      if (isNaN(numQuantity) || numQuantity <= 0) {
+        dispatch(showSnackbar({ message: `Invalid quantity for additional item ${item.item?.name || item.name}`, type: 'error' }));
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const submitOrder = async () => {
     console.log('Submitting order with OTP:', otpInput);
+    
+    // Validate form before submission
+    if (!validateForm()) {
+      return;
+    }
     
     // Prepare updated order items with new quantities
     const updatedOrderItems = currentOrder.orderItems.map(orderItem => ({
@@ -246,10 +326,17 @@ const FinalPickupScreen = () => {
               key={index}
               item={item}
               onQuantityChange={(itemId, quantity) => {
+                const newQuantity = parseFloat(quantity);
+                if (isNaN(newQuantity) || newQuantity < 0) {
+                  dispatch(showSnackbar({ message: 'Please enter a valid positive number', type: 'error' }));
+                  return;
+                }
                 const updatedItems = [...additionalItems];
+                const pricePerUnit = parseFloat(updatedItems[index].item?.pricePerUnit || updatedItems[index].pricePerUnit) || 0;
                 updatedItems[index] = {
                   ...updatedItems[index],
-                  quantity: parseFloat(quantity) || 0,
+                  quantity: newQuantity,
+                  price: newQuantity * pricePerUnit,
                 };
                 setAdditionalItems(updatedItems);
               }}
@@ -262,7 +349,7 @@ const FinalPickupScreen = () => {
               navigation.navigate('selectAdditionalItemScreen', {
                 currentOrderItems: currentOrder?.orderItems,
                 onItemSelect: items => setAdditionalItems(items),
-              })
+                })
             }
           >
             <Text style={styles.addItemText}>+ Add Items</Text>
@@ -326,7 +413,7 @@ const FinalPickupScreen = () => {
         </View>
         <View style={styles.priceCard}>
           <Text style={styles.priceLabel}>
-            Total Price: ₹{calculateTotalPrice().toFixed(2)}
+            Total Price: ₹{(calculateTotalPrice() || 0).toFixed(2)}
           </Text>
         </View>
         {otpSent && !isVerified && (
@@ -337,11 +424,13 @@ const FinalPickupScreen = () => {
             </Text>
             <OtpFields otpInput={otpInput} setOtpInput={setOtpInput} />
             <TouchableOpacity 
-              style={styles.resendBtn} 
+              style={[styles.resendBtn, (resendTimer > 0 || otpLoading) && styles.disabledBtn]} 
               onPress={sendOtp}
-              disabled={otpLoading}
+              disabled={resendTimer > 0 || otpLoading}
             >
-              <Text style={styles.resendText}>Resend OTP</Text>
+              <Text style={[styles.resendText, (resendTimer > 0 || otpLoading) && styles.disabledText]}>
+                {resendTimer > 0 ? `Resend OTP (${resendTimer}s)` : 'Resend OTP'}
+              </Text>
             </TouchableOpacity> 
           </View>
         )}
@@ -523,5 +612,11 @@ const styles = StyleSheet.create({
     color: Colors.whiteColor,
     fontSize: 12,
     fontWeight: '500',
+  },
+  disabledBtn: {
+    backgroundColor: Colors.grayColor,
+  },
+  disabledText: {
+    color: Colors.extraLightGrayColor,
   },
 });

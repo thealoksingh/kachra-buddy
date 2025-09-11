@@ -15,7 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CommonAppBar } from '../../components/commonComponents';
 import { useNavigation } from '@react-navigation/native';
 import { fetchAllAdvertisements } from '../../store/thunks/adminThunk';
-import { selectAdvertisements } from '../../store/selector';
+import { selectAdvertisements, selectUser } from '../../store/selector';
 import Key from '../../constants/key';
 
 const AllAdvertisementsScreen = () => {
@@ -23,8 +23,10 @@ const AllAdvertisementsScreen = () => {
   const dispatch = useDispatch();
   const { API_BASE_URL } = Key;
   const [refreshing, setRefreshing] = useState(false);
+  const user = useSelector(selectUser);
   
   const advertisements = useSelector(selectAdvertisements);
+  console.log('Advertisements:', advertisements);
   
   useEffect(() => {
     dispatch(fetchAllAdvertisements());
@@ -48,9 +50,13 @@ const AllAdvertisementsScreen = () => {
     >
       <Image 
         source={{ 
-          uri: item.imageUrl ? API_BASE_URL + item.imageUrl : 'https://via.placeholder.com/300x200',
+          uri: item?.imageUrl ? `${API_BASE_URL}${item.imageUrl}` : 'https://via.placeholder.com/300x200',
+          ...(item?.imageUrl && user?.accessToken ? {
+            headers: { Authorization: `Bearer ${user.accessToken}` }
+          } : {})
         }} 
-        style={styles.adImage} 
+        style={styles.adImage}
+        onError={(error) => console.log('Image load error:', error.nativeEvent.error)}
       />
       <View style={styles.adContent}>
         <Text style={styles.adTitle}>{item.title}</Text>
@@ -91,7 +97,7 @@ const AllAdvertisementsScreen = () => {
       <FlatList
         data={advertisements}
         renderItem={renderAdvertisement}
-        keyExtractor={item => item.id?.toString()}
+        keyExtractor={item => item?.id?.toString()}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
         refreshControl={

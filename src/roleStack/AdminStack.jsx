@@ -1,41 +1,43 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useSelector } from 'react-redux';
-import { selectUser } from '../store/selector';
 import AdminBottomNavBar from '../components/adminComponents/AdminBottomNavBar';
 import ErrorScreen from '../screens/ErrorScreen';
-import AdminHome from '../screens/admin/AdminHome';
 import HelpScreen from '../screens/HelpScreen';
 import NotificationScreen from '../screens/NotificationScreen';
+import AdminHome from '../screens/admin/AdminHome';
 import AdminProfile from '../screens/admin/AdminProfile';
-import EditAdminProfile from '../screens/admin/EditAdminProfile';
+import AdvertisementDetailScreen from '../screens/admin/AdvertisementDetailScreen';
+import AllAdvertisementsScreen from '../screens/admin/AllAdvertisementsScreen';
+import AllBestDealProducts from '../screens/admin/AllBestDealProducts';
 import AllBookingsScreen from '../screens/admin/AllBookingsScreen';
-import CreateUserScreen from '../screens/admin/CreateUserScreen';
-import BookingDetailAdmin from '../screens/admin/BookingDetailAdmin';
-import PostProductsScreen from '../screens/admin/PostProductsScreen';
 import AllProductsScreen from '../screens/admin/AllProductsScreen';
+import AllSupportIssues from '../screens/admin/AllSupportIssues';
+import AllUsersScreen from '../screens/admin/AllUsersScreen';
+import BookingDetailAdmin from '../screens/admin/BookingDetailAdmin';
+import CreateUserScreen from '../screens/admin/CreateUserScreen';
+import EditAdminProfile from '../screens/admin/EditAdminProfile';
+import PostAd from '../screens/admin/PostAd';
+import PostProductsScreen from '../screens/admin/PostProductsScreen';
+import SendNotificationScreen from '../screens/admin/SendNotificationScreen';
+import SupportIssueDetail from '../screens/admin/SupportIssueDetail';
 import UpdateProductScreen from '../screens/admin/UpdateProductScreen';
 import UpdateUserScreen from '../screens/admin/UpdateUserScreen';
-import SendNotificationScreen from '../screens/admin/SendNotificationScreen';
-import AllUsersScreen from '../screens/admin/AllUsersScreen';
-import PostAd from '../screens/admin/PostAd';
-import AllBestDealProducts from '../screens/admin/AllBestDealProducts';
-import AllSupportIssues from '../screens/admin/AllSupportIssues';
-import SupportIssueDetail from '../screens/admin/SupportIssueDetail';
-import AllAdvertisementsScreen from '../screens/admin/AllAdvertisementsScreen';
-import AdvertisementDetailScreen from '../screens/admin/AdvertisementDetailScreen';
+import { selectUser } from '../store/selector';
+import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
+import TermsConditionsScreen from '../screens/TermsConditionsScreen';
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-     
+
       <Stack.Screen name="adminBottomNavBar" component={AdminBottomNavBar} />
       <Stack.Screen name="allSupportIssues" component={AllSupportIssues} />
-       <Stack.Screen name="supportIssueDetail" component={SupportIssueDetail} />
-       <Stack.Screen name="allBestDealProducts" component={AllBestDealProducts} />
-       <Stack.Screen name="allAdvertisementsScreen" component={AllAdvertisementsScreen} />
-       <Stack.Screen name="advertisementDetail" component={AdvertisementDetailScreen} />
-       <Stack.Screen name="postAd" component={PostAd} />
+      <Stack.Screen name="supportIssueDetail" component={SupportIssueDetail} />
+      <Stack.Screen name="allBestDealProducts" component={AllBestDealProducts} />
+      <Stack.Screen name="allAdvertisementsScreen" component={AllAdvertisementsScreen} />
+      <Stack.Screen name="advertisementDetail" component={AdvertisementDetailScreen} />
+      <Stack.Screen name="postAd" component={PostAd} />
       <Stack.Screen name="sendNotificationScreen" component={SendNotificationScreen} />
       <Stack.Screen name="updateUserScreen" component={UpdateUserScreen} />
       <Stack.Screen name="updateProductScreen" component={UpdateProductScreen} />
@@ -50,6 +52,9 @@ function ActiveStack() {
       <Stack.Screen name="editAdminProfile" component={EditAdminProfile} />
       <Stack.Screen name="allBookingsScreen" component={AllBookingsScreen} />
       <Stack.Screen name="bookingDetailAdmin" component={BookingDetailAdmin} />
+      <Stack.Screen name="privacyPolicyScreen" component={PrivacyPolicyScreen} />
+      <Stack.Screen name="termsConditionsScreen" component={TermsConditionsScreen} />
+
     </Stack.Navigator>
   );
 }
