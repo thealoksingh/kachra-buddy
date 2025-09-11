@@ -159,6 +159,7 @@ const EditAdminProfile = () => {
             value={contactNumber}
             setter={setContactNumber}
             placeholder="Enter your contact number"
+            editable={false}
             type="phone-pad"
           />
         </View>

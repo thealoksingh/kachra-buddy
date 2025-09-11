@@ -178,6 +178,7 @@ const DriverEditProfileScreen = () => {
             setter={setMobNumber}
             placeholder="Enter Contact Number"
             label="Contact No."
+            editable={false}
             type="phone-pad"
           />
         </View>
