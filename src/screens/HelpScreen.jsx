@@ -17,49 +17,77 @@ import {
   screenWidth,
 } from '../styles/commonStyles';
 import MyStatusBar from '../components/MyStatusBar';
-import { ButtonWithLoader, InputBox, TextArea } from '../components/commonComponents';
+import {
+  ButtonWithLoader,
+  InputBox,
+  TextArea,
+} from '../components/commonComponents';
 import { supportTicket } from '../store/thunks/authThunk';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../store/selector';
 import { showSnackbar } from '../store/slices/snackbarSlice';
+import { LottieAlert } from '../components/lottie/LottieAlert';
 
 const HelpScreen = () => {
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
-  
+  const [failureAlertVisible, setFailureAlertVisible] = useState(false);
+  const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
+
   const [subject, setSubject] = useState('');
   const [name, setName] = useState(user?.fullName || '');
   const [mobileNumber, setMobileNumber] = useState(user?.contactNumber || '');
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const validateForm = () => {
+    if (!subject.trim()) {
+      dispatch(showSnackbar({ message: 'Subject is required', type: 'error' }));
+      return false;
+    }
+    if (!name.trim()) {
+      dispatch(showSnackbar({ message: 'Name is required', type: 'error' }));
+      return false;
+    }
+    if (!mobileNumber.trim()) {
+      dispatch(showSnackbar({ message: 'Mobile number is required', type: 'error' }));
+      return false;
+    }
+    if (mobileNumber.length !== 10) {
+      dispatch(showSnackbar({ message: 'Mobile number must be 10 digits', type: 'error' }));
+      return false;
+    }
+    if (!description.trim()) {
+      dispatch(showSnackbar({ message: 'Description is required', type: 'error' }));
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async () => {
+    if (!validateForm()) return;
+    
     setIsLoading(true);
     try {
       const ticketBody = {
         userId: user?.id || 0,
         subject: subject,
         description: description,
-        type: "TECHNICAL",
-        status: "OPEN",
-        priority: "LOW",
         userName: name,
-        userContact: mobileNumber
+        userContact: mobileNumber,
       };
-      console.log("ticketBody==>",ticketBody);
+      console.log('ticketBody==>', ticketBody);
       const response = await dispatch(supportTicket(ticketBody));
-      console.log('Response:', response);
-      
+      console.log('ticket response==>', response);
       if (response.type.endsWith('/fulfilled')) {
-        dispatch(showSnackbar({ message: 'Support ticket submitted successfully!', type: 'success' }));
+        setSuccessAlertVisible(true);
         setSubject('');
         setDescription('');
       } else {
-        console.log('Response payload:', response.payload);
-        dispatch(showSnackbar({ message: response.payload?.message || 'Failed to submit ticket. Please try again.', type: 'error' }));
+        setFailureAlertVisible(true);
       }
     } catch (error) {
-      dispatch(showSnackbar({ message: 'Error submitting ticket', type: 'error' }));
+      setFailureAlertVisible(true);
     } finally {
       setIsLoading(false);
     }
@@ -116,6 +144,23 @@ const HelpScreen = () => {
           />
         </ScrollView>
       </View>
+
+      <LottieAlert
+        type="success"
+        message="Ticket Created Successfully"
+        loop={false}
+        visible={succesAlertVisible}
+        onClose={() => setSuccessAlertVisible(false)}
+        autoClose={true}
+      />
+      <LottieAlert
+        type="failure"
+        message="oops!! Something went wrong ,Try Again "
+        loop={false}
+        visible={failureAlertVisible}
+        onClose={() => setFailureAlertVisible(false)}
+        autoClose={true}
+      />
     </View>
   );
 
