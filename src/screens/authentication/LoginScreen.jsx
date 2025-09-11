@@ -7,7 +7,9 @@ import {
   Linking,
   BackHandler,
   KeyboardAvoidingView,
-  ScrollView
+  ScrollView,
+  Keyboard,
+  Platform
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -36,6 +38,7 @@ const LoginScreen = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const dispatch = useDispatch();
 
   const resetStates = () => {
@@ -48,7 +51,6 @@ const LoginScreen = () => {
   useEffect(() => {
     const backAction = () => {
       resetStates();
-
       return true;
     };
 
@@ -57,7 +59,21 @@ const LoginScreen = () => {
       backAction,
     );
 
-    return () => backHandler.remove();
+    // Keyboard listeners
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      backHandler.remove();
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
   }, []);
 
 
@@ -229,17 +245,20 @@ const LoginScreen = () => {
  return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: Colors.whiteColor }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        enableOnAndroid={true}
+        extraScrollHeight={20}
       >
         <MyStatusBar />
 
         {/* Logo Section */}
-        <View style={styles.logoContainer}>
+        <View style={[styles.logoContainer, keyboardVisible && styles.logoContainerSmall]}>
           <Image
             source={require('../../../assets/images/logo.png')}
             style={[styles.logo, { tintColor: 'white' }]}
@@ -345,6 +364,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
+  },
+  logoContainerSmall: {
+    paddingVertical: 20,
+    minHeight: 120,
+    flex: 0,
   },
   logo: {
     width: 200,

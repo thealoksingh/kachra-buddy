@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { CommonAppBar } from '../../components/commonComponents';
 import CartCard from "../../components/userComponents/CartCard";
@@ -9,6 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectCart, selectUser } from '../../store/selector';
 import { checkoutCart } from '../../store/thunks/userThunk';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Cart = () => {
   const navigation = useNavigation();
@@ -77,44 +78,60 @@ const Cart = () => {
       <CommonAppBar navigation={navigation} label={'Cart'} />
 
       {/* Cart Items */}
-      <ScrollView contentContainerStyle={{ paddingBottom: 150 }}>
-        <View style={styles.itemsContainer}>
-          {cart?.cartItems?.map((item, index) => (
-            <CartCard 
-              key={index} 
-              cartItem={item} 
-              user={user}
-              onQuantityChange={handleQuantityChange}
-              currentQuantity={cartQuantities[item.item.id] || item.quantity}
-            />
-          ))}
-        </View>
+      <ScrollView contentContainerStyle={{ paddingBottom: 150, flexGrow: 1 }}>
+        {cart?.cartItems?.length > 0 ? (
+          <View style={styles.itemsContainer}>
+            {cart.cartItems.map((item, index) => (
+              <CartCard 
+                key={index} 
+                cartItem={item} 
+                user={user}
+                onQuantityChange={handleQuantityChange}
+                currentQuantity={cartQuantities[item.item.id] || item.quantity}
+              />
+            ))}
+          </View>
+        ) : (
+          <View style={styles.emptyContainer}>
+            <Icon name="shopping-cart" size={80} color={Colors.grayColor} />
+            <Text style={styles.emptyTitle}>Your cart is empty</Text>
+            <Text style={styles.emptySubtitle}>Add some items to get started</Text>
+            <TouchableOpacity 
+              style={styles.shopButton}
+              onPress={() => navigation.navigate('home')}
+            >
+              <Text style={styles.shopButtonText}>Start Shopping</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
 
-      {/* Bottom Section */}
-      <View style={styles.bottomContainer}>
-        <View style={styles.calculationContainer}>
-          <View style={styles.row}>
-            <Text style={styles.label}>Subtotal</Text>
-            <Text style={styles.value}>₹{subtotal.toFixed(2)}</Text>
+      {/* Bottom Section - Only show when cart has items */}
+      {cart?.cartItems?.length > 0 && (
+        <View style={styles.bottomContainer}>
+          <View style={styles.calculationContainer}>
+            <View style={styles.row}>
+              <Text style={styles.label}>Subtotal</Text>
+              <Text style={styles.value}>₹{subtotal.toFixed(2)}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>GST (18%)</Text>
+              <Text style={styles.value}>₹{gstAmount.toFixed(2)}</Text>
+            </View>
+            <View style={[styles.row, { marginTop: 8 }]}>
+              <Text style={[styles.label, { fontFamily: Fonts.bold }]}>Total</Text>
+              <Text style={[styles.value, { fontFamily: Fonts.bold }]}>₹{total.toFixed(2)}</Text>
+            </View>
           </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>GST (18%)</Text>
-            <Text style={styles.value}>₹{gstAmount.toFixed(2)}</Text>
-          </View>
-          <View style={[styles.row, { marginTop: 8 }]}>
-            <Text style={[styles.label, { fontFamily: Fonts.bold }]}>Total</Text>
-            <Text style={[styles.value, { fontFamily: Fonts.bold }]}>₹{total.toFixed(2)}</Text>
-          </View>
-        </View>
 
-        <ButtonWithLoader
-          name="Continue"
-          loadingName="Processing..."
-          isLoading={loading}
-          method={handleCheckout}
-        />
-      </View>
+          <ButtonWithLoader
+            name="Continue"
+            loadingName="Processing..."
+            isLoading={loading}
+            method={handleCheckout}
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -162,5 +179,38 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 12,
     color: "#111",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+    paddingVertical: 60,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: Colors.blackColor,
+    marginTop: 20,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: Colors.grayColor,
+    marginTop: 8,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  shopButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 30,
+    paddingVertical: 12,
+    borderRadius: 25,
+    marginTop: 30,
+  },
+  shopButtonText: {
+    color: Colors.whiteColor,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
