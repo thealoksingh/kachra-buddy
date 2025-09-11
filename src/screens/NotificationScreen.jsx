@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Colors } from '../styles/commonStyles';
 import { CommonAppBar } from '../components/commonComponents';
 import { useNavigation } from '@react-navigation/native';
-import { fetchNotifications, markNotificationAsRead } from '../store/thunks/notificationThunk';
+import { fetchNotifications, markNotificationAsRead, deleteNotification } from '../store/thunks/notificationThunk';
 import { selectAuthLoader, selectNotificationsReversed, selectUser } from '../store/selector';
 
 export default function NotificationScreen() {
@@ -50,7 +50,7 @@ export default function NotificationScreen() {
   };
 
   const handleDelete = id => {
-    console.log('Delete notification:', id);
+    dispatch(deleteNotification(id));
   };
   //Colors.darkBlue
   //Colors.primary
