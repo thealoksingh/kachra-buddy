@@ -3,9 +3,17 @@ import { createSelector } from '@reduxjs/toolkit';
 export const selectUser = (state) => state.auth.user;  // ✅ Get user data
 export const selectAuthLoader = (state) => state.auth.loading;  // ✅ Get loader data
 export const selectAuthErrorMessage = (state) => state.auth.error;  // ✅ Get errorMessage data
-export const selectItems = (state) => state.user.items ? [...state.user.items].reverse() : [];  // ✅ Get items data (reversed)
+// Memoized selector for items to prevent unnecessary rerenders
+export const selectItems = createSelector(
+  [(state) => state.user.items],
+  (items) => items ? [...items].reverse() : []
+);
 export const selectCart = (state) => state.user.cart;  // ✅ Get cart data
-export const selectOrders = (state) => state.user.orders ? [...state.user.orders].reverse() : [];  // ✅ Get orders data (reversed)
+// Memoized selector for orders to prevent unnecessary rerenders
+export const selectOrders = createSelector(
+  [(state) => state.user.orders],
+  (orders) => orders ? [...orders].reverse() : []
+);
 export const selectUserLoader = (state) => state.user.loading;  // ✅ Get user loader data
 export const selectUserError = (state) => state.user.error;  // ✅ Get user error data
 
@@ -20,8 +28,16 @@ export const selectIsItemInCart = createSelector(
 
 // ✅ Driver selectors
 
-export const selectDriverOrders = (state) => state.driver.orders ? [...state.driver.orders].reverse() : [];  // ✅ Get all orders data (reversed)
-export const selectDriverItems = (state) => state.driver.items ? [...state.driver.items].reverse() : [];  // ✅ Get all items data (reversed)
+// Memoized selectors for driver data
+export const selectDriverOrders = createSelector(
+  [(state) => state.driver.orders],
+  (orders) => orders ? [...orders].reverse() : []
+);
+
+export const selectDriverItems = createSelector(
+  [(state) => state.driver.items],
+  (items) => items ? [...items].reverse() : []
+);
 export const selectDriverLoader = (state) => state.driver.loading;  // ✅ Get driver loader data
 export const selectDriverError = (state) => state.driver.error;  // ✅ Get driver error data
 
