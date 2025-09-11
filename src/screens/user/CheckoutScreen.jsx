@@ -106,12 +106,12 @@ const CheckoutScreen = () => {
       const response = await dispatch(updateOrder(updateData));
 
       if (updateOrder.fulfilled.match(response)) {
-        dispatch(showLottieAlert({ type: 'success', message: 'Order updated successfully!', autoClose: true }));
+        dispatch(showLottieAlert({ type: 'success', message: 'Pickup Requested successfully!', autoClose: true }));
         setTimeout(() => {
           navigation.replace("userBottomNavBar");
         }, 2500);
       } else {
-        dispatch(showLottieAlert({ type: 'failure', message: response?.payload?.message || 'Failed to update order', autoClose: true }));
+        dispatch(showLottieAlert({ type: 'failure', message: response?.payload?.message || 'Oops!! Request Failed', autoClose: true }));
       }
     } catch (error) {
       dispatch(showLottieAlert({ type: 'failure', message: 'Error updating order', autoClose: true }));

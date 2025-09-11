@@ -43,7 +43,7 @@ const RaisedTickets = () => {
        {isLoading ? (
         <LoaderCard count={5} cardHeight={12}/>
       ):( <FlatList
-        data={supportTickets}
+        data={supportTickets.reverse()}
         renderItem={({ item }) => <TicketCard ticket={item} />}
         keyExtractor={(item) => item?.id?.toString()}
         contentContainerStyle={styles.listContainer}

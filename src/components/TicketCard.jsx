@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   ticketId: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '700',
     color: Colors.primary,
   },
@@ -159,19 +159,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
     color: Colors.whiteColor,
   },
   subject: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: Colors.blackColor,
     marginBottom: 8,
     lineHeight: 22,
   },
   description: {
-    fontSize: 14,
+    fontSize: 12,
     color: Colors.grayColor,
     lineHeight: 20,
     marginBottom: 12,
@@ -183,12 +183,12 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   userName: {
-    fontSize: 13,
+    fontSize: 10,
     fontWeight: '500',
     color: Colors.blackColor,
   },
   userContact: {
-    fontSize: 12,
+    fontSize: 10,
     color: Colors.grayColor,
   },
   adminResponseContainer: {
@@ -198,19 +198,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   adminResponseLabel: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '600',
     color: Colors.primary,
     marginBottom: 4,
   },
   adminResponse: {
-    fontSize: 13,
+    fontSize: 12,
     color: Colors.blackColor,
     lineHeight: 18,
     marginBottom: 4,
   },
   adminName: {
-    fontSize: 11,
+    fontSize: 10,
     color: Colors.grayColor,
     fontStyle: 'italic',
     textAlign: 'right',
@@ -227,12 +227,12 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   type: {
-    fontSize: 12,
+    fontSize: 10,
     color: Colors.primary,
     fontWeight: '500',
   },
   date: {
-    fontSize: 11,
+    fontSize: 10,
     color: Colors.grayColor,
   },
   timestampContainer: {
