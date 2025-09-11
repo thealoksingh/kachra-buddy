@@ -43,3 +43,16 @@ export const pingServer = createAsyncThunk(
   }
 );
 
+//post support Ticket
+export const supportTicket = createAsyncThunk(
+  "auth/supportTicket",
+  async (data, thunkAPI) => {
+    try {
+      const response = await supportTicketAPI(data);
+      return response?.data;
+    } catch (error) {
+      console.log(error.response);
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);

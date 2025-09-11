@@ -3,7 +3,7 @@ import { ScrollView, View } from "react-native";
 import MiniProductCard from "./MiniProductCard";
 
 const MiniProductScrollSection = ({ products }) => {
-  console.log("products", products);
+  // console.log("products", products);
  let row1Products = [];
   let row2Products = [];
 

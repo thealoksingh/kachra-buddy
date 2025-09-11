@@ -114,10 +114,10 @@ const MiniProductCard = ({ title, price, image, isCountable, itemId }) => {
          setIsLoading(false);
       }
   };
-  console.log('User in mini product card', user);
-  console.log('Cart in mini product card', cart);
-  console.log('Product in mini product card', title, price, image, isCountable);
-  console.log('Is item in cart:', isItemInCart);
+  // console.log('User in mini product card', user);
+  // console.log('Cart in mini product card', cart);
+  // console.log('Product in mini product card', title, price, image, isCountable);
+  // console.log('Is item in cart:', isItemInCart);
   return (
     <View style={styles.card}>
       <Image

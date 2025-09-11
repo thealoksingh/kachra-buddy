@@ -29,10 +29,20 @@ import { useNavigation } from '@react-navigation/native';
 import { products, addsData } from '../../utils/dummyData';
 import { FaddedIcon } from '../../components/commonComponents';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectCart, selectItems, selectOrders, selectUser } from '../../store/selector';
-import { fetchItems, fetchCart, fetchOrders, getUserById } from '../../store/thunks/userThunk';
+import {
+  selectCart,
+  selectItems,
+  selectOrders,
+  selectUser,
+} from '../../store/selector';
+import {
+  fetchItems,
+  fetchCart,
+  fetchOrders,
+  getUserById,
+} from '../../store/thunks/userThunk';
 import Key from '../../constants/key';
-import {PendingOrderAlert}  from "../../components/userComponents/PendingOrderAlert";
+import { PendingOrderAlert } from '../../components/userComponents/PendingOrderAlert';
 import { getUserLocation } from '../../utils/CommonMethods';
 
 export const icons = [
@@ -80,12 +90,12 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const items = useSelector(selectItems);
-    const orders = useSelector(selectOrders);
+  const orders = useSelector(selectOrders);
   console.log('Items in home screen', items);
   const [userAddress, setUserAddress] = useState('Getting location...');
   const [refreshing, setRefreshing] = useState(false);
-  const[pendingAlertVisible ,setPendingAlertVisible]=useState(true)
-  const pendingOrders = orders?.filter(order => order.status === 'INCOMPLETE');
+  const [pendingAlertVisible, setPendingAlertVisible] = useState(true);
+  const pendingOrders = orders?.filter(order => order.status === 'INCOPLETE');
 
   useEffect(() => {
     getUserLocation(
@@ -105,13 +115,13 @@ export default function HomeScreen() {
         dispatch(getUserById({ userId })),
         dispatch(fetchItems()),
         dispatch(fetchCart()),
-        dispatch(fetchOrders())
+        dispatch(fetchOrders()),
       ]);
     }
   };
 
   const onRefresh = async () => {
-    console.log("Refreshing data...");
+    console.log('Refreshing data...');
 
     setRefreshing(true);
     await fetchAllData();
@@ -138,8 +148,8 @@ export default function HomeScreen() {
           onPress={() => navigation.navigate('profileScreen')}
           style={styles.profileSection}
         >
-            {user?.avatarUrl ? (
-              <Image
+          {user?.avatarUrl ? (
+            <Image
               source={{
                 uri: API_BASE_URL + user.avatarUrl,
                 headers: {
@@ -149,18 +159,18 @@ export default function HomeScreen() {
               style={styles.profileImage}
             />
           ) : (
-             <View
+            <View
               style={{
-                ...styles.profileImage, 
+                ...styles.profileImage,
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: '#e1e1e1', 
+                backgroundColor: '#e1e1e1',
               }}
             >
               <Ionicons name="person-outline" size={30} color="#666" />
             </View>
           )}
-           <View>
+          <View>
             <Text style={styles.userName}>{user?.fullName}</Text>
             <Text
               style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
@@ -197,7 +207,7 @@ export default function HomeScreen() {
         <Text style={styles.searchText}>Search here...</Text>
       </TouchableOpacity>
 
-      <ScrollView 
+      <ScrollView
         style={styles.mainSection}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -259,14 +269,22 @@ export default function HomeScreen() {
             }}
           />
         </View>
-        <FaddedIcon/>
-       
+
+        <TouchableOpacity  activeOpacity={0.8}  onPress={()=>navigation.navigate('helpScreen')} style={styles.supportCard}>
+          <Ionicons
+            name="notifications-outline"
+            size={28}
+            color={Colors.blackColor}
+          />
+          <Text style={{fontWeight:"700"}}>Help & Support</Text>
+        </TouchableOpacity>
+        <FaddedIcon />
       </ScrollView>
-       <PendingOrderAlert
-         visible={pendingAlertVisible}
-         title={"You have a Pending Order"}
-         message={"please Complete the order"}
-         onClose={()=>setPendingAlertVisible(false)}
+      <PendingOrderAlert
+        visible={pendingAlertVisible}
+        title={'You have a Pending Order'}
+        message={'please Complete the order'}
+        onClose={() => setPendingAlertVisible(false)}
         />
     </LinearGradient>
   );
@@ -341,6 +359,22 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 15,
+    margin: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  supportCard: {
+    width: screenWidth - 60,
+    height: 80,
+    backgroundColor: Colors.whiteColor,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent:"center",
+    gap:20,
     padding: 15,
     margin: 10,
     shadowColor: '#000',
