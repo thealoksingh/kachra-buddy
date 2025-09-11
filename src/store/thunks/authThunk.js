@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { sendOtpAPI, verifyOtpAPI } from '../../utils/api/authApi';
+import { sendOtpAPI, supportTicketAPI, verifyOtpAPI } from '../../utils/api/authApi';
 import { handleAxiosError } from '../../utils/handleAxiosError';
 
 

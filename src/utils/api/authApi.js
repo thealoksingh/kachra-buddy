@@ -1,4 +1,5 @@
 import Key from "../../constants/key";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { apiGetRequest } from '../http/get';
 import { apiPostRequest } from "../http/post";
 
@@ -28,9 +29,12 @@ export const pingServerAPI = () =>
     data: null,
 });
 //post query
-export const supportTicketAPI = (data) =>
-  apiPostRequest({
-    apiUrl: `${API_BASE_URL}/api/auth/verify-otp`,
+export const supportTicketAPI = async (data) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiPostRequest({
+    apiUrl: `${API_BASE_URL}/api/support-tickets`,
     content_type: "application/json",
     data: data,
-});
+    accessToken,
+  });
+};
