@@ -265,13 +265,27 @@ export default function HomeScreen() {
           />
         </View>
 
-        <TouchableOpacity  activeOpacity={0.8}  onPress={()=>navigation.navigate('helpScreen')} style={styles.supportCard}>
+        <TouchableOpacity 
+          activeOpacity={0.8}  
+          onPress={() => navigation.navigate('helpScreen')} 
+          style={styles.supportCard}
+        >
+          <View style={styles.supportIconContainer}>
+            <Ionicons
+              name="help-circle-outline"
+              size={32}
+              color={Colors.primary}
+            />
+          </View>
+          <View style={styles.supportTextContainer}>
+            <Text style={styles.supportTitle}>Help & Support</Text>
+            <Text style={styles.supportSubtitle}>Get assistance anytime</Text>
+          </View>
           <Ionicons
-            name="notifications-outline"
-            size={28}
-            color={Colors.blackColor}
+            name="chevron-forward-outline"
+            size={20}
+            color={Colors.grayColor}
           />
-          <Text style={{fontWeight:"700"}}>Help & Support</Text>
         </TouchableOpacity>
         <FaddedIcon />
       </ScrollView>
@@ -362,20 +376,43 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   supportCard: {
-    width: screenWidth - 60,
-    height: 80,
+   width: screenWidth - 60,
+    height: 90,
+     margin: 10,
     backgroundColor: Colors.whiteColor,
     borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent:"center",
-    gap:20,
-    padding: 15,
-    margin: 10,
+    padding: 20, 
     shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+  },
+  supportIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#f8f9ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  supportTextContainer: {
+    flex: 1,
+  },
+  supportTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.blackColor,
+    marginBottom: 4,
+  },
+  supportSubtitle: {
+    fontSize: 12,
+    color: Colors.grayColor,
+    fontWeight: '400',
   },
   sellnowButton: {
     backgroundColor: Colors.secondary,

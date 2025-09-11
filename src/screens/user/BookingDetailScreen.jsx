@@ -78,37 +78,44 @@ const BookingDetailScreen = () => {
       <CommonAppBar navigation={navigation} label="Booking Details" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <FlatList
-          ref={flatListRef}
-          data={images}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(_, i) => i.toString()}
-          onMomentumScrollEnd={e => {
-            const index = Math.round(e.nativeEvent.contentOffset.x / width);
-            setActiveIndex(index);
-          }}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={() => {
-                setPreviewImage(item);
-                setPreviewVisible(true);
-              }}
-            >
-              <Image
-                source={{
-                  uri: item,
-                  headers: {
-                    Authorization: `Bearer ${user?.accessToken}`,
-                  },
+        {orderData?.status == 'INCOMPLETE' ? (
+          <Image
+            source={require("../../../assets/images/pendingBooking.png")}
+            style={styles.image}
+          />
+        ) : (
+          <FlatList
+            ref={flatListRef}
+            data={images}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(_, i) => i.toString()}
+            onMomentumScrollEnd={e => {
+              const index = Math.round(e.nativeEvent.contentOffset.x / width);
+              setActiveIndex(index);
+            }}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => {
+                  setPreviewImage(item);
+                  setPreviewVisible(true);
                 }}
-                style={styles.image}
-              />
-            </TouchableOpacity>
-          )}
-        />
+              >
+                <Image
+                  source={{
+                    uri: item,
+                    headers: {
+                      Authorization: `Bearer ${user?.accessToken}`,
+                    },
+                  }}
+                  style={styles.image}
+                />
+              </TouchableOpacity>
+            )}
+          />
+        )}
 
         <View style={styles.dotsContainer}>
           {images.map((_, i) => (
@@ -164,7 +171,6 @@ const BookingDetailScreen = () => {
         </View>
 
         <View style={styles.itemsSection}>
-         
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Pickup Date Time</Text>
             <Text style={textStyles.small}>
@@ -183,16 +189,18 @@ const BookingDetailScreen = () => {
               {orderData?.driver ? 'Allocated' : 'Not Allocated'}
             </Text>
           </View>
-           {orderData?.orderType == 'GENERAL' && (
+          {orderData?.orderType == 'GENERAL' && (
             <>
-            <View style={commonStyles.rowSpaceBetween}>
-              <Text style={textStyles.smallBold}>Items</Text>
-              <Text style={textStyles.small}>{items.length}</Text>
-            </View>
-            <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Final Price</Text>
-            <Text style={[textStyles.small,{color:Colors.primary}]}>₹{orderData?.finalPrice || 0}</Text>
-          </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Items</Text>
+                <Text style={textStyles.small}>{items.length}</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Final Price</Text>
+                <Text style={[textStyles.small, { color: Colors.primary }]}>
+                  ₹{orderData?.finalPrice || 0}
+                </Text>
+              </View>
             </>
           )}
           <View style={commonStyles.rowSpaceBetween}>
@@ -209,37 +217,33 @@ const BookingDetailScreen = () => {
             </Text>
           </View>
         </View>
-        {orderData?.orderType == 'VEHICLE' && ( <>
-          <View style={styles.headingSection}>
-            <Text style={styles.sectionTitle}>Vehicle Details</Text>
-          </View>
-          <View style={styles.itemsSection}>
-           
-            <View style={commonStyles.rowSpaceBetween}>
-              <Text style={textStyles.smallBold}>Vehicle Type</Text>
-              <Text style={textStyles.small}>
-               Cargo Vehicle
-              </Text>
+        {orderData?.orderType == 'VEHICLE' && (
+          <>
+            <View style={styles.headingSection}>
+              <Text style={styles.sectionTitle}>Vehicle Details</Text>
             </View>
-            <View style={commonStyles.rowSpaceBetween}>
-              <Text style={textStyles.smallBold}>Vehicle Brand</Text>
-              <Text style={textStyles.small}>TATA</Text>
+            <View style={styles.itemsSection}>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Vehicle Type</Text>
+                <Text style={textStyles.small}>Cargo Vehicle</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Vehicle Brand</Text>
+                <Text style={textStyles.small}>TATA</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Vehicle Number</Text>
+                <Text style={textStyles.small}>MH14FE4940</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Final Price</Text>
+                <Text style={textStyles.small}>
+                  ₹{orderData?.finalPrice || 0}
+                </Text>
+              </View>
             </View>
-            <View style={commonStyles.rowSpaceBetween}>
-              <Text style={textStyles.smallBold}>Vehicle Number</Text>
-              <Text style={textStyles.small}>
-                MH14FE4940
-              </Text>
-            </View>
-            <View style={commonStyles.rowSpaceBetween}>
-              <Text style={textStyles.smallBold}>Final Price</Text>
-              <Text style={textStyles.small}>
-                ₹{orderData?.finalPrice || 0}
-              </Text>
-            </View>
-          
-          </View>
-        </>)}
+          </>
+        )}
         {orderData?.orderType == 'GENERAL' && (
           <>
             <View style={styles.headingSection}>
@@ -274,19 +278,19 @@ const BookingDetailScreen = () => {
             </View>
           </>
         )}
-       <View
+        <View
           style={{ flexDirection: 'row', justifyContent: 'center', gap: 2 }}
         >
           {/* Pending Order → show Complete + Cancel */}
-          {orderData?.status === 'INCOMPLETE'  && (
+          {orderData?.status === 'INCOMPLETE' && (
             <>
               <TouchableOpacity
-                onPress={() => navigation.navigate('checkoutScreen',{orderData})}
+                onPress={() =>
+                  navigation.navigate('checkoutScreen', { orderData })
+                }
                 style={[styles.cancelBtn, { borderColor: Colors.primary }]}
               >
-                <Text
-                  style={[styles.cancelBtnText, { color: Colors.primary }]}
-                >
+                <Text style={[styles.cancelBtnText, { color: Colors.primary }]}>
                   Complete Booking
                 </Text>
               </TouchableOpacity>
@@ -462,7 +466,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 10,
     marginHorizontal: 12,
-    marginVertical:15,
+    marginVertical: 15,
     borderWidth: 1,
     alignItems: 'center',
   },
