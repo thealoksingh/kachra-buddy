@@ -97,6 +97,11 @@ export const selectAdvertisements = createSelector(
   (advertisements) => [...advertisements].reverse()
 );
 
+export const selectAdvertisementsByDisplayOrder = createSelector(
+  [selectAdvertisementsRaw],
+  (advertisements) => [...advertisements].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+);
+
 // Support tickets selectors
 const selectSupportTicketsRaw = (state) => state.auth.supportTickets || [];
 

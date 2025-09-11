@@ -33,8 +33,9 @@ import { FaddedIcon } from '../../components/commonComponents';
 import CurvedCard from '../../screens/driver/CurvedCard';
 import { getUserLocation } from '../../utils/CommonMethods';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectUser } from '../../store/selector';
+import { selectUser, selectAdvertisementsByDisplayOrder } from '../../store/selector';
 import { getUserById } from '../../store/thunks/userThunk';
+import { fetchAllAdvertisements } from '../../store/thunks/adminThunk';
 import Key from '../../constants/key';
 
 export const icons = [
@@ -143,14 +144,21 @@ export default function AdminHome() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  const advertisement = useSelector(selectAdvertisementsByDisplayOrder);
   const userId = user?.id;
   const { API_BASE_URL } = Key;
   const [userAddress, setUserAddress] = useState('Getting location...');
   const [refreshing, setRefreshing] = useState(false);
+  
+  const bigSizeAdv = advertisement?.filter((ad) => ad.adSize === 'BIG') || [];
+  const smallSizeAdv = advertisement?.filter((ad) => ad.adSize === 'SMALL') || [];
 
   const fetchAllData = async () => {
     if (user && userId) {
-      await dispatch(getUserById({ userId }));
+      await Promise.all([
+        dispatch(getUserById({ userId })),
+        dispatch(fetchAllAdvertisements())
+      ]);
     }
   };
 
@@ -232,7 +240,7 @@ export default function AdminHome() {
       >
         <MovingIcons icons={icons} />
         <Graph />
-        <AdSlider data={addsData} type={"big"} />
+        <AdSlider data={bigSizeAdv} type={"big"} />
         
         {/* Admin Action Cards */}
         <View style={styles.cardsContainer}>
@@ -255,7 +263,7 @@ export default function AdminHome() {
           ))}
         </View>
         <View style={{ marginVertical: 20 }}>
-          <AdSlider data={addsData} type={"small"} />
+          <AdSlider data={smallSizeAdv} type={"small"} />
         </View>
 
         <FaddedIcon />

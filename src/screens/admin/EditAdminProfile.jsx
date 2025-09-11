@@ -101,9 +101,9 @@ const EditAdminProfile = () => {
     try {
       let result = null;
       if (source === 'camera') {
-        result = await openCamera();
+        result = await openCamera("1:1",0.7);
       } else {
-        result = await openGallery();
+        result = await openGallery("1:1",0.7);
       }
       
       if (result?.uri) {
@@ -159,6 +159,7 @@ const EditAdminProfile = () => {
             value={contactNumber}
             setter={setContactNumber}
             placeholder="Enter your contact number"
+            editable={false}
             type="phone-pad"
           />
         </View>

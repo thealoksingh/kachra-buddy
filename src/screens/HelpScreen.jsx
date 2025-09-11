@@ -19,6 +19,7 @@ import {
 import MyStatusBar from '../components/MyStatusBar';
 import {
   ButtonWithLoader,
+  FaddedIcon,
   InputBox,
   TextArea,
 } from '../components/commonComponents';
@@ -28,12 +29,12 @@ import { selectUser } from '../store/selector';
 import { showSnackbar } from '../store/slices/snackbarSlice';
 import { showLottieAlert } from '../store/slices/lottieAlertSlice';
 import { LottieAlert } from '../components/lottie/LottieAlert';
+import { useNavigation } from '@react-navigation/native';
 
 const HelpScreen = () => {
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
-
-
+  const navigation=useNavigation()
   const [subject, setSubject] = useState('');
   const [name, setName] = useState(user?.fullName || '');
   const [mobileNumber, setMobileNumber] = useState(user?.contactNumber || '');
@@ -50,15 +51,24 @@ const HelpScreen = () => {
       return false;
     }
     if (!mobileNumber.trim()) {
-      dispatch(showSnackbar({ message: 'Mobile number is required', type: 'error' }));
+      dispatch(
+        showSnackbar({ message: 'Mobile number is required', type: 'error' }),
+      );
       return false;
     }
     if (mobileNumber.length !== 10) {
-      dispatch(showSnackbar({ message: 'Mobile number must be 10 digits', type: 'error' }));
+      dispatch(
+        showSnackbar({
+          message: 'Mobile number must be 10 digits',
+          type: 'error',
+        }),
+      );
       return false;
     }
     if (!description.trim()) {
-      dispatch(showSnackbar({ message: 'Description is required', type: 'error' }));
+      dispatch(
+        showSnackbar({ message: 'Description is required', type: 'error' }),
+      );
       return false;
     }
     return true;
@@ -66,7 +76,7 @@ const HelpScreen = () => {
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
     try {
       const ticketBody = {
@@ -80,14 +90,32 @@ const HelpScreen = () => {
       const response = await dispatch(supportTicket(ticketBody));
       console.log('ticket response==>', response);
       if (response.type.endsWith('/fulfilled')) {
-        dispatch(showLottieAlert({ type: 'success', message: 'Ticket Created Successfully', autoClose: true }));
+        dispatch(
+          showLottieAlert({
+            type: 'success',
+            message: 'Ticket Created Successfully',
+            autoClose: true,
+          }),
+        );
         setSubject('');
         setDescription('');
       } else {
-        dispatch(showLottieAlert({ type: 'failure', message: 'Something went wrong, Try Again', autoClose: true }));
+        dispatch(
+          showLottieAlert({
+            type: 'failure',
+            message: 'Something went wrong, Try Again',
+            autoClose: true,
+          }),
+        );
       }
     } catch (error) {
-      dispatch(showLottieAlert({ type: 'failure', message: 'Error submitting ticket', autoClose: true }));
+      dispatch(
+        showLottieAlert({
+          type: 'failure',
+          message: 'Error submitting ticket',
+          autoClose: true,
+        }),
+      );
     } finally {
       setIsLoading(false);
     }
@@ -142,9 +170,9 @@ const HelpScreen = () => {
             isLoading={isLoading}
             method={handleSubmit}
           />
+          <FaddedIcon />
         </ScrollView>
       </View>
-
       <LottieAlert />
     </View>
   );
@@ -163,6 +191,18 @@ const HelpScreen = () => {
           Fill the form below and our support team will be in touch with you
           shortly.
         </Text>
+        <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={()=>navigation.navigate("raisedTickets")}
+        >
+          <Text style={{ fontSize: 12, fontWeight: '700', color: '#2537f9ff' }}>
+            Click here
+            <Text style={{ ...Fonts.grayColor12Regular, fontWeight: '500' }}>
+              {' '}
+              to view Tickets if you have already generated tickets.
+            </Text>
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }

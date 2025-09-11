@@ -37,8 +37,11 @@ const PostAd = () => {
   const pickImage = async source => {
     try {
       let result = null;
-      if (source === 'camera') result = await openCamera();
-      else result = await openGallery();
+      const aspectRatio = adSize === 'SMALL' ? '3.33:1' : '1.67:1';
+      const quality = 1;
+      
+      if (source === 'camera') result = await openCamera(aspectRatio, quality);
+      else result = await openGallery(aspectRatio, quality);
 
       if (result?.uri) {
         setCurrentImage(result.uri);
@@ -164,14 +167,14 @@ const PostAd = () => {
               <TouchableOpacity
                 style={[
                   styles.sizeButton,
-                  adSize === 'LARGE' && styles.selectedSize,
+                  adSize === 'BIG' && styles.selectedSize,
                 ]}
-                onPress={() => setAdSize('LARGE')}
+                onPress={() => setAdSize('BIG')}
               >
                 <Text
                   style={[
                     styles.sizeText,
-                    adSize === 'LARGE' && styles.selectedSizeText,
+                    adSize === 'BIG' && styles.selectedSizeText,
                   ]}
                 >
                   Large
