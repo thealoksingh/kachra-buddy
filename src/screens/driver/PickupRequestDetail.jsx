@@ -218,8 +218,9 @@ const PickupRequestDetail = () => {
                 },
               ]}
               onPress={() => openGoogleMaps(
-                currentOrder?.orderPickupLatitude || 28.6139, 
-                currentOrder?.orderPickupLongitude || 77.209
+                currentOrder?.orderPickupLatitude , 
+                currentOrder?.orderPickupLongitude ,
+                currentOrder?.sellerName || "Seller Location"
               )}
             >
               <Ionicons name="map-outline" size={18} color={Colors.secondary} />
@@ -241,7 +242,7 @@ const PickupRequestDetail = () => {
                   gap: 6,
                 },
               ]}
-              onPress={() => callUser(currentOrder?.sellerContactNo?.replace(/[^0-9]/g, '') || '9876543210')}
+              onPress={() => callUser(currentOrder?.sellerContactNo?.replace(/[^0-9]/g, ''))}
             >
               <Ionicons
                 name="call-outline"

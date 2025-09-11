@@ -41,7 +41,7 @@ const BookingDetailAdmin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const flatListRef = useRef();
-
+  // console.log("this is booking at admin =>",booking);
   const images = booking?.orderImages?.map(img => API_BASE_URL + img.imageUrl) || [];
 
   const items = booking?.orderItems || [];
@@ -229,7 +229,7 @@ const BookingDetailAdmin = () => {
                   gap: 6,
                 },
               ]}
-              onPress={() => openGoogleMaps(28.6139, 77.209)} // pass dynamic coords here
+              onPress={() => openGoogleMaps(booking?.orderPickupLatitude,booking?.orderPickupLongitude,booking?.sellerName)}
             >
               <Ionicons name="map-outline" size={18} color={Colors.secondary} />
               <Text
@@ -251,7 +251,7 @@ const BookingDetailAdmin = () => {
                   gap: 6,
                 },
               ]}
-              onPress={() => callUser('9876543210')}
+              onPress={() => callUser(booking?.sellerContactNo)}
             >
               <Ionicons
                 name="call-outline"

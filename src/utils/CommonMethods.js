@@ -157,3 +157,26 @@ export const getUserLocation = async (onSuccess, onError) => {
     }
   );
 };
+
+export const callUser = (phoneNumber) => {
+  if (!phoneNumber) {
+    Alert.alert("Invalid", "Phone number not available");
+    return;
+  }
+  const url = `tel:${phoneNumber}`;
+  Linking.openURL(url).catch(() =>
+    Alert.alert("Error", "Unable to make a call")
+  );
+};
+
+// 🗺️ Open Google Maps with directions
+
+
+export  const openGoogleMaps = (latitude, longitude, label = 'Seller Location') => {
+  const encodedLabel = encodeURIComponent(label);
+  const url = Platform.select({
+    ios: `maps://?q=${encodedLabel}&ll=${latitude},${longitude}`,
+    android: `geo:${latitude},${longitude}?q=${latitude},${longitude}(${encodedLabel})`,
+  });
+  Linking.openURL(url);
+};

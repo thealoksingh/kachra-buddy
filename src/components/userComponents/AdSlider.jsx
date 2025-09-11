@@ -24,7 +24,7 @@ const AdSlider = ({ data, type }) => {
   const [selectedUrl, setSelectedUrl] = useState('');
   const flatListRef = useRef(null);
   const indexRef = useRef(currentIndex);
-  console.log("data ",data)
+  // console.log("data ",data)
   //(16:9 for big, ~3.5:1 for strip).
   const width = screenWidth - 60;
   const height = type === 'big' ? (width * 9) / 16 : width / 3.5;
@@ -82,7 +82,7 @@ const AdSlider = ({ data, type }) => {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => {
-          console.log('Ad item:', item);
+          // console.log('Ad item:', item);
           const imageUri = item?.imageUrl;
           const fullImageUrl = imageUri ? API_BASE_URL + imageUri : 'https://t3.ftcdn.net/jpg/03/76/97/16/360_F_376971659_OSsR8oqHDuyoovcqqi2KNcHRKKVA9QqO.jpg';
           // console.log('Image URL:', fullImageUrl);
