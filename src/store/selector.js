@@ -3,9 +3,20 @@ import { createSelector } from '@reduxjs/toolkit';
 export const selectUser = (state) => state.auth.user;  // ✅ Get user data
 export const selectAuthLoader = (state) => state.auth.loading;  // ✅ Get loader data
 export const selectAuthErrorMessage = (state) => state.auth.error;  // ✅ Get errorMessage data
-export const selectItems = (state) => state.user.items ? [...state.user.items].reverse() : [];  // ✅ Get items data (reversed)
+const selectItemsRaw = (state) => state.user.items || [];
+const selectOrdersRaw = (state) => state.user.orders || [];
+
+export const selectItems = createSelector(
+  [selectItemsRaw],
+  (items) => [...items].reverse()
+);
+
 export const selectCart = (state) => state.user.cart;  // ✅ Get cart data
-export const selectOrders = (state) => state.user.orders ? [...state.user.orders].reverse() : [];  // ✅ Get orders data (reversed)
+
+export const selectOrders = createSelector(
+  [selectOrdersRaw],
+  (orders) => [...orders].reverse()
+);
 export const selectUserLoader = (state) => state.user.loading;  // ✅ Get user loader data
 export const selectUserError = (state) => state.user.error;  // ✅ Get user error data
 
@@ -19,18 +30,53 @@ export const selectIsItemInCart = createSelector(
 );
 
 // ✅ Driver selectors
+const selectDriverOrdersRaw = (state) => state.driver.orders || [];
+const selectDriverItemsRaw = (state) => state.driver.items || [];
 
-export const selectDriverOrders = (state) => state.driver.orders ? [...state.driver.orders].reverse() : [];  // ✅ Get all orders data (reversed)
-export const selectDriverItems = (state) => state.driver.items ? [...state.driver.items].reverse() : [];  // ✅ Get all items data (reversed)
+export const selectDriverOrders = createSelector(
+  [selectDriverOrdersRaw],
+  (orders) => [...orders].reverse()
+);
+
+export const selectDriverItems = createSelector(
+  [selectDriverItemsRaw],
+  (items) => [...items].reverse()
+);
+
 export const selectDriverLoader = (state) => state.driver.loading;  // ✅ Get driver loader data
 export const selectDriverError = (state) => state.driver.error;  // ✅ Get driver error data
 
 // Admin selectors
-export const selectAdminUsers = (state) => state.admin.users ? [...state.admin.users].reverse() : [];
-export const selectAdminDrivers = (state) => state.admin.drivers ? [...state.admin.drivers].reverse() : [];
-export const selectAdminItems = (state) => state.admin.items ? [...state.admin.items].reverse() : [];
-export const selectAdminOrders = (state) => state.admin.orders ? [...state.admin.orders].reverse() : [];
-export const selectAllUsers = (state) => state.admin.users ? [...state.admin.users].reverse() : [];
+const selectAdminUsersRaw = (state) => state.admin.users || [];
+const selectAdminDriversRaw = (state) => state.admin.drivers || [];
+const selectAdminItemsRaw = (state) => state.admin.items || [];
+const selectAdminOrdersRaw = (state) => state.admin.orders || [];
+const selectAdvertisementsRaw = (state) => state.admin.advertisements || [];
+
+export const selectAdminUsers = createSelector(
+  [selectAdminUsersRaw],
+  (users) => [...users].reverse()
+);
+
+export const selectAdminDrivers = createSelector(
+  [selectAdminDriversRaw],
+  (drivers) => [...drivers].reverse()
+);
+
+export const selectAdminItems = createSelector(
+  [selectAdminItemsRaw],
+  (items) => [...items].reverse()
+);
+
+export const selectAdminOrders = createSelector(
+  [selectAdminOrdersRaw],
+  (orders) => [...orders].reverse()
+);
+
+export const selectAllUsers = createSelector(
+  [selectAdminUsersRaw],
+  (users) => [...users].reverse()
+);
 
 // Notification selectors
 export const selectNotifications = (state) => state.auth.notifications || [];
@@ -46,4 +92,7 @@ export const selectUnreadNotifications = createSelector(
 );
 
 // Advertisement selectors
-export const selectAdvertisements = (state) => state.admin.advertisements ? [...state.admin.advertisements].reverse() : [];
+export const selectAdvertisements = createSelector(
+  [selectAdvertisementsRaw],
+  (advertisements) => [...advertisements].reverse()
+);

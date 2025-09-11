@@ -123,7 +123,7 @@ export default function HomeScreen() {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && userId) {
       setPendingAlertVisible(pendingOrders.length > 0);
       dispatch(fetchItems());
       dispatch(fetchCart());

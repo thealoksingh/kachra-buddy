@@ -32,6 +32,7 @@ import {
   addItemsToOrder,
 } from '../../store/thunks/driverThunk';
 import { selectDriverLoader, selectDriverItems } from '../../store/selector';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
 
 const FinalPickupScreen = () => {
   const navigation = useNavigation();
@@ -115,45 +116,60 @@ const FinalPickupScreen = () => {
   };
 
   const submitOrder = async () => {
-    const updatedOrderItems = currentOrder.orderItems.map(item => ({
-      ...item,
-      quantity: updatedQuantities[item.id] ?? item.quantity,
+    console.log('Submitting order with OTP:', otpInput);
+    // Prepare updated order items with new quantities
+    const updatedOrderItems = currentOrder.orderItems.map(orderItem => ({
+      id: orderItem.id,
+      itemId: orderItem.item.id,
+      quantity: updatedQuantities[orderItem.id] ?? orderItem.quantity,
+      price: (updatedQuantities[orderItem.id] ?? orderItem.quantity) * orderItem.item.pricePerUnit,
+      unit: orderItem.unit
     }));
 
-    // Add additional items if any
-    if (additionalItems.length > 0) {
-      await dispatch(
-        addItemsToOrder({
-          orderId: currentOrder.id,
-          items: additionalItems,
-        }),
-      );
-    }
+    console.log('Updated Order Items:', updatedOrderItems);
 
-    const orderData = {
-      orderItems: [...updatedOrderItems, ...additionalItems],
-      finalPrice: calculateTotalPrice(),
-      remark: remark,
-    };
+    // Prepare additional items in correct format
+    const formattedAdditionalItems = additionalItems.map(item => ({
+      itemId: item.item.id,
+      quantity: item.quantity,
+      price: item.price,
+      unit: item.item.unit
+    }));
 
-    const result = await dispatch(
-      updateDriverOrder({
-        orderId: currentOrder.id,
-        orderData,
-        postedBy: 'DRIVER',
+    console.log('Formatted Additional Items:', formattedAdditionalItems);
+
+    // Prepare final order data matching API structure
+    const orderUpdateData =  {
+        id: currentOrder.id,
+        orderItems: [...updatedOrderItems, ...formattedAdditionalItems],
+        finalPrice: calculateTotalPrice(),
+        givenAmount: parseFloat(givenAmount) || 0,
+        remark: remark || '',
+        images: images,
         otp: otpInput,
-        images,
-      }),
-    );
+        postedBy: 'DRIVER',
+        updatedAt: new Date().toISOString()
+      };
 
-    if (updateDriverOrder.fulfilled.match(result)) {
-      setSuccessAlertVisible(true);
-      setTimeout(() => {
-        navigation.pop(2); // Go back 2 steps
-      }, 2000);
-    } else {
-      setFailureAlertVisible(true);
-    }
+    console.log('Order Data to submit:', orderUpdateData);
+
+    // const result = await dispatch(
+    //   updateDriverOrder({
+    //     orderId: currentOrder.id,
+    //     orderData: orderUpdateData.data,
+    //     otp: otpInput,
+    //     images,
+    //   }),
+    // );
+
+    // if (updateDriverOrder.fulfilled.match(result)) {
+    //   setSuccessAlertVisible(true);
+    //   setTimeout(() => {
+    //     navigation.pop(2); // Go back 2 steps
+    //   }, 2000);
+    // } else {
+    //   setFailureAlertVisible(true);
+    // }
   };
 
   const pickImage = async source => {

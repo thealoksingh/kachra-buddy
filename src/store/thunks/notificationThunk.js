@@ -18,6 +18,9 @@ export const fetchNotifications = createAsyncThunk(
   'notification/fetchNotifications',
   async (userId, thunkAPI) => {
     try {
+      if (!userId) {
+        return thunkAPI.rejectWithValue({ message: 'User ID is required' });
+      }
       const response = await fetchNotificationsAPI(userId);
       return response?.data;
     } catch (error) {
