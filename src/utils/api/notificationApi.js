@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { apiPostRequest } from "../http/post";
 import { apiGetRequest } from '../http/get';
 import { apiPatchRequest } from '../http/patch';
+import { apiDeleteRequest } from '../http/delete';
 
 const { API_BASE_URL } = Key;
 
@@ -28,6 +29,14 @@ export const markNotificationAsReadAPI = async (notificationId) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiPatchRequest({
     apiUrl: `${API_BASE_URL}/api/notifications/${notificationId}/read`,
+    accessToken,
+  });
+};
+
+export const deleteNotificationAPI = async (notificationId) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiDeleteRequest({
+    apiUrl: `${API_BASE_URL}/api/notifications/${notificationId}`,
     accessToken,
   });
 };

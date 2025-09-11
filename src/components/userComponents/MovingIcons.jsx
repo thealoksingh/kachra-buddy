@@ -11,6 +11,22 @@ import { Colors, textStyles } from '../../styles/commonStyles';
 
 const { width } = Dimensions.get('window');
 
+const getItemColor = (label) => {
+  const colorMap = {
+    'Shoe': '#8B4513',
+    'Plastic': '#FF6B35',
+    'Metal': '#708090',
+    'Paper': '#32CD32',
+    'Electronics': '#4169E1',
+    'Water Tank': '#00CED1',
+    'Tyre': '#2F4F4F',
+    'Battery': '#FFD700',
+    'Garbage': '#8FBC8F',
+    'Carton': '#DEB887',
+  };
+  return colorMap[label] || Colors.primary;
+};
+
 export default function MovingIcons({ icons }) {
   const scrollX = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef(null);
@@ -56,20 +72,22 @@ export default function MovingIcons({ icons }) {
               justifyContent: 'center',
               alignItems: 'center',
               borderWidth: 1,
-              borderColor: Colors.grayColor,
+              borderColor: getItemColor(item.label),
+              backgroundColor: `${getItemColor(item.label)}15`,
             }}
           >
             <Image
               source={item.path}
-              style={{ width: 30, height: 30, tintColor: Colors.grayColor }}
+              style={{ width: 30, height: 30, tintColor: getItemColor(item.label) }}
               resizeMode="contain"
             />
           </View>
           <Text
             style={{
-              color: Colors.grayColor,
+              color: getItemColor(item.label),
               ...textStyles.extraSmall,
               textAlign: 'center',
+              fontWeight: '500',
             }}
           >
             {item.label}

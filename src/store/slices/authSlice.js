@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { sendOtp, verifyOtp } from '../thunks/authThunk';
 import { completeUserProfile, getUserById, updateProfilePic, updateUser } from '../thunks/userThunk';
 import { updateAdminProfile, updateAdminProfilePic } from '../thunks/adminThunk';
-import { sendNotification, fetchNotifications, markNotificationAsRead } from '../thunks/notificationThunk';
+import { sendNotification, fetchNotifications, markNotificationAsRead, deleteNotification } from '../thunks/notificationThunk';
 
 const initialState = {
   user: null,
@@ -169,6 +169,11 @@ const authSlice = createSlice({
           state.notifications[index].status = 'READ';
           state.notifications[index].readAt = new Date().toISOString();
         }
+      })
+      // Delete Notification
+      .addCase(deleteNotification.fulfilled, (state, action) => {
+        const notificationId = action.payload.id;
+        state.notifications = state.notifications.filter(n => n.id !== notificationId);
       });
     }
 });

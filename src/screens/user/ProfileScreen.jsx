@@ -122,13 +122,13 @@ const ProfileScreen = () => {
           {profileOption({
             option: 'Terms & Conditions',
             iconName: 'list-alt',
-            onPress: () => navigation.navigate('editProfileScreen'),
+            onPress: () => navigation.navigate('termsConditionsScreen'),
           })}
 
           {profileOption({
             option: 'Privacy Policy',
             iconName: 'privacy-tip',
-            onPress: () => navigation.navigate('editProfileScreen'),
+            onPress: () => navigation.navigate('privacyPolicyScreen'),
           })}
           {profileOption({
             option: 'Raised Tickets',
