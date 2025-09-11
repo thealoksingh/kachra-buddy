@@ -34,8 +34,8 @@ const EditProfileScreen = () => {
   const pickImage = async source => {
     try {
       let result = null;
-      if (source === 'camera') result = await openCamera("1:1");
-      else result = await openGallery("1:1");
+      if (source === 'camera') result = await openCamera("1:1",0.7);
+      else result = await openGallery("1:1",0.7);
 
       if (result?.uri) {
         setAvatar(result.uri);

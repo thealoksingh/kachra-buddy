@@ -5,7 +5,7 @@ export const useImagePicker = () => {
   const pickAndEdit = async (
     source = 'gallery',
     ratio = null,
-    quality = 0.7
+    quality = 0.6
   ) => {
     return new Promise((resolve, reject) => {
       const picker = source === 'camera' ? launchCamera : launchImageLibrary;

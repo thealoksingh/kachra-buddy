@@ -101,9 +101,9 @@ const EditAdminProfile = () => {
     try {
       let result = null;
       if (source === 'camera') {
-        result = await openCamera();
+        result = await openCamera("1:1",0.7);
       } else {
-        result = await openGallery();
+        result = await openGallery("1:1",0.7);
       }
       
       if (result?.uri) {
