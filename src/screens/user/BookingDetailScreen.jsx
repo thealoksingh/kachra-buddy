@@ -23,7 +23,7 @@ import { LottieAlert } from '../../components/lottie/LottieAlert';
 const { width } = Dimensions.get('window');
 
 const BookingDetailScreen = () => {
-  console.log('Rendering BookingDetailScreen');
+  // console.log('Rendering BookingDetailScreen');
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();

@@ -131,7 +131,7 @@ export default function HomeScreen() {
     if (user && userId) {
       setPendingAlertVisible(pendingOrders.length > 0);
       dispatch(fetchItems());
-       dispatch(fetchAllAdvertisements()),
+      dispatch(fetchAllAdvertisements()),
       dispatch(fetchCart());
       dispatch(fetchOrders());
       dispatch(fetchNotifications(userId));

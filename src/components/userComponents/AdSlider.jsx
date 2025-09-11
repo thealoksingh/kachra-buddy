@@ -6,10 +6,13 @@ import {
   Dimensions,
   Text,
   StyleSheet,
+  TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../store/selector';
 import Key from '../../constants/key';
+import { WarningWithButton } from '../lottie/WarningWithButton';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -17,6 +20,8 @@ const AdSlider = ({ data, type }) => {
   const user = useSelector(selectUser);
   const { API_BASE_URL } = Key;
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [warningVisible, setWarningVisible] = useState(false);
+  const [selectedUrl, setSelectedUrl] = useState('');
   const flatListRef = useRef(null);
   const indexRef = useRef(currentIndex);
   console.log("data ",data)
@@ -53,6 +58,20 @@ const AdSlider = ({ data, type }) => {
 
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
 
+  const handleAdPress = (item) => {
+    if (item?.redirectUrl) {
+      setSelectedUrl(item.redirectUrl);
+      setWarningVisible(true);
+    }
+  };
+
+  const handleRedirect = () => {
+    setWarningVisible(false);
+    if (selectedUrl) {
+      Linking.openURL(selectedUrl).catch(err => console.error('Failed to open URL:', err));
+    }
+  };
+
   return (
     <View>
       <FlatList
@@ -69,7 +88,11 @@ const AdSlider = ({ data, type }) => {
           // console.log('Image URL:', fullImageUrl);
           
           return (
-            <View style={[styles.adBox, { height: height, width: width }]}>
+            <TouchableOpacity 
+              style={[styles.adBox, { height: height, width: width }]}
+              onPress={() => handleAdPress(item)}
+              activeOpacity={0.9}
+            >
               <Image
                 source={{
                   uri: fullImageUrl,
@@ -85,7 +108,7 @@ const AdSlider = ({ data, type }) => {
               <View style={styles.adLabel}>
                 <Text style={styles.adText}>Ad</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           );
         }}
         onViewableItemsChanged={onViewableItemsChanged}
@@ -101,6 +124,17 @@ const AdSlider = ({ data, type }) => {
           />
         ))}
       </View>
+      
+      {warningVisible && (
+        <WarningWithButton
+          message="Are you sure you want to visit this Ad?"
+          onYes={handleRedirect}
+          onClose={() => setWarningVisible(false)}
+          yesText="Visit"
+          noText="Cancel"
+          loop={false}
+        />
+      )}
     </View>
   );
 };
