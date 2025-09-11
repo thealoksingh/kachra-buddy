@@ -38,3 +38,13 @@ export const supportTicketAPI = async (data) => {
     accessToken,
   });
 };
+
+export const getAllSupportTicketsAPI = async (userId) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiGetRequest({
+    apiUrl: `${API_BASE_URL}/api/support-tickets/user/${userId}`,
+    content_type: "application/json",
+    data: null,
+    accessToken,
+  });
+};

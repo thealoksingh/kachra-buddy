@@ -8,50 +8,32 @@ import {
 } from "react-native";
 import {
   Colors,
-
   Sizes,
   Fonts,
 } from "../styles/commonStyles";
 import MyStatusBar from "../components/MyStatusBar";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { SupportTicket } from "../components/TicketCard";
+import { TicketCard } from "../components/TicketCard";
 import { CommonAppBar } from "../components/commonComponents";
 import { useNavigation } from "@react-navigation/native";
-import {LoaderCard} from "../components/LoaderCard";
-const allIssues=[
-{
-    id: "1",
-    title: "App not loading",
-    status: "Open",
-    created_at: "2024-08-25 10:30 AM",
-    user: {
-      avatar: null,
-      owner_legal_name: "Rohit Sharma",
-      mobile_number: "9876543210",
-      role: "user",
-    },
-  },
-  {
-    id: "2",
-    title: "App not loading",
-    status: "Open",
-    created_at: "2024-08-25 10:30 AM",
-    user: {
-      avatar: null,
-      owner_legal_name: "Rohit Sharma",
-      mobile_number: "9876543210",
-      role: "user",
-    },
-  },
-
-]
-
+import { LoaderCard } from "../components/LoaderCard";
+import { getAllSupportTickets } from "../store/thunks/authThunk";
+import { useDispatch, useSelector } from 'react-redux';
+import { selectSupportTickets, selectUser, selectAuthLoader } from '../store/selector';
 
 
 const RaisedTickets = () => {
-
   const navigation = useNavigation();
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const supportTickets = useSelector(selectSupportTickets);
+  const isLoading = useSelector(selectAuthLoader);
+
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(getAllSupportTickets(user.id));
+    }
+  }, [dispatch, user?.id]);
 
   return (
     <View style={styles.container}>
@@ -61,8 +43,8 @@ const RaisedTickets = () => {
        {isLoading ? (
         <LoaderCard count={5} cardHeight={12}/>
       ):( <FlatList
-        data={allIssues}
-        renderItem={({ item }) => <SupportTicket issue={item} />}
+        data={supportTickets}
+        renderItem={({ item }) => <TicketCard ticket={item} />}
         keyExtractor={(item) => item?.id?.toString()}
         contentContainerStyle={styles.listContainer}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -70,7 +52,7 @@ const RaisedTickets = () => {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <MaterialIcons name="confirmation-number" size={60} color={Colors.extraLightGrayColor} />
-            <Text style={styles.emptyText}>No Issues found</Text>
+            <Text style={styles.emptyText}>No Support Tickets found</Text>
             
           </View>
         }

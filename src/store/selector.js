@@ -96,3 +96,11 @@ export const selectAdvertisements = createSelector(
   [selectAdvertisementsRaw],
   (advertisements) => [...advertisements].reverse()
 );
+
+// Support tickets selectors
+const selectSupportTicketsRaw = (state) => state.auth.supportTickets || [];
+
+export const selectSupportTickets = createSelector(
+  [selectSupportTicketsRaw],
+  (tickets) => [...tickets].reverse()
+);

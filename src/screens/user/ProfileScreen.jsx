@@ -133,7 +133,7 @@ const ProfileScreen = () => {
           {profileOption({
             option: 'Raised Tickets',
             iconName: 'confirmation-number',
-            onPress: () => navigation.navigate('editProfileScreen'),
+            onPress: () => navigation.navigate('raisedTickets'),
           })}
 
           {logoutInfo()}

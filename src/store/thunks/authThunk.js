@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { sendOtpAPI, supportTicketAPI, verifyOtpAPI } from '../../utils/api/authApi';
+import { getAllSupportTicketsAPI, sendOtpAPI, supportTicketAPI, verifyOtpAPI } from '../../utils/api/authApi';
 import { handleAxiosError } from '../../utils/handleAxiosError';
 
 
@@ -49,6 +49,20 @@ export const supportTicket = createAsyncThunk(
   async (data, thunkAPI) => {
     try {
       const response = await supportTicketAPI(data);
+      return response?.data;
+    } catch (error) {
+      console.log(error.response);
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+//Get All support Ticket
+export const getAllSupportTickets = createAsyncThunk(
+  "auth/getAllSupportTickets",
+  async (userId, thunkAPI) => {
+    try {
+      const response = await getAllSupportTicketsAPI(userId);
       return response?.data;
     } catch (error) {
       console.log(error.response);

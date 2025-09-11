@@ -17,6 +17,8 @@ import NotificationScreen from '../screens/NotificationScreen';
 import HelpScreen from '../screens/HelpScreen';
 import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
 import TermsConditionsScreen from '../screens/TermsConditionsScreen';
+import RaisedTickets from '../screens/RaisedTickets';
+
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
@@ -35,6 +37,7 @@ function ActiveStack() {
       <Stack.Screen name="locationPickerScreen" component={LocationPickerScreen} />
       <Stack.Screen name="editProfileScreen" component={EditProfileScreen} />
       <Stack.Screen name="helpScreen" component={HelpScreen} />
+      <Stack.Screen name="raisedTickets" component={RaisedTickets} />
       <Stack.Screen name="privacyPolicyScreen" component={PrivacyPolicyScreen} />
       <Stack.Screen name="termsConditionsScreen" component={TermsConditionsScreen} />
     </Stack.Navigator>

@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { sendOtp, verifyOtp } from '../thunks/authThunk';
+import { sendOtp, verifyOtp, getAllSupportTickets } from '../thunks/authThunk';
 import { completeUserProfile, getUserById, updateProfilePic, updateUser } from '../thunks/userThunk';
 import { updateAdminProfile, updateAdminProfilePic } from '../thunks/adminThunk';
 import { sendNotification, fetchNotifications, markNotificationAsRead, deleteNotification } from '../thunks/notificationThunk';
@@ -7,6 +7,7 @@ import { sendNotification, fetchNotifications, markNotificationAsRead, deleteNot
 const initialState = {
   user: null,
   notifications: [],
+  supportTickets: [],
   loading: false,
   error: null,
 };
@@ -16,9 +17,9 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
-      
       state.user = null;
       state.notifications = [];
+      state.supportTickets = [];
       state.loading = false;
       state.error = null;
     },
@@ -174,6 +175,19 @@ const authSlice = createSlice({
       .addCase(deleteNotification.fulfilled, (state, action) => {
         const notificationId = action.payload.id;
         state.notifications = state.notifications.filter(n => n.id !== notificationId);
+      })
+      // Get All Support Tickets
+      .addCase(getAllSupportTickets.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllSupportTickets.fulfilled, (state, action) => {
+        state.loading = false;
+        state.supportTickets = action?.payload?.data || [];
+      })
+      .addCase(getAllSupportTickets.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action?.payload?.message;
       });
     }
 });
