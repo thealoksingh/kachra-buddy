@@ -185,38 +185,50 @@ const SupportIssueDetail = () => {
       >
         {/* Header Card */}
         <View style={styles.headerCard}>
-          <View style={styles.ticketHeader}>
-            <Text style={styles.ticketId}>#{ticket.id || 'N/A'}</Text>
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: getStatusColor(ticket.status) },
-              ]}
-            >
-              <Text style={styles.statusText}>{ticket.status || 'N/A'}</Text>
-            </View>
-          </View>
           {/* User Information */}
 
-          <View style={styles.userSection}>
-            {ticket?.avatar ? (
-              <Image source={{ uri: ticket?.avatar }} style={styles.avatar} />
-            ) : (
-              <View style={styles.avatarPlaceholder}>
-                <Icon name="account" size={24} color={Colors.grayColor} />
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+                }}
+          >
+            <>
+              {ticket?.avatar ? (
+                <Image source={{ uri: ticket?.avatar }} style={styles.avatar} />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Icon name="account" size={24} color={Colors.grayColor} />
+                </View>
+              )}
+              <View style={styles.userDetails}>
+                <Text style={styles.userName}>{ticket?.userName}</Text>
+                <Text style={styles.userMobile}>{ticket?.userContact}</Text>
               </View>
-            )}
-            <View style={styles.userDetails}>
-              <Text style={styles.userName}>{ticket?.userName}</Text>
-              <Text style={styles.userMobile}>{ticket?.userContact}</Text>
-            </View>
+              <Text style={styles.ticketId}>#{ticket?.userId || 'N/A'}</Text>
+          
+            </>
           </View>
         </View>
 
         {/* Ticket Details */}
         <View style={styles.infoCard}>
-          <Text style={styles.cardTitle}>Ticket Details</Text>
-
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 20,
+            }}
+          >
+            <Text style={[styles.cardTitle, { marginBottom: 0 }]}>
+              Ticket Details
+            </Text>
+            <Text style={styles.ticketId}>#{ticket.id || 'N/A'}</Text>
+          </View>
           {isEditing ? (
             <>
               {renderSelector('Status', status, statusOptions, setStatus)}
@@ -274,8 +286,14 @@ const SupportIssueDetail = () => {
                   {ticket.type || 'Not Available'}
                 </Text>
               </View>
-             <View style={{height:1,backgroundColor:Colors.extraLightGrayColor,marginVertical:10}}/>
-              <View >
+              <View
+                style={{
+                  height: 1,
+                  backgroundColor: Colors.extraLightGrayColor,
+                  marginVertical: 10,
+                }}
+              />
+              <View>
                 <Text style={styles.subject}>
                   Ticket Subject : {ticket.subject || 'No Subject'}
                 </Text>
@@ -337,7 +355,7 @@ const SupportIssueDetail = () => {
             </View>
           )}
         </View>
-        <FaddedIcon/>
+        <FaddedIcon />
       </ScrollView>
 
       {/* Action Buttons */}
@@ -539,8 +557,8 @@ const styles = StyleSheet.create({
   },
   editButton: {
     backgroundColor: Colors.primary,
-    borderRadius: 12,
-    paddingVertical: 14,
+    borderRadius: 10,
+    paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -557,14 +575,14 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: Colors.extraLightGrayColor,
-    borderRadius: 12,
-    paddingVertical: 14,
+    backgroundColor: Colors.secondary,
+    borderRadius: 10,
+    paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelButtonText: {
-    color: Colors.grayColor,
+    color: Colors.whiteColor,
     fontSize: 14,
     fontWeight: '600',
   },

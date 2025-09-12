@@ -19,70 +19,13 @@ import { FaddedIcon } from '../../components/commonComponents';
 import { fetchAllTickets } from '../../store/thunks/adminThunk';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllTickets } from '../../store/selector';
+import { LoaderCard } from '../../components/LoaderCard';
 
-// Support Tickets Data
-const supportTickets = [
-  {
-    id: 1,
-    owner_legal_name: 'Alok Singh',
-    mobile_number: '+91 9687543210',
-    ticketStatus: 'Open',
-    ticketTitle: 'Payment Issue - Transaction Failed',
-    ticketDescription: 'Unable to complete payment for waste pickup service',
-    priority: 'High',
-    rating: 2,
-    role: 'user',
-    createdAt: '2024-01-15',
-    avatar:
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
-  },
-  {
-    id: 2,
-    owner_legal_name: 'Ravi Kumar',
-    mobile_number: '+91 9876543211',
-    ticketStatus: 'In Progress',
-    ticketTitle: 'App Crashes During Pickup',
-    ticketDescription:
-      'Application crashes when trying to mark pickup as complete',
-    priority: 'Medium',
-    rating: 4,
-    role: 'driver',
-    createdAt: '2024-01-14',
-    avatar:
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
-  },
-  {
-    id: 3,
-    owner_legal_name: 'Gendu Singh',
-    mobile_number: '+91 9896543212',
-    ticketStatus: 'Resolved',
-    ticketTitle: 'Location Not Found',
-    ticketDescription: 'GPS location showing incorrect address for pickup',
-    priority: 'Low',
-    rating: 5,
-    role: 'user',
-    createdAt: '2024-01-13',
-    avatar: null,
-  },
-  {
-    id: 4,
-    owner_legal_name: 'Priya Sharma',
-    mobile_number: '+91 9876543213',
-    ticketStatus: 'Closed',
-    ticketTitle: 'Account Verification Issue',
-    ticketDescription: 'Unable to verify driver documents',
-    priority: 'High',
-    rating: 3,
-    role: 'driver',
-    createdAt: '2024-01-12',
-    avatar:
-      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
-  },
-];
 
 const AllSupportIssues = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
   const allTickets = useSelector(selectAllTickets);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('both');
@@ -90,6 +33,10 @@ const AllSupportIssues = () => {
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
   console.log('allTickets at admin', allTickets);
   useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
     dispatch(fetchAllTickets());
   }, [dispatch]);
 
@@ -421,7 +368,9 @@ function TicketCard({ ticket }) {
 
       {searchBar()}
 
-      <FlatList
+        {isLoading ? (
+        <LoaderCard count={5} cardHeight={20} />
+        ) : (<FlatList
         data={filteredTickets.reverse()}
         renderItem={({ item }) => <TicketCard ticket={item} />}
         keyExtractor={item => item?.id?.toString()}
@@ -434,7 +383,7 @@ function TicketCard({ ticket }) {
              <Text style={styles.emptyText}>No Support Tickets Found</Text>
           </View>
         }
-      />
+      />)}
 
       {bottomSheet()}
      
