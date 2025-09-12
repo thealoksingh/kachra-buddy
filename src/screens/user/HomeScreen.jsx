@@ -36,6 +36,7 @@ import Key from '../../constants/key';
 import { PendingOrderAlert } from '../../components/userComponents/PendingOrderAlert';
 import { getUserLocation } from '../../utils/CommonMethods';
 import { fetchAllAdvertisements } from '../../store/thunks/adminThunk';
+import NotificationTest from '../../components/NotificationTest';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -293,6 +294,7 @@ export default function HomeScreen() {
             color={Colors.grayColor}
           />
         </TouchableOpacity>
+        <NotificationTest />
         <FaddedIcon />
       </ScrollView>
       <PendingOrderAlert

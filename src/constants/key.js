@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_BASE_URL = 'https://297f2c51923a.ngrok-free.app';
+const API_BASE_URL = 'https://03dbf0c19f84.ngrok-free.app';
 export const Key = {
     API_BASE_URL,
     accessToken: AsyncStorage.getItem("access_token"),

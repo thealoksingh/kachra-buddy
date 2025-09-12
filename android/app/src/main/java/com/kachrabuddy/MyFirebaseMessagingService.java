@@ -14,7 +14,7 @@ import android.content.Context;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
-    private static final String CHANNEL_ID = "kachra_buddy_channel";
+    private static final String CHANNEL_ID = "default";
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
@@ -34,9 +34,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID, "Kachra Buddy Notifications",
+                CHANNEL_ID, "KachraBuddy Notifications",
                 NotificationManager.IMPORTANCE_HIGH
             );
+            channel.setDescription("Notifications from KachraBuddy app");
+            channel.enableVibration(true);
+            channel.setShowBadge(true);
             notificationManager.createNotificationChannel(channel);
         }
 

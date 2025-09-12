@@ -33,6 +33,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectUser, selectDriverItems, selectDriverLoading, selectAdvertisementsByDisplayOrder } from '../../store/selector';
 import { fetchAllItems, fetchDriverOrders } from '../../store/thunks/driverThunk';
 import { fetchAllAdvertisements } from '../../store/thunks/adminThunk';
+import NotificationTest from '../../components/NotificationTest';
+import Key from '../../constants/key';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -72,6 +74,7 @@ export const icons = [
 ];
 
 export default function DriverHome() {
+  const { API_BASE_URL } = Key;
   const user = useSelector(selectUser);
   const driverItems = useSelector(selectDriverItems);
   const advertisement = useSelector(selectAdvertisementsByDisplayOrder);
@@ -211,6 +214,7 @@ export default function DriverHome() {
           <AdSlider data={smallSizeAdv} type={"small"}/>
         </View>
 
+        <NotificationTest />
         <FaddedIcon />
       </ScrollView>
     </LinearGradient>

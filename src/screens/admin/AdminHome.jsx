@@ -37,6 +37,7 @@ import { selectUser, selectAdvertisementsByDisplayOrder } from '../../store/sele
 import { getUserById } from '../../store/thunks/userThunk';
 import { fetchAllAdvertisements } from '../../store/thunks/adminThunk';
 import Key from '../../constants/key';
+import NotificationTest from '../../components/NotificationTest';
 
 export const icons = [
   { id: '1', path: require('../../../assets/icons/shoes.png'), label: 'Shoe' },
@@ -266,6 +267,7 @@ export default function AdminHome() {
           <AdSlider data={smallSizeAdv} type={"small"} />
         </View>
 
+        <NotificationTest />
         <FaddedIcon />
       </ScrollView>
     </LinearGradient>
