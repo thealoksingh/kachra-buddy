@@ -101,7 +101,7 @@ const Cart = () => {
               style={styles.shopButton}
               onPress={() => navigation.replace('userBottomNavBar')}
             >
-              <Text style={styles.shopButtonText}>Start Shopping</Text>
+              <Text style={styles.shopButtonText}>Add Items</Text>
             </TouchableOpacity>
           </View>
         )}

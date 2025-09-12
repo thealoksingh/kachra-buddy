@@ -13,6 +13,7 @@ import { selectUser } from '../../store/selector';
 import { outForPickup, outForDelivery } from '../../store/thunks/driverThunk';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
 import Key from '../../constants/key';
+import { getStatusColor } from '../../utils/CommonMethods';
 
 const PickupRequestCard = ({ booking }) => {
   const navigation = useNavigation();
@@ -32,7 +33,6 @@ const PickupRequestCard = ({ booking }) => {
       dispatch(showSnackbar({ message: 'Failed to mark order as out for pickup', type: 'error', time: 3000 }));
     }
   };
-  
 
   
   // Extract data from order entity
@@ -115,7 +115,7 @@ const PickupRequestCard = ({ booking }) => {
     <TouchableOpacity
       onPress={() => navigation.navigate('pickupRequestDetail',{ orderId: booking?.id})}
       activeOpacity={0.7}
-      style={[styles.card, commonStyles.shadow]}
+      style={[styles.card,{ borderLeftColor: getStatusColor(booking?.status) }]}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <Text style={textStyles.subHeading}>Booking</Text>
@@ -178,8 +178,8 @@ const PickupRequestCard = ({ booking }) => {
       <View
         style={[commonStyles.rowSpaceBetween, { marginTop: Sizes.fixPadding }]}
       >
-        <Text style={textStyles.smallBold}>Final Price</Text>
-        <Text style={[textStyles.smallBold, { color: Colors.greenColor }]}>
+        <Text style={textStyles.smallBold}>Expected Price</Text>
+        <Text style={[textStyles.bold, { color: Colors.greenColor }]}>
           ₹{booking?.finalPrice || 0}
         </Text>
       </View>
@@ -213,6 +213,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     margin: Sizes.fixPadding,
     padding: Sizes.fixPadding * 1.5,
+    elevation: 3,
+    shadowColor: Colors.blackColor,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.extraLightGrayColor,
+    borderLeftWidth: 6,
   },
   divider: {
     height: 1,

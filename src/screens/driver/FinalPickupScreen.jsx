@@ -210,17 +210,20 @@ const FinalPickupScreen = () => {
 
     // Prepare additional items in correct format
     let formattedAdditionalItems = [];
+    console.log('Additionalitems before formattedAdditionalItems :',JSON.stringify( additionalItems,null,2));
     try {
       formattedAdditionalItems = additionalItems.map(item => ({
-        itemId: item.item.id,
+        itemId: item.id,
         quantity: item.quantity,
         price: item.price,
-        unit: item.item.unit
+        unit: item.unit
       }));
-      console.log('Formatted Additional Items SUCCESS:', formattedAdditionalItems);
+      console.log('formattedAdditionalItems ==>:',JSON.stringify( formattedAdditionalItems,null,2));
     } catch (error) {
       console.log('ERROR formatting additional items:', error);
       console.log('Additional items causing error:', additionalItems);
+      // Fallback: use empty array if formatting fails
+      formattedAdditionalItems = [];
     }
 
     // Prepare order DTO matching API structure (without images, otp, postedBy)

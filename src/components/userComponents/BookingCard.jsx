@@ -11,6 +11,7 @@ import {
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../store/selector';
 import Key from '../../constants/key';
+import { getStatusColor } from '../../utils/CommonMethods';
 
 const BookingCard = ({ booking }) => {
   const navigation = useNavigation();
@@ -74,7 +75,7 @@ const BookingCard = ({ booking }) => {
     <TouchableOpacity
       onPress={() => navigation.navigate('bookingDetailScreen',{ orderId: booking?.id })}
       activeOpacity={0.7}
-      style={[styles.card, commonStyles.shadow]}
+      style={[styles.card,{ borderLeftColor: getStatusColor(booking?.status) }]}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <Text style={textStyles.subHeading}>Booking</Text>
@@ -144,6 +145,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     margin: Sizes.fixPadding,
     padding: Sizes.fixPadding * 1.5,
+    elevation: 3,
+    shadowColor: Colors.blackColor,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.extraLightGrayColor,
+    borderLeftWidth: 6,
   },
   divider: {
     height: 1,

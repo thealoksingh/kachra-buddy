@@ -180,3 +180,16 @@ export  const openGoogleMaps = (latitude, longitude, label = 'Seller Location') 
   });
   Linking.openURL(url);
 };
+
+ export const getStatusColor = status => {
+    switch (status?.toUpperCase()) {
+      case 'INCOMPLETE': return '#ff9800';
+      case 'COMPLETED': return '#4caf50';
+      case 'ACTIVE': return '#2196f3';
+      case 'CANCELLED_BY_ADMIN': return '#f44336';
+      case 'CANCELLED_BY_DRIVER': return '#f44336';
+      case 'CANCELLED_BY_USER': return '#f44336';
+      case 'OUT_FOR_PICKUP': return '#3ac8c8ff';
+      default: return '#757575';
+    }
+};

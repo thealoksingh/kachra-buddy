@@ -19,6 +19,8 @@ const lottieAlertSlice = createSlice({
     },
     hideLottieAlert: (state) => {
       state.visible = false;
+      state.type = 'success';
+      state.message = '';
     },
   },
 });
