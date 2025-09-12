@@ -17,6 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import { fetchAllAdvertisements } from '../../store/thunks/adminThunk';
 import { selectAdvertisements, selectUser } from '../../store/selector';
 import Key from '../../constants/key';
+import { LoaderCard } from '../../components/LoaderCard';
 
 const AllAdvertisementsScreen = () => {
   const navigation = useNavigation();
@@ -24,15 +25,23 @@ const AllAdvertisementsScreen = () => {
   const { API_BASE_URL } = Key;
   const [refreshing, setRefreshing] = useState(false);
   const user = useSelector(selectUser);
-  
+   const [isLoading, setIsLoading] = useState(false);
   const advertisements = useSelector(selectAdvertisements);
-  console.log('Advertisements:', advertisements);
+  // console.log('Advertisements:', advertisements);
   
   useEffect(() => {
+     setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
     dispatch(fetchAllAdvertisements());
   }, [dispatch]);
 
   const onRefresh = async () => {
+     setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
     setRefreshing(true);
     await dispatch(fetchAllAdvertisements());
     setRefreshing(false);
@@ -94,7 +103,9 @@ const AllAdvertisementsScreen = () => {
       <MyStatusBar />
       <CommonAppBar navigation={navigation} label="All Advertisements" />
 
-      <FlatList
+        {isLoading ? (
+        <LoaderCard count={5} cardHeight={20} />
+        ) : (<FlatList
         data={advertisements}
         renderItem={renderAdvertisement}
         keyExtractor={item => item?.id?.toString()}
@@ -109,7 +120,7 @@ const AllAdvertisementsScreen = () => {
             <Text style={styles.emptyText}>No advertisements found</Text>
           </View>
         }
-      />
+      />)}
 
       <TouchableOpacity
         activeOpacity={0.8}

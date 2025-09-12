@@ -27,6 +27,10 @@ const AllBookingsScreen = () => {
   }, [dispatch]);
 
   const onRefresh = async () => {
+      setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
     setRefreshing(true);
     await dispatch(fetchAllOrders());
     setRefreshing(false);

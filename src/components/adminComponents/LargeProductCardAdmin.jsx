@@ -32,9 +32,9 @@ const LargeProductCardAdmin = ({ product, isInCart = false, onToggleCart }) => {
         {product?.name || 'Product Title'}
       </Text>
 
-       <Text style={styles.description} numberOfLines={2}>
+       {/* <Text style={styles.description} numberOfLines={2}>
         Material : {product?.tags || 'N/A'}
-      </Text>
+      </Text> */}
 
        <Text style={styles.price}>
         {product?.isCountable

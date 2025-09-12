@@ -49,12 +49,12 @@ const AllProductsScreen = () => {
 
   const filteredProducts = items.filter(item => {
     const textMatch =
-      item.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-      item.tags?.toLowerCase().includes(searchText.toLowerCase());
+      item?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+      item?.tags?.toLowerCase().includes(searchText.toLowerCase());
 
     const filterMatch =
       selectedFilter === 'All' ||
-      item.tags?.toLowerCase().includes(selectedFilter.toLowerCase());
+      item?.name?.toLowerCase().includes(selectedFilter.toLowerCase());
 
     return textMatch && filterMatch;
   });
@@ -71,7 +71,7 @@ const AllProductsScreen = () => {
         />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search items to Sell..."
+          placeholder="Search items ..."
           placeholderTextColor="#999"
           value={searchText}
           onChangeText={setSearchText}

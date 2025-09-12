@@ -94,7 +94,7 @@ const CreateUserScreen = () => {
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
       <CommonAppBar navigation={navigation} label="Create New User/Driver" />
 
-      <View style={{ flex: 1, marginHorizontal: 16, marginTop: 20 }}>
+      <View style={{ flex: 1, marginHorizontal: 16, marginTop: 10 }}>
         {/* Avatar upload commented out as not required
         <View style={styles.avatarContainer}>
           {avatar ? (
@@ -293,9 +293,8 @@ export default CreateUserScreen;
 
 const styles = StyleSheet.create({
   formCard: {
-    marginTop: 60,
-    padding: 16,
-    paddingTop: 60,
+    marginTop: 20,
+    padding: 30,
     backgroundColor: Colors.whiteColor,
     borderRadius: 16,
     shadowColor: '#000',
