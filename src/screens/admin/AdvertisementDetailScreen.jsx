@@ -13,13 +13,18 @@ import { useDispatch } from 'react-redux';
 import { Colors, commonStyles } from '../../styles/commonStyles';
 import MyStatusBar from '../../components/MyStatusBar';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { CommonAppBar, InputBox, ButtonWithLoader } from '../../components/commonComponents';
+import {
+  CommonAppBar,
+  InputBox,
+  ButtonWithLoader,
+} from '../../components/commonComponents';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { updateAdvertisement } from '../../store/thunks/adminThunk';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
 import { useImagePicker } from '../../components/useImagePicker';
 import ImagePickerSheet from '../../components/ImagePickerSheet';
 import Key from '../../constants/key';
+import { DottedBlackLoader } from '../../components/lottie/loaderView';
 
 const AdvertisementDetailScreen = () => {
   const navigation = useNavigation();
@@ -27,26 +32,32 @@ const AdvertisementDetailScreen = () => {
   const dispatch = useDispatch();
   const { API_BASE_URL } = Key;
   const advertisement = route.params?.advertisement || {};
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState(advertisement.title || '');
-  const [description, setDescription] = useState(advertisement.description || '');
-  const [redirectUrl, setRedirectUrl] = useState(advertisement.redirectUrl || '');
+  const [description, setDescription] = useState(
+    advertisement.description || '',
+  );
+  const [redirectUrl, setRedirectUrl] = useState(
+    advertisement.redirectUrl || '',
+  );
   const [adSize, setAdSize] = useState(advertisement.adSize || 'SMALL');
-  const [displayOrder, setDisplayOrder] = useState(advertisement.displayOrder?.toString() || '');
+  const [displayOrder, setDisplayOrder] = useState(
+    advertisement.displayOrder?.toString() || '',
+  );
   const [status, setStatus] = useState(advertisement.status || 'ACTIVE');
   const [currentImage, setCurrentImage] = useState(null);
   const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
 
   const { openCamera, openGallery } = useImagePicker();
 
-   const pickImage = async source => {
+  const pickImage = async source => {
     try {
       let result = null;
       const aspectRatio = adSize === 'SMALL' ? '3.33:1' : '1.67:1';
       const quality = 1;
-      
+
       if (source === 'camera') result = await openCamera(aspectRatio, quality);
       else result = await openGallery(aspectRatio, quality);
 
@@ -62,11 +73,13 @@ const AdvertisementDetailScreen = () => {
 
   const handleUpdate = async () => {
     if (!title || !description) {
-      dispatch(showSnackbar({
-        message: 'Please fill all required fields',
-        type: 'error',
-        time: 3000
-      }));
+      dispatch(
+        showSnackbar({
+          message: 'Please fill all required fields',
+          type: 'error',
+          time: 3000,
+        }),
+      );
       return;
     }
 
@@ -78,55 +91,70 @@ const AdvertisementDetailScreen = () => {
         redirectUrl,
         status,
         adSize,
-        displayOrder: displayOrder ? parseInt(displayOrder) : advertisement.displayOrder
+        displayOrder: displayOrder
+          ? parseInt(displayOrder)
+          : advertisement.displayOrder,
       };
 
-      const result = await dispatch(updateAdvertisement({ 
-        advertisementId: advertisement.id, 
-        advertisementData, 
-        file: currentImage 
-      }));
-      
+      const result = await dispatch(
+        updateAdvertisement({
+          advertisementId: advertisement.id,
+          advertisementData,
+          file: currentImage,
+        }),
+      );
+
       if (updateAdvertisement.fulfilled.match(result)) {
-        dispatch(showSnackbar({
-          message: 'Advertisement updated successfully',
-          type: 'success',
-          time: 3000
-        }));
+        dispatch(
+          showSnackbar({
+            message: 'Advertisement updated successfully',
+            type: 'success',
+            time: 3000,
+          }),
+        );
         setIsEditing(false);
         setCurrentImage(null);
       } else {
-        dispatch(showSnackbar({
-          message: 'Failed to update advertisement',
-          type: 'error',
-          time: 3000
-        }));
+        dispatch(
+          showSnackbar({
+            message: 'Failed to update advertisement',
+            type: 'error',
+            time: 3000,
+          }),
+        );
       }
     } catch (error) {
-      dispatch(showSnackbar({
-        message: 'Failed to update advertisement',
-        type: 'error',
-        time: 3000
-      }));
+      dispatch(
+        showSnackbar({
+          message: 'Failed to update advertisement',
+          type: 'error',
+          time: 3000,
+        }),
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const imageUri = currentImage || (advertisement.imageUrl ? API_BASE_URL + advertisement.imageUrl : null);
+  const imageUri =
+    currentImage ||
+    (advertisement.imageUrl ? API_BASE_URL + advertisement.imageUrl : null);
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <MyStatusBar />
-      <CommonAppBar 
-        navigation={navigation} 
-        label={isEditing ? "Edit Advertisement" : "Advertisement Details"}
+      <CommonAppBar
+        navigation={navigation}
+        label={isEditing ? 'Edit Advertisement' : 'Advertisement Details'}
       />
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.imageContainer}>
           {imageUri ? (
             <Image source={{ uri: imageUri }} style={styles.adImage} />
@@ -154,7 +182,7 @@ const AdvertisementDetailScreen = () => {
                 placeholder="Enter Ad Title"
                 label="Title"
               />
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Description</Text>
                 <InputBox
@@ -176,18 +204,34 @@ const AdvertisementDetailScreen = () => {
                 <Text style={styles.label}>Ad Size</Text>
                 <View style={styles.sizeButtons}>
                   <TouchableOpacity
-                    style={[styles.sizeButton, adSize === 'SMALL' && styles.selectedSize]}
+                    style={[
+                      styles.sizeButton,
+                      adSize === 'SMALL' && styles.selectedSize,
+                    ]}
                     onPress={() => setAdSize('SMALL')}
                   >
-                    <Text style={[styles.sizeText, adSize === 'SMALL' && styles.selectedSizeText]}>
+                    <Text
+                      style={[
+                        styles.sizeText,
+                        adSize === 'SMALL' && styles.selectedSizeText,
+                      ]}
+                    >
                       Small
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.sizeButton, adSize === 'LARGE' && styles.selectedSize]}
+                    style={[
+                      styles.sizeButton,
+                      adSize === 'LARGE' && styles.selectedSize,
+                    ]}
                     onPress={() => setAdSize('LARGE')}
                   >
-                    <Text style={[styles.sizeText, adSize === 'LARGE' && styles.selectedSizeText]}>
+                    <Text
+                      style={[
+                        styles.sizeText,
+                        adSize === 'LARGE' && styles.selectedSizeText,
+                      ]}
+                    >
                       Large
                     </Text>
                   </TouchableOpacity>
@@ -198,18 +242,34 @@ const AdvertisementDetailScreen = () => {
                 <Text style={styles.label}>Status</Text>
                 <View style={styles.statusButtons}>
                   <TouchableOpacity
-                    style={[styles.statusButton, status === 'ACTIVE' && styles.selectedStatus]}
+                    style={[
+                      styles.statusButton,
+                      status === 'ACTIVE' && styles.selectedStatus,
+                    ]}
                     onPress={() => setStatus('ACTIVE')}
                   >
-                    <Text style={[styles.statusText, status === 'ACTIVE' && styles.selectedStatusText]}>
+                    <Text
+                      style={[
+                        styles.statusText,
+                        status === 'ACTIVE' && styles.selectedStatusText,
+                      ]}
+                    >
                       Active
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.statusButton, status === 'INACTIVE' && styles.selectedStatus]}
+                    style={[
+                      styles.statusButton,
+                      status === 'INACTIVE' && styles.selectedStatus,
+                    ]}
                     onPress={() => setStatus('INACTIVE')}
                   >
-                    <Text style={[styles.statusText, status === 'INACTIVE' && styles.selectedStatusText]}>
+                    <Text
+                      style={[
+                        styles.statusText,
+                        status === 'INACTIVE' && styles.selectedStatusText,
+                      ]}
+                    >
                       Inactive
                     </Text>
                   </TouchableOpacity>
@@ -227,16 +287,34 @@ const AdvertisementDetailScreen = () => {
           ) : (
             <>
               <Text style={styles.title}>{advertisement.title}</Text>
-              <Text style={styles.description}>{advertisement.description}</Text>
-              
+              <Text style={styles.description}>
+                {advertisement.description}
+              </Text>
+
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Status:</Text>
-                <View style={[styles.statusBadge, { 
-                  backgroundColor: advertisement.status === 'ACTIVE' ? Colors.lightPrimary : Colors.extraLightGrayColor 
-                }]}>
-                  <Text style={[styles.badgeText, { 
-                    color: advertisement.status === 'ACTIVE' ? Colors.primary : Colors.grayColor 
-                  }]}>
+                <View
+                  style={[
+                    styles.statusBadge,
+                    {
+                      backgroundColor:
+                        advertisement.status === 'ACTIVE'
+                          ? Colors.lightPrimary
+                          : Colors.extraLightGrayColor,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.badgeText,
+                      {
+                        color:
+                          advertisement.status === 'ACTIVE'
+                            ? Colors.primary
+                            : Colors.grayColor,
+                      },
+                    ]}
+                  >
                     {advertisement.status}
                   </Text>
                 </View>
@@ -249,25 +327,33 @@ const AdvertisementDetailScreen = () => {
 
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Display Order:</Text>
-                <Text style={styles.detailValue}>{advertisement.displayOrder || 'N/A'}</Text>
+                <Text style={styles.detailValue}>
+                  {advertisement.displayOrder || 'N/A'}
+                </Text>
               </View>
 
               {advertisement.redirectUrl && (
                 <View style={styles.detailRow}>
                   <Text style={styles.detailLabel}>Redirect URL:</Text>
-                  <Text style={styles.detailValue} numberOfLines={1}>{advertisement.redirectUrl}</Text>
+                  <Text style={styles.detailValue} numberOfLines={1}>
+                    {advertisement.redirectUrl}
+                  </Text>
                 </View>
               )}
 
               <View style={styles.statsContainer}>
                 <View style={styles.statCard}>
                   <Icon name="visibility" size={24} color={Colors.primary} />
-                  <Text style={styles.statNumber}>{advertisement.viewCount || 0}</Text>
+                  <Text style={styles.statNumber}>
+                    {advertisement.viewCount || 0}
+                  </Text>
                   <Text style={styles.statLabel}>Views</Text>
                 </View>
                 <View style={styles.statCard}>
                   <Icon name="touch-app" size={24} color={Colors.primary} />
-                  <Text style={styles.statNumber}>{advertisement.clickCount || 0}</Text>
+                  <Text style={styles.statNumber}>
+                    {advertisement.clickCount || 0}
+                  </Text>
                   <Text style={styles.statLabel}>Clicks</Text>
                 </View>
               </View>
@@ -294,13 +380,20 @@ const AdvertisementDetailScreen = () => {
             >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
-            <ButtonWithLoader
-              name="Update"
-              loadingName="Updating..."
-              isLoading={loading}
-              method={handleUpdate}
-              style={styles.updateButton}
-            />
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: Colors.primary }]}
+              onPress={handleUpdate}
+            >
+              <Text
+                style={{
+                  color: Colors.whiteColor,
+                  fontSize: 16,
+                  fontWeight: '600',
+                }}
+              >
+                Update
+              </Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <TouchableOpacity
@@ -319,6 +412,9 @@ const AdvertisementDetailScreen = () => {
         onCamera={() => pickImage('camera')}
         onGallery={() => pickImage('gallery')}
       />
+      {loading?(
+        <DottedBlackLoader/>
+      ):null}
     </KeyboardAvoidingView>
   );
 };
@@ -524,8 +620,5 @@ const styles = StyleSheet.create({
     color: Colors.grayColor,
     fontSize: 16,
     fontWeight: '600',
-  },
-  updateButton: {
-    flex: 1,
   },
 });
