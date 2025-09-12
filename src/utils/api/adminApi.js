@@ -200,10 +200,12 @@ export const fetchAllTicketsAPI = async () => {
   });
 };
 
-export const updateTicketAPI = async (ticketId) => {
+export const updateTicketAPI = async (ticketId, ticketData) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiPutRequest({
     apiUrl: `${API_BASE_URL}/api/support-tickets/${ticketId}`,
+    content_type: "application/json",
+    data: ticketData,
     accessToken,
   });
 };
