@@ -1,26 +1,25 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
-  View,
   TextInput,
-  ScrollView,
   TouchableOpacity,
-  FlatList,
-  ActivityIndicator,
-  RefreshControl,
+  View,
 } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
-import LargeProductCardAdmin from '../../components/adminComponents/LargeProductCardAdmin';
-import { Colors, textStyles } from '../../styles/commonStyles';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { ButtonWithLoader } from '../../components/commonComponents';
+import { useDispatch, useSelector } from 'react-redux';
+import LargeProductCardAdmin from '../../components/adminComponents/LargeProductCardAdmin';
 import MyStatusBar from '../../components/MyStatusBar';
+import { selectAdminItems } from '../../store/selector';
 import { fetchAllItems } from '../../store/thunks/adminThunk';
-import { selectAdminItems, selectItems } from '../../store/selector';
+import { Colors } from '../../styles/commonStyles';
 
-const filters = ['All', 'plastic', 'rubber', 'glass', 'aluminium', 'metal'];
+const filters = ['All', 'Plastic', 'Rubber', 'Glass',  'Metal', 'Paper', 'E-waste'];
 
 const AllProductsScreen = () => {
   const [searchText, setSearchText] = useState('');
@@ -54,7 +53,7 @@ const AllProductsScreen = () => {
 
     const filterMatch =
       selectedFilter === 'All' ||
-      item?.name?.toLowerCase().includes(selectedFilter.toLowerCase());
+      item?.tags?.toLowerCase().includes(selectedFilter.toLowerCase());
 
     return textMatch && filterMatch;
   });

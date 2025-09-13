@@ -1,24 +1,23 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
+  FlatList,
+  ScrollView,
   StyleSheet,
   Text,
-  View,
   TextInput,
-  ScrollView,
   TouchableOpacity,
-  FlatList,
+  View,
 } from 'react-native';
-import LargeProductCard from '../../components/userComponents/LargeProductCard';
-import { Colors, textStyles } from '../../styles/commonStyles';
-import { products } from '../../utils/dummyData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useSelector } from 'react-redux';
 import { ButtonWithLoader } from '../../components/commonComponents';
 import MyStatusBar from '../../components/MyStatusBar';
-import { useSelector } from 'react-redux';
-import { selectCart, selectItems, selectUser } from '../../store/selector';
+import LargeProductCard from '../../components/userComponents/LargeProductCard';
+import { selectCart, selectItems } from '../../store/selector';
+import { Colors, textStyles } from '../../styles/commonStyles';
 
-const filters = ['All', 'plastic', 'rubber', 'glass', 'aluminium', 'metal'];
+const filters = ['All', 'Plastic', 'Rubber', 'Glass',  'Metal', 'Paper', 'E-waste'];
 
 const SearchScreen = () => {
   const items = useSelector(selectItems);
@@ -35,7 +34,7 @@ const SearchScreen = () => {
 
     const filterMatch =
       selectedFilter === 'All' ||
-      item?.name?.toLowerCase().includes(selectedFilter.toLowerCase());
+      item?.tags?.toLowerCase().includes(selectedFilter.toLowerCase());
 
     return textMatch && filterMatch;
   });
