@@ -10,6 +10,7 @@ import AllBookingsScreen from '../../screens/admin/AllBookingsScreen';
 import AllUsersScreen from '../../screens/admin/AllUsersScreen';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import ProfileScreen from '../../screens/user/ProfileScreen';
 
 
 const Tab = createBottomTabNavigator();
@@ -121,7 +122,7 @@ const AdminBottomNavBar = ({ navigation }) => {
 
         <Tab.Screen
           name="Profile"
-          component={AdminProfile}
+          component={ProfileScreen}
           options={{
             tabBarIcon: ({ focused }) =>
               focused ? (

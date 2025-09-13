@@ -3,9 +3,7 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Image,
   TextInput,
-  FlatList,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -13,12 +11,13 @@ import {
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
-import { Colors, screenWidth } from '../../styles/commonStyles';
+import { Colors } from '../../styles/commonStyles';
 import {
   ButtonWithLoader,
   CommonAppBar,
   InputBox,
 } from '../../components/commonComponents';
+import MyStatusBar from '../../components/MyStatusBar';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { sendNotification } from '../../store/thunks/notificationThunk';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
@@ -34,69 +33,81 @@ const SendNotificationScreen = () => {
   const [sendWhatsApp, setSendWhatsApp] = useState(true);
   const [sendSMS, setSendSMS] = useState(true);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const [notificationMode, setNotificationMode] = useState('PERSONALIZED');
 
   const maxChars = 100;
   const remainingChars = maxChars - message.length;
 
-  const handleSendNotification = async () => {
-    if (!title || !message) {
-      dispatch(showSnackbar({
-        message: 'Please fill all required fields',
-        type: 'error',
-        time: 3000
-      }));
+  const handlePersonalizedNotification = async () => {
+    if (!title || !message || !selectedUser) {
+      dispatch(
+        showSnackbar({
+          message: 'Please fill all required fields and select a user',
+          type: 'error',
+          time: 3000,
+        }),
+      );
       return;
     }
 
     setLoading(true);
     try {
       const notificationData = {
-        userId: selectedUser?.id || 0,
+        userId: selectedUser.id,
         title,
         message,
         type: notificationType,
         sendWhatsApp,
-        sendSMS
+        sendSMS,
       };
 
       const result = await dispatch(sendNotification(notificationData));
-      
+
       if (sendNotification.fulfilled.match(result)) {
-        dispatch(showSnackbar({
-          message: 'Notification sent successfully',
-          type: 'success',
-          time: 3000
-        }));
+        dispatch(
+          showSnackbar({
+            message: 'Personalized notification sent successfully',
+            type: 'success',
+            time: 3000,
+          }),
+        );
         setTitle('');
         setMessage('');
         setSelectedUser(null);
       } else {
-        dispatch(showSnackbar({
-          message: 'Failed to send notification',
-          type: 'error',
-          time: 3000
-        }));
+        dispatch(
+          showSnackbar({
+            message: 'Failed to send notification',
+            type: 'error',
+            time: 3000,
+          }),
+        );
       }
     } catch (error) {
-      dispatch(showSnackbar({
-        message: 'Failed to send notification',
-        type: 'error',
-        time: 3000
-      }));
+      dispatch(
+        showSnackbar({
+          message: 'Failed to send notification',
+          type: 'error',
+          time: 3000,
+        }),
+      );
     } finally {
       setLoading(false);
     }
   };
 
-
+  const handleGlobalNotification = async () => {
+  console.log("Global notification function called");
+  };
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: Colors.whiteColor }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      <MyStatusBar />
       <CommonAppBar navigation={navigation} label="Send Notification" />
-
+      
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
@@ -107,6 +118,44 @@ const SendNotificationScreen = () => {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.formCard}>
+          <View style={styles.selectorContainer}>
+            <Text style={styles.sectionLabel}>Notification Mode</Text>
+            <View style={styles.selectorButtons}>
+              <TouchableOpacity
+                style={[
+                  styles.selectorButton,
+                  notificationMode === 'PERSONALIZED' && styles.selectedButton,
+                ]}
+                onPress={() => setNotificationMode('PERSONALIZED')}
+              >
+                <Text
+                  style={[
+                    styles.selectorButtonText,
+                    notificationMode === 'PERSONALIZED' && styles.selectedButtonText,
+                  ]}
+                >
+                  Personalized
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.selectorButton,
+                  notificationMode === 'GLOBAL' && styles.selectedButton,
+                ]}
+                onPress={() => setNotificationMode('GLOBAL')}
+              >
+                <Text
+                  style={[
+                    styles.selectorButtonText,
+                    notificationMode === 'GLOBAL' && styles.selectedButtonText,
+                  ]}
+                >
+                  Global
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
           <InputBox
             value={title}
             setter={setTitle}
@@ -114,65 +163,78 @@ const SendNotificationScreen = () => {
             label="Title"
           />
 
-          <View style={styles.dropdownContainer}>
-            <Text style={styles.sectionLabel}>
-              Notification Type
-              <Text style={{ color: Colors.secondary }}>*</Text>
-            </Text>
-            <TouchableOpacity
-              style={styles.dropdown}
-              onPress={() => setShowTypeDropdown(!showTypeDropdown)}
-            >
-              <Text style={styles.dropdownText}>{notificationType}</Text>
-              <Icon name="keyboard-arrow-down" size={24} color={Colors.grayColor} />
-            </TouchableOpacity>
-            {showTypeDropdown && (
-              <View style={styles.dropdownList}>
-                {['ORDER', 'PROMOTION', 'GENERAL', 'SYSTEM'].map(type => (
-                  <TouchableOpacity
-                    key={type}
-                    style={styles.dropdownItem}
-                    onPress={() => {
-                      setNotificationType(type);
-                      setShowTypeDropdown(false);
-                    }}
-                  >
-                    <Text style={styles.dropdownItemText}>{type}</Text>
-                  </TouchableOpacity>
-                ))}
+          {notificationMode === 'PERSONALIZED' && (
+            <>
+              <View style={styles.dropdownContainer}>
+                <Text style={styles.sectionLabel}>
+                  Notification Type
+                  <Text style={{ color: Colors.secondary }}>*</Text>
+                </Text>
+                <TouchableOpacity
+                  style={styles.dropdown}
+                  onPress={() => setShowTypeDropdown(!showTypeDropdown)}
+                >
+                  <Text style={styles.dropdownText}>{notificationType}</Text>
+                  <Icon
+                    name="keyboard-arrow-down"
+                    size={24}
+                    color={Colors.grayColor}
+                  />
+                </TouchableOpacity>
+                {showTypeDropdown && (
+                  <View style={styles.dropdownList}>
+                    {['ORDER', 'PROMOTION', 'GENERAL', 'SYSTEM'].map(type => (
+                      <TouchableOpacity
+                        key={type}
+                        style={styles.dropdownItem}
+                        onPress={() => {
+                          setNotificationType(type);
+                          setShowTypeDropdown(false);
+                        }}
+                      >
+                        <Text style={styles.dropdownItemText}>{type}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
               </View>
-            )}
-          </View>
 
-
-          <TouchableOpacity
-            style={styles.selectUserButton}
-            onPress={() =>
-              navigation.navigate('allUsersScreen', {
-                fromSelectUser: 'both',
-                onUserSelect: user => setSelectedUser(user),
-              })
-            }
-          >
-            {selectedUser ? (
-              <View style={styles.selectedUserDisplay}>
-                <View style={styles.selectedAvatarPlaceholder}>
-                  <Icon name="person" size={20} color={Colors.grayColor} />
-                </View>
-                <View style={styles.selectedUserInfo}>
-                  <Text style={styles.selectedUserName}>
-                    {selectedUser.fullName}
+              <TouchableOpacity
+                style={styles.selectUserButton}
+                onPress={() =>
+                  navigation.navigate('allUsersScreen', {
+                    fromSelectUser: 'both',
+                    onUserSelect: user => setSelectedUser(user),
+                  })
+                }
+              >
+                {selectedUser ? (
+                  <View style={styles.selectedUserDisplay}>
+                    <View style={styles.selectedAvatarPlaceholder}>
+                      <Icon name="person" size={20} color={Colors.grayColor} />
+                    </View>
+                    <View style={styles.selectedUserInfo}>
+                      <Text style={styles.selectedUserName}>
+                        {selectedUser.fullName}
+                      </Text>
+                      <Text style={styles.selectedUserMobile}>
+                        {selectedUser.contactNumber}
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <Text style={styles.selectUserText}>
+                    Select Target User *
                   </Text>
-                  <Text style={styles.selectedUserMobile}>
-                    {selectedUser.contactNumber}
-                  </Text>
-                </View>
-              </View>
-            ) : (
-              <Text style={styles.selectUserText}>Select Target User (Optional)</Text>
-            )}
-            <Icon name="keyboard-arrow-down" size={24} color={Colors.grayColor} />
-          </TouchableOpacity>
+                )}
+                <Icon
+                  name="keyboard-arrow-down"
+                  size={24}
+                  color={Colors.grayColor}
+                />
+              </TouchableOpacity>
+            </>
+          )}
 
           <View style={styles.messageContainer}>
             <Text style={styles.sectionLabel}>
@@ -181,7 +243,7 @@ const SendNotificationScreen = () => {
             </Text>
             <TextInput
               style={styles.messageInput}
-              placeholder="Enter your notification message..."
+              placeholder={`Enter your ${notificationMode.toLowerCase()} notification message...`}
               placeholderTextColor={Colors.grayColor}
               value={message}
               onChangeText={setMessage}
@@ -192,7 +254,8 @@ const SendNotificationScreen = () => {
               style={[
                 styles.charCount,
                 {
-                  color: remainingChars >= 0 ? Colors.primary : Colors.secondary,
+                  color:
+                    remainingChars >= 0 ? Colors.primary : Colors.secondary,
                 },
               ]}
             >
@@ -231,10 +294,10 @@ const SendNotificationScreen = () => {
 
         <View style={{ marginTop: 20 }}>
           <ButtonWithLoader
-            name="Send Notification"
+            name={`Send ${notificationMode === 'PERSONALIZED' ? 'Personalized' : 'Global'} Notification`}
             loadingName="Sending..."
             isLoading={loading}
-            method={handleSendNotification}
+            method={notificationMode === 'PERSONALIZED' ? handlePersonalizedNotification : handleGlobalNotification}
           />
         </View>
       </ScrollView>
@@ -260,19 +323,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: Colors.primary,
   },
-  typeSelector: {
+  selectorContainer: {
     marginBottom: 16,
   },
-  userTypeSelector: {
-    marginBottom: 16,
-  },
-  typeButtons: {
+  selectorButtons: {
     flexDirection: 'row',
     gap: 12,
   },
-  typeButton: {
+  selectorButton: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     borderWidth: 1,
@@ -280,20 +340,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.whiteColor,
     alignItems: 'center',
   },
-  selectedType: {
+  selectedButton: {
     backgroundColor: Colors.lightPrimary,
     borderColor: Colors.primary,
   },
-  typeText: {
-    fontSize: 12,
+  selectorButtonText: {
+    fontSize: 14,
     color: Colors.grayColor,
   },
-  selectedTypeText: {
+  selectedButtonText: {
     color: Colors.primary,
-    fontWeight: '500',
-  },
-  userSelector: {
-    marginBottom: 16,
+    fontWeight: '600',
   },
   selectUserButton: {
     flexDirection: 'row',
@@ -304,6 +361,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.lightGrayColor,
     borderRadius: 8,
     backgroundColor: Colors.whiteColor,
+    marginBottom: 16,
   },
   selectUserText: {
     color: Colors.grayColor,
@@ -313,12 +371,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-  },
-  selectedUserAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
   },
   selectedAvatarPlaceholder: {
     width: 40,
