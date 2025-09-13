@@ -151,7 +151,7 @@ const ProfileScreen = () => {
 
 
 
-  const handleLogout = async () => {
+const handleLogout = async () => {
     try {
       await dispatch(performLogout());
       setShowLogoutAlert(false);
@@ -332,7 +332,7 @@ const ProfileScreen = () => {
       <View style={[styles.content,{}]}>
         {user.role != 'ADMIN' && (
           <View style={styles.navigationCards}>
-            <TouchableOpacity style={styles.navCard}>
+            <TouchableOpacity onPress={()=>navigation.navigate("raisedTickets")} style={styles.navCard}>
               <MaterialIcons
                 name="support-agent"
                 size={32}
@@ -341,7 +341,7 @@ const ProfileScreen = () => {
               <Text style={styles.navTitle}>Support Tickets</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.navCard}>
+            <TouchableOpacity onPress={()=>navigation.navigate("helpScreen")} style={styles.navCard}>
               <MaterialIcons
                 name="help-outline"
                 size={32}

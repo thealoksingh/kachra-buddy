@@ -12,14 +12,14 @@ import {
   FlatList,
   Keyboard,
   Linking,
+  Image,
 } from 'react-native';
-
+import CustomMapMarker from '../../components/CustomMapMarker';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Key from '../../constants/key';
 import { Colors } from '../../styles/commonStyles';
-
 
 const AUTOCOMPLETE_URL =
   'https://maps.googleapis.com/maps/api/place/autocomplete/json';
@@ -43,31 +43,35 @@ const LocationPickerScreen = ({ navigation, route }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  useEffect(() => {
+    getUserLocation();
+  }, []);
 
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
       try {
         // Check if permission is already granted
         const hasPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         );
-        
+
         if (hasPermission) {
           console.log('[perm] already granted');
           return true;
         }
-        
+
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
             title: 'Location Permission',
-            message: 'App needs access to your location to show nearby services',
+            message:
+              'App needs access to your location to show nearby services',
             buttonPositive: 'Allow',
             buttonNegative: 'Deny',
           },
         );
         console.log('[perm] granted:', granted);
-        
+
         return granted === PermissionsAndroid.RESULTS.GRANTED;
       } catch (err) {
         console.warn('[perm] error:', err);
@@ -86,58 +90,60 @@ const LocationPickerScreen = ({ navigation, route }) => {
     }
 
     Geolocation.getCurrentPosition(
-        (position) => {
-          console.log('[loc] position:', position);
-          const { latitude, longitude } = position.coords;
-          const newRegion = {
-            latitude,
-            longitude,
-            latitudeDelta: 0.03,
-            longitudeDelta: 0.03,
-          };
+      position => {
+        console.log('[loc] position:', position);
+        const { latitude, longitude } = position.coords;
+        const newRegion = {
+          latitude,
+          longitude,
+          latitudeDelta: 0.03,
+          longitudeDelta: 0.03,
+        };
 
-          setRegion(newRegion);
-          setCurrentLocation({ latitude, longitude });
-          setSelectedLocation({ latitude, longitude });
-          setAddress('Current Location');
+        setRegion(newRegion);
+        setCurrentLocation({ latitude, longitude });
+        setSelectedLocation({ latitude, longitude });
 
-          mapRef.current?.animateToRegion(newRegion, 1000);
-        },
-        (error) => {
-          console.log('[loc] error code:', error.code);
-          console.log('[loc] error message:', error.message);
-          console.log('[loc] full error:', error);
-          
-          if (error.code === 1) {
-            Alert.alert(
-              'Permission Required',
-              'Location permission is needed. Please go to Settings > Apps > Your App > Permissions and enable Location.',
-              [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Open Settings', onPress: () => Linking.openSettings() }
-              ]
-            );
-          } else if (error.code === 2) {
-            Alert.alert(
-              'Enable GPS', 
-              'GPS is turned off. Please enable Location/GPS in your device settings.',
-              [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Open Settings', onPress: () => Linking.openSettings() }
-              ]
-            );
-          } else if (error.code === 3) {
-            Alert.alert('Timeout', 'Location request timed out. Please try again.');
-          } else {
-            Alert.alert('Location Error', 'Could not get current location');
-          }
-        },
-        {
-          enableHighAccuracy: false,
-          timeout: 10000,
-          maximumAge: 60000,
+        mapRef.current?.animateToRegion(newRegion, 1000);
+      },
+      error => {
+        console.log('[loc] error code:', error.code);
+        console.log('[loc] error message:', error.message);
+        console.log('[loc] full error:', error);
+
+        if (error.code === 1) {
+          Alert.alert(
+            'Permission Required',
+            'Location permission is needed. Please go to Settings > Apps > Your App > Permissions and enable Location.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Open Settings', onPress: () => Linking.openSettings() },
+            ],
+          );
+        } else if (error.code === 2) {
+          Alert.alert(
+            'Enable GPS',
+            'GPS is turned off. Please enable Location/GPS in your device settings.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Open Settings', onPress: () => Linking.openSettings() },
+            ],
+          );
+        } else if (error.code === 3) {
+          Alert.alert(
+            'Timeout',
+            'Location request timed out. Please try again.',
+          );
+        } else {
+          Alert.alert('Location Error', 'Could not get current location');
         }
-      );
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 60000,
+      },
+    );
   };
 
   const fetchAddressFromCoordinates = async (lat, lng) => {
@@ -189,7 +195,7 @@ const LocationPickerScreen = ({ navigation, route }) => {
         `${AUTOCOMPLETE_URL}?key=${mapkey}` +
         `&input=${encodeURIComponent(text)}` +
         `&language=en` +
-        `&components=country:in`; 
+        `&components=country:in`;
       const res = await fetch(url);
       const data = await res.json();
       console.log(
@@ -341,9 +347,7 @@ const LocationPickerScreen = ({ navigation, route }) => {
         onMapReady={() => console.log('[map] ready')}
       >
         {selectedLocation && <Marker coordinate={selectedLocation} />}
-        {currentLocation && (
-          <Marker coordinate={currentLocation} pinColor={Colors.primary} />
-        )}
+    
       </MapView>
 
       <TouchableOpacity
@@ -351,7 +355,7 @@ const LocationPickerScreen = ({ navigation, route }) => {
         onPress={getUserLocation}
         activeOpacity={0.8}
       >
-        <Ionicons name="locate-outline" size={22} color={Colors.blackColor} />
+        <Ionicons name="locate-outline" size={22} color={Colors.whiteColor} />
       </TouchableOpacity>
       {address && (
         <View
@@ -464,7 +468,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: Colors.whiteColor,
+    backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 3,

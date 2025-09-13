@@ -75,7 +75,6 @@ const MiniProductCard = ({ title, price, image, isCountable, itemId }) => {
          setIsLoading(false);
       }
   };
-
   // Function to handle remove from cart
   const handleRemoveFromCart = async () => {
     setIsLoading(true);
