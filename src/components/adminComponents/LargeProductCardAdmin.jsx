@@ -37,9 +37,7 @@ const LargeProductCardAdmin = ({ product, isInCart = false, onToggleCart }) => {
       </Text> */}
 
        <Text style={styles.price}>
-        {product?.isCountable
-          ? `₹ ${product?.pricePerUnit} / piece`
-          : `₹ ${product?.pricePerUnit} / kg`}
+          ₹ {product?.pricePerUnit} / {product?.unit}
       </Text>
 
     </TouchableOpacity>
