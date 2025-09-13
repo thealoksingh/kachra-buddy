@@ -21,7 +21,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useImagePicker } from '../../components/useImagePicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { updateProfilePic, updateUser } from '../../store/thunks/userThunk';
+import { deleteProfilePic, updateProfilePic, updateUser } from '../../store/thunks/userThunk';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
 import { performLogout } from '../../store/thunks/logoutThunk';
 const ProfileScreen = () => {
@@ -58,7 +58,7 @@ const ProfileScreen = () => {
     }
   };
 
-  const handleUpdateProfilePic = async imageData => {
+ const handleUpdateProfilePic = async imageData => {
     setLoading(true);
     try {
       const userId = await AsyncStorage.getItem('user_id');
@@ -103,10 +103,7 @@ const ProfileScreen = () => {
     }
   };
 
-  const handleEditName = () => {
-    setIsEditingName(true);
-  };
-
+ 
   const handleUpdateName = async () => {
     setLoading(true);
     try {
@@ -152,10 +149,7 @@ const ProfileScreen = () => {
     }
   };
 
-  const handleCancelEdit = () => {
-    setIsEditingName(false);
-    setUserName(user?.fullName || 'N/A');
-  };
+
 
   const handleLogout = async () => {
     try {
@@ -171,10 +165,36 @@ const ProfileScreen = () => {
     }
   };
 
-  const onRemoveImage = () => {
-    setUserImage(null);
+  const onRemoveImage = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('user_id');
+      await dispatch(deleteProfilePic(userId));
+      dispatch(
+        showSnackbar({
+          message: 'Profile picture removed successfully!',
+          type: 'success',
+          time: 3000,
+        }),
+      );
+      setPickerSheetVisible(false);
+      setUserImage(null);
+    } catch (error) {
+      setPickerSheetVisible(false);
+      dispatch(
+        showSnackbar({
+          message: 'Failed to remove profile picture',
+          type: 'error',
+          time: 3000,
+        }),
+      );
+    }
   };
 
+
+  const handleCancelEdit = () => {
+    setIsEditingName(false);
+    setUserName(user?.fullName || 'N/A');
+  };
   const menuItems = [
     {
       id: 1,
@@ -291,7 +311,7 @@ const ProfileScreen = () => {
                 <View style={styles.nameDisplayContainer}>
                   <Text style={styles.userName}>{userName}</Text>
                   <TouchableOpacity
-                    onPress={handleEditName}
+                    onPress={()=>setIsEditingName(true)}
                     style={styles.editNameButton}
                   >
                     <MaterialIcons
@@ -417,7 +437,7 @@ const styles = StyleSheet.create({
   },
   overlayCircle: {
     position: 'absolute',
-    backgroundColor: '#96d7991d',
+    backgroundColor: '#6ce2723c',
     borderRadius: 1000,
   },
   circle1: {
@@ -431,7 +451,7 @@ const styles = StyleSheet.create({
     height: 192,
     bottom: -96,
     right: -96,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: '#6ce2723c',
   },
   profileSection: {
     flexDirection: 'row',

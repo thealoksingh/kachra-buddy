@@ -61,10 +61,12 @@ export const updateProfilePicAPI = async (data) => {
   });
 };
 
-export const deleteProfilePicAPI = async (data) => {
+
+
+export const deleteProfilePicAPI = async (userId) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiDeleteRequest({
-    apiUrl: `${API_BASE_URL}/users/${data?.userId}/profile-picture`,
+    apiUrl: `${API_BASE_URL}/users/${userId}/profile-picture`,
     content_type: "application/json",
     data: null,
     accessToken,
