@@ -11,7 +11,6 @@ import BookingDetailScreen from '../screens/user/BookingDetailScreen';
 import SearchScreen from '../screens/user/SearchScreen';
 import CheckoutScreen from '../screens/user/CheckoutScreen';
 import LocationPickerScreen from '../screens/map/LocationPickerScreen';
-import EditProfileScreen from "../screens/user/EditProfileScreen"
 import ErrorScreen from '../screens/ErrorScreen';
 import NotificationScreen from '../screens/NotificationScreen';
 import HelpScreen from '../screens/HelpScreen';
@@ -35,8 +34,7 @@ function ActiveStack() {
       <Stack.Screen name="profileScreen" component={ProfileScreen} />
       <Stack.Screen name="searchScreen" component={SearchScreen} />  
       <Stack.Screen name="locationPickerScreen" component={LocationPickerScreen} />
-      <Stack.Screen name="editProfileScreen" component={EditProfileScreen} />
-      <Stack.Screen name="helpScreen" component={HelpScreen} />
+       <Stack.Screen name="helpScreen" component={HelpScreen} />
       <Stack.Screen name="raisedTickets" component={RaisedTickets} />
       <Stack.Screen name="privacyPolicyScreen" component={PrivacyPolicyScreen} />
       <Stack.Screen name="termsConditionsScreen" component={TermsConditionsScreen} />

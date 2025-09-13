@@ -31,6 +31,7 @@ const EditProfileScreen = () => {
   console.log('avatar url', avatar);
   const dispatch = useDispatch();
   const { openCamera, openGallery } = useImagePicker();
+  
   const pickImage = async source => {
     try {
       let result = null;

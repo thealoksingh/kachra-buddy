@@ -5,7 +5,6 @@ import ErrorScreen from '../screens/ErrorScreen';
 import HelpScreen from '../screens/HelpScreen';
 import NotificationScreen from '../screens/NotificationScreen';
 import AdminHome from '../screens/admin/AdminHome';
-import AdminProfile from '../screens/admin/AdminProfile';
 import AdvertisementDetailScreen from '../screens/admin/AdvertisementDetailScreen';
 import AllAdvertisementsScreen from '../screens/admin/AllAdvertisementsScreen';
 import AllBestDealProducts from '../screens/admin/AllBestDealProducts';
@@ -15,7 +14,6 @@ import AllSupportIssues from '../screens/admin/AllSupportIssues';
 import AllUsersScreen from '../screens/admin/AllUsersScreen';
 import BookingDetailAdmin from '../screens/admin/BookingDetailAdmin';
 import CreateUserScreen from '../screens/admin/CreateUserScreen';
-import EditAdminProfile from '../screens/admin/EditAdminProfile';
 import PostAd from '../screens/admin/PostAd';
 import PostProductsScreen from '../screens/admin/PostProductsScreen';
 import SendNotificationScreen from '../screens/admin/SendNotificationScreen';
@@ -25,6 +23,7 @@ import UpdateUserScreen from '../screens/admin/UpdateUserScreen';
 import { selectUser } from '../store/selector';
 import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
 import TermsConditionsScreen from '../screens/TermsConditionsScreen';
+import ProfileScreen from '../screens/user/ProfileScreen';
 const Stack = createNativeStackNavigator();
 
 function ActiveStack() {
@@ -48,8 +47,7 @@ function ActiveStack() {
       <Stack.Screen name="adminHome" component={AdminHome} />
       <Stack.Screen name="helpScreen" component={HelpScreen} />
       <Stack.Screen name="notificationScreen" component={NotificationScreen} />
-      <Stack.Screen name="adminProfile" component={AdminProfile} />
-      <Stack.Screen name="editAdminProfile" component={EditAdminProfile} />
+      <Stack.Screen name="adminProfile" component={ProfileScreen} />
       <Stack.Screen name="allBookingsScreen" component={AllBookingsScreen} />
       <Stack.Screen name="bookingDetailAdmin" component={BookingDetailAdmin} />
       <Stack.Screen name="privacyPolicyScreen" component={PrivacyPolicyScreen} />

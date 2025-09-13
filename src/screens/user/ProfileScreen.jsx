@@ -1,46 +1,166 @@
-import { useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
 import {
-  StyleSheet,
-  Text,
   View,
+  Text,
   Image,
-  ScrollView,
   TouchableOpacity,
-  Platform,
-  Modal,
+  ScrollView,
+  StyleSheet,
+  TextInput,
 } from 'react-native';
-import React, { useState } from 'react';
-import {
-  Colors,
-  Fonts,
-  Sizes,
-  commonStyles,
-  screenWidth,
-} from '../../styles/commonStyles';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Colors, screenWidth } from '../../styles/commonStyles';
 import MyStatusBar from '../../components/MyStatusBar';
-import ImagePreviewModal from '../../components/ImagePreviewModal';
+import Key from '../../constants/key';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../../store/selector';
+import { useNavigation } from '@react-navigation/native';
+import ImagePickerSheet from '../../components/ImagePickerSheet';
+import ImagePreviewModal from '../../components/ImagePreviewModal';
+import { WarningWithButton } from '../../components/lottie/WarningWithButton';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useImagePicker } from '../../components/useImagePicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { updateProfilePic, updateUser } from '../../store/thunks/userThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
 import { performLogout } from '../../store/thunks/logoutThunk';
-import Key from '../../constants/key';
-
 const ProfileScreen = () => {
-  const [previewImage, setPreviewImage] = useState(null);
-  const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
-  const [showLogoutSheet, setshowLogoutSheet] = useState(false);
-  const navigation = useNavigation();
+  const { API_BASE_URL } = Key;
   const user = useSelector(selectUser);
-  const [avatar, setAvatar] = useState(user?.avatarUrl);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [userName, setUserName] = useState(user?.fullName || 'N/A');
+  const [userImage, setUserImage] = useState(user?.avatarUrl || null);
+  const [showLogoutAlert, setShowLogoutAlert] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+  const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
+  const { openCamera, openGallery } = useImagePicker();
 
-  const {API_BASE_URL} = Key; // Replace with your actual base URL
+  const pickImage = async source => {
+    try {
+      let result = null;
+      if (source === 'camera') {
+        result = await openCamera('1:1', 0.7);
+      } else {
+        result = await openGallery('1:1', 0.7);
+      }
+
+      if (result?.uri) {
+        await handleUpdateProfilePic(result);
+      }
+    } catch (error) {
+      console.log('Error picking image:', error);
+    } finally {
+      setPickerSheetVisible(false);
+    }
+  };
+
+  const handleUpdateProfilePic = async imageData => {
+    setLoading(true);
+    try {
+      const userId = await AsyncStorage.getItem('user_id');
+      const data = {
+        userId,
+        uri: imageData.uri,
+        type: imageData.type,
+        name: imageData.fileName || 'profile.jpg',
+      };
+
+      const response = await dispatch(updateProfilePic(data));
+
+      if (updateProfilePic.fulfilled.match(response)) {
+        dispatch(
+          showSnackbar({
+            message: 'Profile picture updated successfully!',
+            type: 'success',
+            time: 3000,
+          }),
+        );
+        setUserImage(response.payload?.avatarUrl);
+      } else {
+        dispatch(
+          showSnackbar({
+            message:
+              response?.payload?.message || 'Failed to update profile picture',
+            type: 'error',
+            time: 5000,
+          }),
+        );
+      }
+    } catch (error) {
+      dispatch(
+        showSnackbar({
+          message: 'Error uploading image',
+          type: 'error',
+          time: 3000,
+        }),
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditName = () => {
+    setIsEditingName(true);
+  };
+
+  const handleUpdateName = async () => {
+    setLoading(true);
+    try {
+      const userId = await AsyncStorage.getItem('user_id');
+      const data = {
+        userId,
+        fullName: userName || user?.fullName,
+        contactNumber: user?.contactNumber,
+        role: user?.role,
+        status: user?.status,
+      };
+
+      const response = await dispatch(updateUser(data));
+
+      if (updateUser.fulfilled.match(response)) {
+        dispatch(
+          showSnackbar({
+            message: 'Profile updated successfully!',
+            type: 'success',
+            time: 3000,
+          }),
+        );
+        setIsEditingName(false);
+      } else {
+        dispatch(
+          showSnackbar({
+            message: response?.payload?.message || 'Failed to update profile',
+            type: 'error',
+            time: 5000,
+          }),
+        );
+      }
+    } catch (error) {
+      dispatch(
+        showSnackbar({
+          message: 'Error updating profile',
+          type: 'error',
+          time: 3000,
+        }),
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingName(false);
+    setUserName(user?.fullName || 'N/A');
+  };
 
   const handleLogout = async () => {
     try {
-      setshowLogoutSheet(false);
       await dispatch(performLogout());
+      setShowLogoutAlert(false);
       navigation.reset({
         index: 0,
         routes: [{ name: 'auth' }],
@@ -51,292 +171,423 @@ const ProfileScreen = () => {
     }
   };
 
+  const onRemoveImage = () => {
+    setUserImage(null);
+  };
+
+  const menuItems = [
+    {
+      id: 1,
+      title: 'Terms & Conditions',
+      icon: 'description',
+      iconType: 'MaterialIcons',
+      backgroundColor: Colors.whiteColor,
+      onPress: () => navigation.navigate('termsConditionsScreen'),
+    },
+    {
+      id: 2,
+      title: 'Privacy Policy',
+      icon: 'privacy-tip',
+      iconType: 'MaterialIcons',
+      backgroundColor: Colors.whiteColor,
+      onPress: () => navigation.navigate('privacyPolicyScreen'),
+    },
+    {
+      id: 3,
+      title: 'Logout',
+      icon: 'log-out-outline',
+      iconType: 'Ionicons',
+      backgroundColor: Colors.whiteColor,
+      onPress: () => setShowLogoutAlert(true),
+    },
+  ];
+
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
+    <View style={styles.container}>
       <MyStatusBar />
-      <ScrollView style={{ flex: 1 }}>
-           <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            marginTop: 50,
-            paddingTop: Sizes.fixPadding,
-            paddingBottom: Sizes.fixPadding * 2.0,
-          }}
+       <View style={[styles.header,{paddingBottom: user?.role == 'ADMIN' ? 20 : 64,
+    }]}>
+        <View style={[styles.overlayCircle, styles.circle1]} />
+        <View style={[styles.overlayCircle, styles.circle2]} />
+
+        <View style={styles.profileSection}>
+          <View style={styles.profileImageContainer}>
+            <TouchableOpacity
+              onPress={() => {
+                if (userImage) {
+                  setPreviewImage(API_BASE_URL + userImage);
+                  setImageModalVisible(true);
+                }
+              }}
+            >
+              {userImage ? (
+                <Image
+                  source={{
+                    uri: API_BASE_URL + userImage,
+                    headers: { Authorization: `Bearer ${user?.accessToken}` },
+                  }}
+                  style={styles.profileImage}
+                />
+              ) : (
+                <View
+                  style={[
+                    styles.profileImage,
+                    {
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: '#eee',
+                    },
+                  ]}
+                >
+                
+                  <MaterialIcons name="account-circle" size={80} color="#999" />
+                </View>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.editImageButton}
+              onPress={() => setPickerSheetVisible(true)}
+            >
+              <MaterialIcons name="edit" size={12} color={Colors.blackColor} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.profileInfo}>
+            <View style={styles.nameContainer}>
+              {isEditingName ? (
+                <View style={styles.editNameContainer}>
+                  <TextInput
+                    style={styles.nameInput}
+                    value={userName}
+                    onChangeText={setUserName}
+                    autoFocus
+                    selectTextOnFocus
+                  />
+                  <View style={styles.editButtons}>
+                    <TouchableOpacity
+                      onPress={handleUpdateName}
+                      style={styles.saveButton}
+                    >
+                      <MaterialIcons
+                        name="check"
+                        size={12}
+                        color={Colors.whiteColor}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={handleCancelEdit}
+                      style={styles.cancelButton}
+                    >
+                      <MaterialIcons
+                        name="close"
+                        size={12}
+                        color={Colors.whiteColor}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : (
+                <View style={styles.nameDisplayContainer}>
+                  <Text style={styles.userName}>{userName}</Text>
+                  <TouchableOpacity
+                    onPress={handleEditName}
+                    style={styles.editNameButton}
+                  >
+                    <MaterialIcons
+                      name="edit"
+                      size={16}
+                      color={Colors.whiteColor}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+
+            <Text style={styles.mobNumber}>{user?.contactNumber}</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={[styles.content,{}]}>
+        {user.role != 'ADMIN' && (
+          <View style={styles.navigationCards}>
+            <TouchableOpacity style={styles.navCard}>
+              <MaterialIcons
+                name="support-agent"
+                size={32}
+                color={Colors.primary}
+              />
+              <Text style={styles.navTitle}>Support Tickets</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.navCard}>
+              <MaterialIcons
+                name="help-outline"
+                size={32}
+                color={Colors.primary}
+              />
+              <Text style={styles.navTitle}>Customer Support</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        <View
+          style={[
+            styles.menuSection,
+            { marginTop: user.role == 'ADMIN' ? 60 : 0 },
+          ]}
         >
-          {profileInfoWithOptions()}
-        </ScrollView>
-      </ScrollView>
-      {logoutSheet()}
-       {previewImage && (
-        <ImagePreviewModal
-          image={previewImage}
-          visibility={fullImageModalVisible}
-          setVisibility={setFullImageModalVisible}
+          {menuItems.map(item => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.menuItem}
+              onPress={item.onPress}
+            >
+              <View style={styles.menuItemLeft}>
+                <View
+                  style={[
+                    styles.menuIcon,
+                    { backgroundColor: item.backgroundColor },
+                  ]}
+                >
+                  {item.iconType === 'MaterialIcons' ? (
+                    <MaterialIcons
+                      name={item.icon}
+                      size={16}
+                      color={item.textColor || '#374151'}
+                    />
+                  ) : (
+                    <Ionicons
+                      name={item.icon}
+                      size={16}
+                      color={item.textColor || '#374151'}
+                    />
+                  )}
+                </View>
+                <Text style={styles.menuTitle}>{item.title}</Text>
+              </View>
+              <MaterialIcons
+                name="chevron-right"
+                size={20}
+                color={Colors.grayColor}
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      <ImagePickerSheet
+        visible={pickerSheetVisible}
+        onClose={() => setPickerSheetVisible(false)}
+        onCamera={() => pickImage('camera')}
+        onGallery={() => pickImage('gallery')}
+        onRemove={userImage ? onRemoveImage : null}
+      />
+
+      <ImagePreviewModal
+        image={previewImage}
+        visibility={imageModalVisible}
+        setVisibility={setImageModalVisible}
+      />
+
+      {showLogoutAlert && (
+        <WarningWithButton
+          onYes={handleLogout}
+          message="Are you sure you want to logout?"
+          buttonText="Logout"
+          onClose={() => setShowLogoutAlert(false)}
         />
       )}
     </View>
   );
-
-  function profileInfoWithOptions() {
-   
-    return (
-      <View style={styles.profileInfoWithOptionsWrapStyle}>
-        <TouchableOpacity
-          onPress={() => {
-            if(avatar ){
-            setPreviewImage(API_BASE_URL+avatar);
-            setFullImageModalVisible(true);}
-          }}
-          style={{ alignItems: 'center' }}
-        >
-          {avatar ? (
-            <Image source={{ uri: API_BASE_URL+avatar,
-               headers: {
-                  Authorization: `Bearer ${user?.accessToken}`,
-                }
-             }} style={styles.userImageStyle} />
-          ) : (
-            <View style={styles.userIconStyle}>
-              <Icon name="person-off" size={60} color="#e0e0eb" />
-            </View>
-          )}
-        </TouchableOpacity>
-
-        <View
-          style={{
-            alignItems: 'center',
-            marginTop: Sizes.fixPadding,
-            marginBottom: Sizes.fixPadding,
-          }}
-        >
-          <Text style={{ ...Fonts.blackColor18SemiBold }}>{user?.fullName}</Text>
-          <Text style={{ ...Fonts.grayColor16Medium }}>+91 {user?.contactNumber}</Text>
-        </View>
-        <View>
-          {profileOption({
-            option: 'Edit Profile',
-            iconName: 'person',
-            onPress: () => navigation.navigate('editProfileScreen'),
-          })}
-
-          {profileOption({
-            option: 'Terms & Conditions',
-            iconName: 'list-alt',
-            onPress: () => navigation.navigate('termsConditionsScreen'),
-          })}
-
-          {profileOption({
-            option: 'Privacy Policy',
-            iconName: 'privacy-tip',
-            onPress: () => navigation.navigate('privacyPolicyScreen'),
-          })}
-          {profileOption({
-            option: 'Raised Tickets',
-            iconName: 'confirmation-number',
-            onPress: () => navigation.navigate('raisedTickets'),
-          })}
-
-          {logoutInfo()}
-        </View>
-      
-      </View>
-    );
-  }
-
-  function logoutInfo() {
-    return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={() => {
-          setshowLogoutSheet(true);
-        }}
-        style={{
-          ...commonStyles.rowSpaceBetween,
-          marginBottom: Sizes.fixPadding * 2.0,
-        }}
-      >
-        <View style={{ ...commonStyles.rowAlignCenter, flex: 1 }}>
-          <View style={styles.optionIconWrapper}>
-            <MaterialIcons name="logout" size={24} color={Colors.redColor} />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={{
-              ...Fonts.redColor18Medium,
-              marginLeft: Sizes.fixPadding * 1.5,
-              flex: 1,
-            }}
-          >
-            Logout
-          </Text>
-        </View>
-        <MaterialIcons
-          name="arrow-forward-ios"
-          size={15.0}
-          color={Colors.redColor}
-        />
-      </TouchableOpacity>
-    );
-  }
-
-  function profileOption({ option, iconName, onPress }) {
-    return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={onPress}
-        style={{
-          ...commonStyles.rowSpaceBetween,
-          marginBottom: Sizes.fixPadding * 2.0,
-        }}
-      >
-        <View style={{ ...commonStyles.rowAlignCenter, flex: 1 }}>
-          <View style={styles.optionIconWrapper}>
-            <MaterialIcons name={iconName} size={24} color={Colors.primary} />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={{
-              ...Fonts.blackColor14Medium,
-              marginLeft: Sizes.fixPadding * 1.5,
-              flex: 1,
-            }}
-          >
-            {option}
-          </Text>
-        </View>
-        <MaterialIcons
-          name="arrow-forward-ios"
-          size={15.0}
-          color={Colors.primary}
-        />
-      </TouchableOpacity>
-    );
-  }
-
-  function logoutSheet() {
-    return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showLogoutSheet}
-        onRequestClose={() => setshowLogoutSheet(false)}
-      >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0, 0, 0, 0.25)',
-            justifyContent: 'flex-end',
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: Colors.bodyBackColor,
-              borderTopLeftRadius: Sizes.fixPadding * 3.0,
-              borderTopRightRadius: Sizes.fixPadding * 3.0,
-              paddingTop: Sizes.fixPadding * 2,
-            }}
-          >
-            {/* <Text style={styles.logoutTextStyle}>Logout</Text> */}
-            <Text
-              style={{
-                textAlign: 'center',
-                ...Fonts.blackColor14Medium,
-                marginBottom: Sizes.fixPadding * 4,
-                marginHorizontal: Sizes.fixPadding * 2.0,
-              }}
-            >
-              Are you sure you want to log out?
-            </Text>
-            <View
-              style={{
-                ...commonStyles.rowAlignCenter,
-                marginTop: Sizes.fixPadding,
-              }}
-            >
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => setshowLogoutSheet(false)}
-                style={{
-                  ...styles.cancelButtonStyle,
-                  ...styles.sheetButtonStyle,
-                }}
-              >
-                <Text style={{ ...Fonts.blackColor14Medium }}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={handleLogout}
-                style={{
-                  ...styles.logoutButtonStyle,
-                  ...styles.sheetButtonStyle,
-                }}
-              >
-                <Text style={{ ...Fonts.whiteColor14Medium }}>Logout</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-    );
-  }
 };
 
-export default ProfileScreen;
-
 const styles = StyleSheet.create({
-  userImageStyle: {
-    width: screenWidth / 4.0,
-    height: screenWidth / 4.0,
-    borderRadius: screenWidth / 4.0 / 2.0,
-    marginTop: -Sizes.fixPadding * 5.0,
-    borderColor: Colors.extraLightGrayColor,
-    borderWidth: 2.0,
-  },
-  userIconStyle: {
-    width: screenWidth / 4.0,
-    height: screenWidth / 4.0,
-    borderRadius: screenWidth / 4.0 / 2.0,
-    marginTop: -Sizes.fixPadding * 5.0,
-    borderColor: Colors.extraLightGrayColor,
-    borderWidth: 2.0,
-    backgroundColor: Colors.whiteColor,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profileInfoWithOptionsWrapStyle: {
-    backgroundColor: Colors.bodyBackColor,
-    ...commonStyles.shadow,
-    borderRadius: Sizes.fixPadding * 2.0,
-    marginTop: Sizes.fixPadding * 5.0,
-    marginHorizontal: Sizes.fixPadding * 2.0,
-    paddingHorizontal: Sizes.fixPadding * 2.0,
-  },
-  optionIconWrapper: {
-    width: 46.0,
-    height: 46.0,
-    borderRadius: 23.0,
-    backgroundColor: 'rgba(87, 88, 88, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sheetButtonStyle: {
+  container: {
     flex: 1,
-    ...commonStyles.shadow,
-    borderTopWidth: Platform.OS == 'ios' ? 0 : 1.0,
-    paddingHorizontal: Sizes.fixPadding,
-    paddingVertical:
-      Platform.OS == 'ios' ? Sizes.fixPadding + 3.0 : Sizes.fixPadding,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cancelButtonStyle: {
     backgroundColor: Colors.whiteColor,
-    borderTopColor: Colors.extraLightGrayColor,
-    borderBottomLeftRadius: Sizes.fixPadding - 5.0,
   },
-  logoutButtonStyle: {
-    borderTopColor: Colors.primary,
+  header: {
     backgroundColor: Colors.primary,
-    borderBottomRightRadius: Sizes.fixPadding - 5.0,
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  overlayCircle: {
+    position: 'absolute',
+    backgroundColor: '#96d7991d',
+    borderRadius: 1000,
+  },
+  circle1: {
+    width: 256,
+    height: 256,
+    top: -128,
+    right: -128,
+  },
+  circle2: {
+    width: 192,
+    height: 192,
+    bottom: -96,
+    right: -96,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  profileImageContainer: {
+    position: 'relative',
+    marginRight: 16,
+  },
+  profileImage: {
+    width: 86,
+    height: 86,
+    borderRadius: 48,
+    borderWidth: 2,
+    borderColor: Colors.whiteColor,
+  },
+  editImageButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: Colors.whiteColor,
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  nameContainer: {
+    marginBottom: 8,
+  },
+  nameDisplayContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  userName: {
+    color: Colors.whiteColor,
+    fontSize: 16,
+    fontWeight: '600',
+    marginRight: 8,
+  },
+  editNameButton: {
+    padding: 4,
+  },
+  editNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  nameInput: {
+    color: Colors.whiteColor,
+    fontSize: 14,
+    fontWeight: '600',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    flex: 1,
+    marginRight: 8,
+  },
+  editButtons: {
+    flexDirection: 'row',
+  },
+  saveButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 4,
+  },
+  cancelButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mobNumber: {
+    color: Colors.whiteColor,
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    marginTop: -32,
+  },
+  navigationCards: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  navCard: {
+    backgroundColor: Colors.whiteColor,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  navTitle: {
+    color: Colors.blackColor,
+    fontSize: 12,
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  menuSection: {
+    gap: 10,
+  },
+  menuItem: {
+    backgroundColor: Colors.whiteColor,
+    borderRadius: 12,
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    shadowColor: '#000000cf',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  menuItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  menuIcon: {
+    width: screenWidth * 0.1,
+    height: 40,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  menuTitle: {
+    color: Colors.blackColor,
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
+
+export default ProfileScreen;
