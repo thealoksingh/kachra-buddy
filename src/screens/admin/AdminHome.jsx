@@ -78,7 +78,7 @@ export const icons = [
 
 // Admin dashboard cards configuration
 const adminCards = [
-  
+
   {
     id: 1,
     icon: 'storefront-outline',
@@ -98,7 +98,7 @@ const adminCards = [
     firstColor: '#00f2fe',
     secondColor: '#4facfe',
     screen: 'allAdvertisementsScreen'
-  },  
+  },
   {
     id: 3,
     icon: 'notifications-outline',
@@ -109,16 +109,16 @@ const adminCards = [
     secondColor: '#764ba2',
     screen: 'sendNotificationScreen'
   },
-  {
-    id: 4,
-    icon: 'pricetag-outline',
-    title: 'Special Offers',
-    bottomTitle: 'Best Deals',
-    description: 'Create attractive deals and discount offers',
-    firstColor: '#ffd271ff',
-    secondColor: '#faaf0dff',
-    screen: 'allBestDealProducts'
-  },
+  // {
+  //   id: 4,
+  //   icon: 'pricetag-outline',
+  //   title: 'Special Offers',
+  //   bottomTitle: 'Best Deals',
+  //   description: 'Create attractive deals and discount offers',
+  //   firstColor: '#ffd271ff',
+  //   secondColor: '#faaf0dff',
+  //   screen: 'allBestDealProducts'
+  // },
   // {
   //   id: 5,
   //   icon: 'cube-outline',
@@ -135,7 +135,7 @@ const adminCards = [
     title: 'Support Tickets',
     bottomTitle: 'Resolve Queries',
     description: 'Handle customer support and complaints',
-    firstColor:'#38f9d7',
+    firstColor: '#38f9d7',
     secondColor: '#43e97b',
     screen: 'allSupportIssues'
   },
@@ -150,7 +150,7 @@ export default function AdminHome() {
   const { API_BASE_URL } = Key;
   const [userAddress, setUserAddress] = useState('Getting location...');
   const [refreshing, setRefreshing] = useState(false);
-  
+
   const bigSizeAdv = advertisement?.filter((ad) => ad.adSize === 'BIG') || [];
   const smallSizeAdv = advertisement?.filter((ad) => ad.adSize === 'SMALL') || [];
 
@@ -181,13 +181,14 @@ export default function AdminHome() {
         console.log('Error:', error);
       }
     );
+    fetchAllData();
   }, []);
   return (
     <LinearGradient
       colors={[Colors.primary, Colors.whiteColor]}
       style={{ flex: 1 }}
     >
-      
+
       <MyStatusBar />
       <View style={styles.topBar}>
         <TouchableOpacity
@@ -233,7 +234,7 @@ export default function AdminHome() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.mainSection}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -242,7 +243,7 @@ export default function AdminHome() {
         <MovingIcons icons={icons} />
         <Graph />
         <AdSlider data={bigSizeAdv} type={"big"} />
-        
+
         {/* Admin Action Cards */}
         <View style={styles.cardsContainer}>
           {adminCards.map((card, index) => (

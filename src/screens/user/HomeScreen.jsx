@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import {
   StyleSheet,
   View,
@@ -75,7 +75,7 @@ export const icons = [
   { id: '10', path: require('../../../assets/icons/box.png'), label: 'Carton' },
 ];
 
-export default function HomeScreen() {
+function HomeScreen() {
   const { API_BASE_URL } = Key;
   const user = useSelector(selectUser);
   const userId = user?.id;
@@ -84,16 +84,27 @@ export default function HomeScreen() {
   const dispatch = useDispatch();
   const items = useSelector(selectItems);
   const orders = useSelector(selectOrders);
-  const advertisement  = useSelector(selectAdvertisementsByDisplayOrder);
-  // console.log('Items in home screen', items);
+  const advertisement = useSelector(selectAdvertisementsByDisplayOrder);
   const [userAddress, setUserAddress] = useState('Getting location...');
   const [refreshing, setRefreshing] = useState(false);
   const [pendingAlertVisible, setPendingAlertVisible] = useState(true);
-  const pendingOrders = orders?.filter(order => order.status === 'INCOMPLETE');
   const unreadNotifications = useSelector(selectUnreadNotifications);
-  const bigSizeAdv = advertisement?.filter((ad) => ad.adSize === 'BIG') || [];
-  const smallSizeAdv = advertisement?.filter((ad) => ad.adSize === 'SMALL') || [];
-  console.log('advertisement==>:', advertisement);
+
+  // Memoized computed values to prevent unnecessary re-calculations
+  const pendingOrders = useMemo(() => 
+    orders?.filter(order => order.status === 'INCOMPLETE') || [], 
+    [orders]
+  );
+  
+  const bigSizeAdv = useMemo(() => 
+    advertisement?.filter((ad) => ad.adSize === 'BIG') || [], 
+    [advertisement]
+  );
+  
+  const smallSizeAdv = useMemo(() => 
+    advertisement?.filter((ad) => ad.adSize === 'SMALL') || [], 
+    [advertisement]
+  );
 
   useEffect(() => {
     getUserLocation(
@@ -108,25 +119,30 @@ export default function HomeScreen() {
     );
   }, []);
 
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
     if (user && userId) {
       await Promise.all([
         dispatch(getUserById({ userId })),
         dispatch(fetchItems()),
-            dispatch(fetchCart()),
+        dispatch(fetchCart()),
         dispatch(fetchOrders()),
         dispatch(fetchNotifications(userId))
       ]);
     }
-  };
+  }, [user, userId, dispatch]);
 
-  const onRefresh = async () => {
-    console.log('Refreshing data...');
-
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await fetchAllData();
     setRefreshing(false);
-  };
+  }, [fetchAllData]);
+
+  // Memoized navigation handlers
+  const navigateToProfile = useCallback(() => navigation.navigate('profileScreen'), [navigation]);
+  const navigateToNotifications = useCallback(() => navigation.navigate('notificationScreen'), [navigation]);
+  const navigateToSearch = useCallback(() => navigation.navigate('searchScreen'), [navigation]);
+  const navigateToScrapVehicle = useCallback(() => navigation.navigate('scrapVehicleScreen'), [navigation]);
+  const navigateToHelp = useCallback(() => navigation.navigate('helpScreen'), [navigation]);
 
   useEffect(() => {
     if (user && userId) {
@@ -147,7 +163,7 @@ export default function HomeScreen() {
       <View style={styles.topBar}>
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => navigation.navigate('profileScreen')}
+          onPress={navigateToProfile}
           style={styles.profileSection}
         >
           {user?.avatarUrl ? (
@@ -161,48 +177,36 @@ export default function HomeScreen() {
               style={styles.profileImage}
             />
           ) : (
-            <View
-              style={{
-                ...styles.profileImage,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: '#e1e1e1',
-              }}
-            >
+            <View style={styles.defaultProfileImage}>
               <Ionicons name="person-outline" size={30} color="#666" />
             </View>
           )}
           <View>
             <Text style={styles.userName}>{user?.fullName}</Text>
-            <Text
-              style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
-            >
+            <Text style={styles.userAddress}>
               {userAddress}
             </Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => navigation.navigate('notificationScreen')}
-          style={{ position: 'relative' }}
+          onPress={navigateToNotifications}
+          style={styles.notificationContainer}
         >
           <Ionicons
             name="notifications-outline"
             size={28}
             color={Colors.whiteColor}
           />
-
           <View style={styles.badge}>
-            <Text 
-              style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
-            >
-              {unreadNotifications?.length}
+            <Text style={styles.badgeText}>
+              {unreadNotifications?.length || 0}
             </Text>
           </View>
         </TouchableOpacity>
       </View>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate('searchScreen')}
+        onPress={navigateToSearch}
         style={styles.searchBar}
       >
         <Ionicons name="search-outline" size={20} color="#999" />
@@ -211,70 +215,62 @@ export default function HomeScreen() {
 
       <ScrollView
         style={styles.mainSection}
+        showsVerticalScrollIndicator={false}
+        removeClippedSubviews={true}
+        keyboardShouldPersistTaps="handled"
+        scrollEventThrottle={16}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
         <MovingIcons icons={icons} />
-        <AdSlider data={bigSizeAdv} type={'big'} />
+        {bigSizeAdv?.length > 0 && <AdSlider data={bigSizeAdv} type={'big'} />}
 
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginVertical: 20,
-          }}
-        >
-          <Text style={{ color: Colors.blackColor, ...textStyles.subHeading }}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>
             Best Deals
           </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('searchScreen')}>
-            <Text style={{ color: Colors.primary, ...textStyles.subHeading }}>
+          <TouchableOpacity onPress={navigateToSearch}>
+            <Text style={styles.seeAllText}>
               See All
             </Text>
           </TouchableOpacity>
         </View>
 
-        <MiniProductScrollSection products={items} />
-        <View style={{ marginVertical: 20 }}>
-          <AdSlider data={smallSizeAdv} type={'small'} />
-        </View>
+        {items?.length > 0 && <MiniProductScrollSection products={items} />}
+        {smallSizeAdv?.length > 0 && (
+          <View style={styles.adContainer}>
+            <AdSlider data={smallSizeAdv} type={'small'} />
+          </View>
+        )}
 
         <View style={styles.scrapVehicleCard}>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>
+          <View style={styles.scrapVehicleContent}>
+            <Text style={styles.scrapVehicleTitle}>
               Sell Old Vehicle
             </Text>
-            <Text style={{ fontSize: 14, color: '#666', marginBottom: 15 }}>
+            <Text style={styles.scrapVehicleSubtitle}>
               Turn your old stuff into cash today.
             </Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate('scrapVehicleScreen')}
+              onPress={navigateToScrapVehicle}
               activeOpacity={0.7}
               style={styles.sellnowButton}
             >
-              <Text style={{ color: 'white', fontWeight: '600' }}>
+              <Text style={styles.sellnowButtonText}>
                 Sell Now
               </Text>
             </TouchableOpacity>
           </View>
-
           <Image
             source={require('../../../assets/images/scrapVehicle.png')}
-            style={{
-              width: 150,
-              height: 150,
-              resizeMode: 'contain',
-              marginLeft: 10,
-            }}
+            style={styles.scrapVehicleImage}
           />
         </View>
 
         <TouchableOpacity 
           activeOpacity={0.8}  
-          onPress={() => navigation.navigate('helpScreen')} 
+          onPress={navigateToHelp} 
           style={styles.supportCard}
         >
           <View style={styles.supportIconContainer}>
@@ -307,6 +303,8 @@ export default function HomeScreen() {
   );
 }
 
+export default memo(HomeScreen);
+
 const styles = StyleSheet.create({
   topBar: {
     marginTop: 10,
@@ -327,11 +325,28 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
   },
-
+  defaultProfileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#e1e1e1',
+  },
   userName: {
     fontSize: 14,
     fontFamily: appFonts.semiBold,
     color: Colors.whiteColor,
+  },
+  userAddress: {
+    ...textStyles.extraSmall,
+    color: Colors.whiteColor,
+  },
+  notificationContainer: {
+    position: 'relative',
   },
   searchBar: {
     marginTop: 15,
@@ -356,7 +371,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 18,
   },
-
   badge: {
     position: 'absolute',
     top: -5,
@@ -368,6 +382,27 @@ const styles = StyleSheet.create({
     minWidth: 20,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  badgeText: {
+    ...textStyles.extraSmall,
+    color: Colors.whiteColor,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  sectionTitle: {
+    color: Colors.blackColor,
+    ...textStyles.subHeading,
+  },
+  seeAllText: {
+    color: Colors.primary,
+    ...textStyles.subHeading,
+  },
+  adContainer: {
+    marginVertical: 20,
   },
   scrapVehicleCard: {
     width: screenWidth - 60,
@@ -382,16 +417,36 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 4,
+    overflow: 'hidden',
+  },
+  scrapVehicleContent: {
+    flex: 1,
+    paddingRight: 10,
+  },
+  scrapVehicleTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  scrapVehicleSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 15,
+  },
+  scrapVehicleImage: {
+    width: 120,
+    height: 120,
+    resizeMode: 'contain',
   },
   supportCard: {
-   width: screenWidth - 60,
+    width: screenWidth - 60,
     height: 90,
-     margin: 10,
+    margin: 10,
     backgroundColor: Colors.whiteColor,
     borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20, 
+    padding: 20,
     shadowColor: '#000',
     shadowOpacity: 0.15,
     shadowRadius: 8,
@@ -432,5 +487,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 4,
+  },
+  sellnowButtonText: {
+    color: 'white',
+    fontWeight: '600',
   },
 });

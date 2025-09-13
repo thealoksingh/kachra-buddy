@@ -18,6 +18,8 @@ import { LottieAlert } from '../../components/lottie/LottieAlert';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../store/selector';
 import Key from '../../constants/key';
+import MultiSelectDropdown from '../../components/MultiSelectDropdown';
+import SingleSelectDropdown from '../../components/SingleSelectDropdown';
 
 const UpdateProductScreen = () => {
   const navigation = useNavigation();
@@ -32,10 +34,18 @@ const UpdateProductScreen = () => {
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
   const [name, setName] = useState(item?.name || '');
   const [rate, setRate] = useState(item?.pricePerUnit?.toString() || '');
-  const [type, setType] = useState(item?.isCountable ? 'countable' : 'non-countable');
-  const [tags, setTags] = useState(item?.tags || '');
+  const [unit, setUnit] = useState(item?.unit || 'KG');
+  const [tags, setTags] = useState(item?.tags ? item.tags.split(',').map(tag => tag.trim()) : []);
   console.log("item = ", tags);
-  const [image, setImage] = useState(item?.imageUrl || null);
+  
+  const unitOptions = ['KG', 'LITRE', 'PIECE', 'BUNDLE', 'BOX', 'PACKET', 'TONNE', 'METRE'];
+  const tagOptions = [
+    'Plastic', 'Metal', 'Paper',  'Glass', 
+    'Rubber',
+     'E-waste', 'Best-Deals'
+  ];
+  const [image, setImage] = useState(null);
+  const [showServerImage, setShowServerImage] = useState(true);
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
   const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
@@ -65,14 +75,31 @@ const UpdateProductScreen = () => {
   };
 
   const removeImage = () => {
+    console.log('Removing image');
     setImage(null);
+    setShowServerImage(false);
+  };
+
+  const handleImagePreview = () => {
+    if (image) {
+      // Show local selected image
+      setPreviewImage(image);
+    } else if (item?.imageUrl && showServerImage) {
+      // Show server image with full URL
+      setPreviewImage(API_BASE_URL + item?.imageUrl);
+    }
+    setFullImageModalVisible(true);
   };
 
   const handleUpdateItem = async () => {
     console.log('Updating item');
-    if (!name || !rate || !tags) {
+    
+    // Validation: Check if image exists (either local or server)
+    const hasImage = image || (item?.imageUrl && showServerImage);
+    
+    if (!name || !rate || !unit || tags.length === 0 || !hasImage) {
       dispatch(showSnackbar({
-        message: 'Please fill all required fields',
+        message: 'Please fill all required fields including image',
         type: 'error',
         time: 3000
       }));
@@ -84,19 +111,23 @@ const UpdateProductScreen = () => {
       const itemData = {
         name,
         pricePerUnit: parseFloat(rate),
-        unit: type === 'countable' ? 'PIECE' : 'KG',
-        tags,
-        countable: type === 'countable',
-        isCountable: type === 'countable'
+        unit,
+        tags: tags.join(','),
+        isCountable: unit === 'PIECE'
       };
+      console.log("item data in update product screen", itemData);
       
-      // Check if image is a new upload (local URI) or existing server image
-      const isNewImage = image && !image.includes(item.imageUrl);
-      const file = isNewImage ? image : null;
+      // Only send file if new image is selected
+      const file = image ? image : null;
+      console.log('Image file to upload:', file);
       
       const result = await dispatch(updateItem({ itemId: item.id, itemData, file }));
       
       if (updateItem.fulfilled.match(result)) {
+        // Reset image states after successful update
+        setImage(null);
+        setShowServerImage(true);
+        
         dispatch(showSnackbar({
           message: 'Item updated successfully',
           type: 'success',
@@ -118,7 +149,7 @@ const UpdateProductScreen = () => {
       }));
     } finally {
       setLoading(false);
-    }
+    }  
   };
 
   return (
@@ -135,81 +166,46 @@ const UpdateProductScreen = () => {
             optional={false}
             type={'default'}
           />
-          <View style={styles.typeSelector}>
-            <Text style={styles.sectionLabel}>
-              Item Type
-              <Text style={{ color: Colors.secondary }}>*</Text>
-            </Text>
-            <View style={styles.typeButtons}>
-              <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  type === 'countable' && styles.selectedType,
-                ]}
-                onPress={() => setType('countable')}
-              >
-                <Text
-                  style={[
-                    styles.typeText,
-                    type === 'countable' && styles.selectedTypeText,
-                  ]}
-                >
-                  Countable
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  type === 'non-countable' && styles.selectedType,
-                ]}
-                onPress={() => setType('non-countable')}
-              >
-                <Text
-                  style={[
-                    styles.typeText,
-                    type === 'non-countable' && styles.selectedTypeText,
-                  ]}
-                >
-                  Non-Countable
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <SingleSelectDropdown
+            label="Unit"
+            placeholder="Select unit for this item"
+            options={unitOptions}
+            selectedValue={unit}
+            onSelectionChange={setUnit}
+            optional={false}
+          />
           <InputBox
             value={rate}
             setter={setRate}
-            placeholder={type === 'countable' ? 'Enter Rate per piece' : 'Enter Rate per kg'}
-            label={type === 'countable' ? 'Rate per piece' : 'Rate per kg'}
+            placeholder={`Enter Rate per ${unit?.toLowerCase() || 'unit'}`}
+            label={`Rate per ${unit?.toLowerCase() || 'unit'}`}
             optional={false}
             type={'phone-pad'}
           />
-          <InputBox
-            value={tags}
-            setter={setTags}
-            placeholder={'Enter tags (e.g., plastic, metal)'}
-            label={'Tags'}
+          <MultiSelectDropdown
+            label="Tags"
+            placeholder="Select tags for this item"
+            options={tagOptions}
+            selectedValues={tags}
+            onSelectionChange={setTags}
             optional={false}
-            type={'default'}
           />
           <Text style={styles.sectionLabel}>
             Upload Image{' '}
             <Text style={{ color: Colors.secondary }}>*</Text>
           </Text>
           <View style={styles.imageRow}>
-            {image ? (
+            {(image || (item?.imageUrl && showServerImage)) ? (
               <View style={styles.imageBox}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setPreviewImage(image);
-                    setFullImageModalVisible(true);
-                  }}
-                >
-                  <Image source={{
-                    uri: API_BASE_URL + item?.imageUrl,
-                    headers: { Authorization: `Bearer ${user?.accessToken}` }
-                  }} style={styles.image} />
+                <TouchableOpacity onPress={handleImagePreview}>
+                  <Image 
+                    source={{
+                      uri: image || (API_BASE_URL + item?.imageUrl),
+                      headers: !image && item?.imageUrl ? { Authorization: `Bearer ${user?.accessToken}` } : undefined
+                    }} 
+                    style={styles.image}
+                  />
                 </TouchableOpacity>
-
                 <TouchableOpacity
                   style={styles.removeBtn}
                   onPress={removeImage}
@@ -244,7 +240,10 @@ const UpdateProductScreen = () => {
         <ImagePreviewModal
           image={previewImage}
           visibility={fullImageModalVisible}
-          setVisibility={setFullImageModalVisible}
+          setVisibility={() => {
+            setFullImageModalVisible(false);
+            setPreviewImage(null);
+          }}
         />
       )}
 
