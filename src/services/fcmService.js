@@ -70,6 +70,8 @@ export const registerFCMToken = async () => {
     }
 
     const response = await registerFCMTokenAPI(token);
+    console.log('FCM token registration response:', response);
+
     if (response?.status === 200) {
       await AsyncStorage.setItem('fcm_token', token);
       console.log('FCM token registered successfully');

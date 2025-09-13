@@ -29,7 +29,7 @@ import { useNavigation } from '@react-navigation/native';
 import { products, addsData } from '../../utils/dummyData';
 import { FaddedIcon } from '../../components/commonComponents';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectCart, selectItems, selectUnreadNotifications, selectOrders, selectUser, selectAdvertisementsByDisplayOrder, selectAdvertisements } from '../../store/selector';
+import { selectCart, selectItems, selectUnreadNotifications, selectOrders, selectUser, selectAdvertisementsByDisplayOrder, selectAdvertisements, selectBestDealItems } from '../../store/selector';
 import { fetchItems, fetchCart, fetchOrders, getUserById } from '../../store/thunks/userThunk';
 import { fetchNotifications } from '../../store/thunks/notificationThunk';
 import Key from '../../constants/key';
@@ -83,6 +83,7 @@ function HomeScreen() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const items = useSelector(selectItems);
+  const bestDealItems = useSelector(selectBestDealItems);
   const orders = useSelector(selectOrders);
   const advertisement = useSelector(selectAdvertisementsByDisplayOrder);
   const [userAddress, setUserAddress] = useState('Getting location...');
@@ -237,7 +238,7 @@ function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {items?.length > 0 && <MiniProductScrollSection products={items} />}
+        {bestDealItems?.length > 0 && <MiniProductScrollSection products={bestDealItems} />}
         {smallSizeAdv?.length > 0 && (
           <View style={styles.adContainer}>
             <AdSlider data={smallSizeAdv} type={'small'} />

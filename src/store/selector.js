@@ -11,6 +11,10 @@ export const selectItems = createSelector(
   (items) => [...items].reverse()
 );
 
+export const selectBestDealItems = createSelector(
+  [selectItemsRaw],
+  (items) => items.filter(item => item.tags?.includes("Best-Deals"))
+);
 export const selectCart = (state) => state.user.cart;  // ✅ Get cart data
 
 export const selectOrders = createSelector(
