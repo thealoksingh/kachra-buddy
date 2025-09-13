@@ -17,7 +17,15 @@ import LargeProductCard from '../../components/userComponents/LargeProductCard';
 import { selectCart, selectItems } from '../../store/selector';
 import { Colors, textStyles } from '../../styles/commonStyles';
 
-const filters = ['All', 'Plastic', 'Rubber', 'Glass',  'Metal', 'Paper', 'E-waste'];
+const filters = [
+  'All',
+  'Plastic',
+  'Rubber',
+  'Glass',
+  'Metal',
+  'Paper',
+  'E-waste',
+];
 
 const SearchScreen = () => {
   const items = useSelector(selectItems);
@@ -94,10 +102,11 @@ const SearchScreen = () => {
         data={filteredProducts}
         keyExtractor={(_, i) => i.toString()}
         numColumns={2}
-        columnWrapperStyle={{ justifyContent: 'space-between' }}
         contentContainerStyle={{ paddingBottom: 20 }}
-        renderItem={({ item }) => (
-          <View style={styles.cardWrap}>
+        renderItem={({ item, index }) => (
+          <View
+            style={[styles.cardWrap, { marginLeft: index % 2 === 0 ? 0 : 2 }]}
+          >
             <LargeProductCard product={item} />
           </View>
         )}

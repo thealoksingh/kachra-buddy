@@ -119,10 +119,9 @@ const AllProductsScreen = () => {
           data={filteredProducts}
           keyExtractor={(_, i) => i.toString()}
           numColumns={2}
-          columnWrapperStyle={{ justifyContent: 'space-between' }}
           contentContainerStyle={{ paddingBottom: 20 }}
-          renderItem={({ item }) => (
-            <View style={styles.cardWrap}>
+          renderItem={({ item, index }) => (
+            <View style={[styles.cardWrap, { marginLeft: index % 2 === 0 ? 0 : 2 }]}>
               <LargeProductCardAdmin product={item} />
             </View>
           )}
@@ -188,8 +187,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   cardWrap: {
-    width: '48%',
+    flex: 1,
     marginBottom: 12,
+    marginRight: 10,
   },
   floatingButton: {
     position: 'absolute',
