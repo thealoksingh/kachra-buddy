@@ -12,15 +12,17 @@ import { Colors } from '../styles/commonStyles';
 import { CommonAppBar } from '../components/commonComponents';
 import { useNavigation } from '@react-navigation/native';
 import { fetchNotifications, markNotificationAsRead, deleteNotification } from '../store/thunks/notificationThunk';
-import { selectAuthLoader, selectNotificationsReversed, selectUser } from '../store/selector';
+import { removeNotification, updateNotificationStatus } from '../store/slices/authSlice';
+import { selectAuthLoader, selectNotifications, selectNotificationsReversed, selectUser } from '../store/selector';
 
 export default function NotificationScreen() {
     const navigation = useNavigation();
+      const loading = useSelector(selectAuthLoader);
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
-  const notifications = useSelector(selectNotificationsReversed);
-  const loading = useSelector(selectAuthLoader);
+  const notifications = useSelector(selectNotifications);
 
+ console.log('notifications in screen', notifications);
   const formatTime = (createdAt) => {
     const now = new Date();
     const created = new Date(createdAt);
@@ -36,21 +38,21 @@ export default function NotificationScreen() {
   };
 
   const onRefresh = () => {
-    if (user?.id) {
-      dispatch(fetchNotifications(user.id));
-    }
+    // if (user?.id) {
+    //   dispatch(fetchNotifications(user.id));
+    // }
   };
 
 
 
   const handleCardPress = (item) => {
     if (item.status === 'UNREAD') {
-      dispatch(markNotificationAsRead(item.id));
+      dispatch(updateNotificationStatus({ id: item.id, status: 'read' }));
     }
   };
 
   const handleDelete = id => {
-    dispatch(deleteNotification(id));
+    dispatch(removeNotification({ id }));
   };
   //Colors.darkBlue
   //Colors.primary

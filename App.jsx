@@ -95,7 +95,7 @@ export default function App() {
           ) : (
             <NoInternetScreen
               onRetry={() =>
-                NetInfo.fetch().then(state => setIsConnected(state.isConnected))
+              NetInfo.fetch().then(state => setIsConnected(state.isConnected))
               }
             />
           )}

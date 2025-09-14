@@ -4,6 +4,9 @@ import { registerFCMTokenAPI } from '../utils/api/notificationApi';
 import { PermissionsAndroid, Platform } from 'react-native';
 import notifee, { AndroidImportance, AuthorizationStatus as NotifeeAuthStatus } from '@notifee/react-native';
 
+import { addNotification } from '../store/slices/authSlice';
+import store from '../store/store';
+
 export const createDefaultChannel = async () => {
   await notifee.createChannel({
     id: 'default',
@@ -50,6 +53,18 @@ export const initializeFCM = async () => {
       console.log('Notification permissions enabled');
       await createDefaultChannel();
       await registerFCMToken();
+      
+      // Handle token refresh
+      messaging().onTokenRefresh(async (token) => {
+        console.log('FCM Token refreshed:', token);
+        await AsyncStorage.setItem('fcm_token', token);
+        try {
+          await registerFCMTokenAPI(token);
+          console.log('Refreshed FCM token registered successfully');
+        } catch (error) {
+          console.log('Failed to register refreshed FCM token:', error);
+        }
+      });
     } else {
       console.log('Notification permissions denied');
     }
@@ -83,9 +98,16 @@ export const registerFCMToken = async () => {
 
 export const setupForegroundListener = () => {
   return messaging().onMessage(async remoteMessage => {
-    console.log('Foreground message received:', remoteMessage.notification?.title);
+    console.log('Foreground message received:', remoteMessage.notification);
 
     try {
+      // Add to Redux store
+      store.dispatch(addNotification({
+        title: remoteMessage.notification?.title || 'KachraBuddy',
+        message: remoteMessage.notification?.body || 'You have a new message',
+        type: remoteMessage.data?.type || 'GENERAL'
+      }));
+
       await notifee.displayNotification({
         title: remoteMessage.notification?.title || 'KachraBuddy',
         body: remoteMessage.notification?.body || 'You have a new message',

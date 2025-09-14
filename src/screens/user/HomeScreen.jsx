@@ -127,7 +127,7 @@ function HomeScreen() {
         dispatch(fetchItems()),
         dispatch(fetchCart()),
         dispatch(fetchOrders()),
-        dispatch(fetchNotifications(userId))
+        // dispatch(fetchNotifications(userId))
       ]);
     }
   }, [user, userId, dispatch]);
@@ -152,7 +152,7 @@ function HomeScreen() {
       dispatch(fetchAllAdvertisements()),
       dispatch(fetchCart());
       dispatch(fetchOrders());
-      dispatch(fetchNotifications(userId));
+      // dispatch(fetchNotifications(userId));
     }
   }, [user, dispatch, userId]);
   return (

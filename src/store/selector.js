@@ -83,7 +83,11 @@ export const selectAllUsers = createSelector(
 );
 
 // Notification selectors
-export const selectNotifications = (state) => state.auth.notifications || [];
+export const selectNotifications = (state) => {
+  console.log('selectNotifications - state.auth:', state.auth);
+  console.log('selectNotifications - notifications:', state.auth.notifications);
+  return state.auth.notifications || [];
+};
 
 export const selectNotificationsReversed = createSelector(
   [selectNotifications],

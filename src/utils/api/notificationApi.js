@@ -28,7 +28,7 @@ export const sendGlobalNotificationAPI = async ({ title, body }) => {
 export const fetchNotificationsAPI = async (userId) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiGetRequest({
-    apiUrl: `${API_BASE_URL}/api/push-notifications/user/${userId}`,
+    apiUrl: `${API_BASE_URL}/api/notifications/user/${userId}`,
     accessToken,
   });
 };
@@ -36,7 +36,7 @@ export const fetchNotificationsAPI = async (userId) => {
 export const markNotificationAsReadAPI = async (notificationId) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiPatchRequest({
-    apiUrl: `${API_BASE_URL}/api/push-notifications/${notificationId}/read`,
+    apiUrl: `${API_BASE_URL}/api/notifications/${notificationId}/read`,
     accessToken,
   });
 };
@@ -44,7 +44,7 @@ export const markNotificationAsReadAPI = async (notificationId) => {
 export const deleteNotificationAPI = async (notificationId) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiDeleteRequest({
-    apiUrl: `${API_BASE_URL}/api/push-notifications/${notificationId}`,
+    apiUrl: `${API_BASE_URL}/api/notifications/${notificationId}`,
     accessToken,
   });
 };
