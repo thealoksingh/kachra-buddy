@@ -1,0 +1,95 @@
+import { StyleSheet, View, FlatList, RefreshControl } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import SwipableTabs from '../../components/SwipableTabs';
+import { CommonAppBar, FaddedIcon } from '../../components/commonComponents';
+import { useNavigation } from '@react-navigation/native';
+import { Colors } from '../../styles/commonStyles';
+import BookingCardAdmin from '../../components/adminComponents/BookingCardAdmin';
+import { fetchAllOrders } from '../../store/thunks/adminThunk';
+import { selectAdminOrders } from '../../store/selector';
+import { LoaderCard } from '../../components/LoaderCard';
+
+const AllBookingsScreen = () => {
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const orders = useSelector(selectAdminOrders);
+  const [refreshing, setRefreshing] = useState(false);
+  console.log('orders in all bookings screen', orders);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    dispatch(fetchAllOrders());
+  }, [dispatch]);
+
+  const onRefresh = async () => {
+      setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    setRefreshing(true);
+    await dispatch(fetchAllOrders());
+    setRefreshing(false);
+  };
+
+  const ongoingOrders = orders.filter(
+    order =>
+      order.status === 'ACTIVE' ||
+      order.status === 'NEW' ||
+      order.status === 'OUT_FOR_PICKUP',
+  );
+
+  const previousOrders = orders.filter(
+    order => order.status === 'COMPLETED' || order.status === 'CANCELLED',
+  );
+
+  const PreviousBookings = React.useMemo(() => (
+    isLoading ? (
+      <LoaderCard count={5} cardHeight={20} />
+    ) : (
+      <FlatList
+        data={previousOrders}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({ item }) => <BookingCardAdmin booking={item} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        ListFooterComponent={<FaddedIcon />}
+      />
+    )
+  ), [isLoading, previousOrders, refreshing]);
+
+  const OngoingBookings = React.useMemo(() => (
+    isLoading ? (
+      <LoaderCard count={5} cardHeight={20} />
+    ) : (
+      <FlatList
+        data={ongoingOrders}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({ item }) => <BookingCardAdmin booking={item} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        ListFooterComponent={<FaddedIcon />}
+      />
+    )
+  ), [isLoading, ongoingOrders, refreshing]);
+
+  return (
+    <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
+      <CommonAppBar navigation={navigation} label={'Bookings'} />
+      <SwipableTabs
+        titles={['Ongoing Bookings', 'Previous Bookings']}
+        components={[OngoingBookings, PreviousBookings]}
+      />
+    </View>
+  );
+};
+
+export default AllBookingsScreen;
+
+const styles = StyleSheet.create({});

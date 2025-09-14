@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {textStyles ,Colors} from '../../styles/commonStyles';
+import MyStatusBar from '../../components/MyStatusBar';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -66,6 +67,7 @@ const OnboardingScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <MyStatusBar/>
       <View style={{ flex: 3 }}>
         <FlatList
           data={onboardingData}

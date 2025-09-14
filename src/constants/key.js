@@ -1,9 +1,9 @@
-const APP_BACKEND_API = 'https://5b1a-2409-40d0-2b7-699f-bc1e-42d7-b70c-be3c.ngrok-free.app';
-// const DRIVER_API_URL = APP_BACKEND_API + "/api/driver";
-// const USER_API_URL = APP_BACKEND_API + "/api/user";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const API_BASE_URL = 'https://03dbf0c19f84.ngrok-free.app';
 export const Key = {
-    APP_BACKEND_API,
+    API_BASE_URL,
+    accessToken: AsyncStorage.getItem("access_token"),
     mapApiKey: 'AIzaSyASRGQshp6t0wfi0WA-6MoHQsD0qAfflaM',
     unsplashApiKey: "nsjVrH4CnoI197tnVB1miQ9Q3gkfeaWfYRkm-1cAPR4",
 };

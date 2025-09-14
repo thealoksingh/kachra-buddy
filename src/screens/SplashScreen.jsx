@@ -1,21 +1,34 @@
 import React, { useEffect } from "react";
 import { View, StyleSheet, Image, ActivityIndicator } from "react-native";
+import { useSelector } from "react-redux";
+import { selectUser } from "../store/selector";
 
 export default function SplashScreen({ navigation }) {
+
+  const user = useSelector(selectUser);
+  console.log("User in splash screen", user);
   useEffect(() => {
     const timer = setTimeout(() => {
-      // For now,
-      navigation.replace("user");
 
-      // Later:
-      // if (token && role === "user") navigation.replace("user");
-      // else if (token && role === "admin") navigation.replace("admin");
-      // else if (token && role === "driver") navigation.replace("driver");
-      // else navigation.replace("auth");
-    }, 2000);
+      if (user && user?.role === "USER" && user?.status === "ACTIVE") {
+        // if(true){
+        // For now,
+        console.log("navigating to user");
+        navigation.replace("user");
+      } else if (user && user?.role === "ADMIN" && user?.status === "ACTIVE") {
+        console.log("navigating to admin");
+        navigation.replace("admin");
+      } else if (user && user?.role === "DRIVER" && user?.status === "ACTIVE") {
+        console.log("navigating to driver");
+        navigation.replace("driver");
+      } else {
+        navigation.replace("auth");
+      }
+
+    }, 2000); // 2 seconds delay for splash screen
 
     return () => clearTimeout(timer);
-  }, [navigation]);
+  }, [user, navigation]);
 
   return (
     <View style={styles.container}>

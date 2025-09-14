@@ -1,43 +1,193 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { setLoading, setProfile, setRequests, setBookings, setError } from '../slices/userSlice';
+import { completeProfileAPI, getUserByIdAPI, updateProfilePicAPI, updateUserAPI, fetchItemsAPI, fetchCartAPI, addItemToCartAPI, removeItemFromCartAPI, checkoutCartAPI, createOrderAPI, updateOrderAPI, fetchOrdersAPI, getOrderByIdAPI, cancelOrderAPI, deleteProfilePicAPI } from '../../utils/api/userApi';
+import { handleAxiosError } from '../../utils/handleAxiosError';
 
-export const fetchUserProfile = createAsyncThunk(
-  'user/fetchProfile',
-  async (_, { dispatch, rejectWithValue }) => {
+// Thunk for sending OTP
+export const getUserById = createAsyncThunk(
+  "auth/getUserById",
+  async (data, thunkAPI) => {
     try {
-      dispatch(setLoading(true));
-      // Replace with actual API call
-      const response = await fetch('/api/user/profile');
-      if (!response.ok) throw new Error('Failed to fetch profile');
-      
-      const data = await response.json();
-      dispatch(setProfile(data));
-      return data;
+      const response = await getUserByIdAPI(data);
+      return response?.data;
     } catch (error) {
-      dispatch(setError(error.message));
-      return rejectWithValue(error.message);
-    } finally {
-      dispatch(setLoading(false));
+      return handleAxiosError(error, thunkAPI);
     }
   }
 );
 
-export const fetchUserRequests = createAsyncThunk(
-  'user/fetchRequests',
-  async (_, { dispatch, rejectWithValue }) => {
+// Thunk for completing user profile
+export const completeUserProfile = createAsyncThunk(
+  "auth/completeUserProfile",
+  async (data, thunkAPI) => {
     try {
-      dispatch(setLoading(true));
-      const response = await fetch('/api/user/requests');
-      if (!response.ok) throw new Error('Failed to fetch requests');
-      
-      const data = await response.json();
-      dispatch(setRequests(data));
-      return data;
+      const response = await completeProfileAPI(data);
+      return response?.data;
     } catch (error) {
-      dispatch(setError(error.message));
-      return rejectWithValue(error.message);
-    } finally {
-      dispatch(setLoading(false));
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+export const updateProfilePic = createAsyncThunk(
+  "user/updateProfilePic",
+  async (data, thunkAPI) => {
+    try {
+      const response = await updateProfilePicAPI(data);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+export const deleteProfilePic = createAsyncThunk(
+  "user/deleteProfilePic",
+  async (data, thunkAPI) => {
+    try {
+      const response = await deleteProfilePicAPI(data);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+export const updateUser = createAsyncThunk(
+  "user/updateUser",
+  async (data, thunkAPI) => {
+    try {
+      const response = await updateUserAPI(data);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+export const fetchItems = createAsyncThunk(
+  "user/fetchItems",
+  async (_, thunkAPI) => {
+    try {
+      const response = await fetchItemsAPI();
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for fetching user's cart
+export const fetchCart = createAsyncThunk(
+  "user/fetchCart",
+  async (_, thunkAPI) => {
+    try {
+      const response = await fetchCartAPI();
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for adding item to cart
+export const addItemToCart = createAsyncThunk(
+  "user/addItemToCart",
+  async (data, thunkAPI) => {
+    try {
+      const response = await addItemToCartAPI(data);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for removing item from cart
+export const removeItemFromCart = createAsyncThunk(
+  "user/removeItemFromCart",
+  async (itemId, thunkAPI) => {
+    try {
+      const response = await removeItemFromCartAPI(itemId);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for checkout cart
+export const checkoutCart = createAsyncThunk(
+  "user/checkoutCart",
+  async (_, thunkAPI) => {
+    try {
+      const response = await checkoutCartAPI();
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for updating order
+export const updateOrder = createAsyncThunk(
+  "user/updateOrder",
+  async (data, thunkAPI) => {
+    try {
+      const response = await updateOrderAPI(data);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for fetching all orders
+export const fetchOrders = createAsyncThunk(
+  "user/fetchOrders",
+  async (_, thunkAPI) => {
+    try {
+      const response = await fetchOrdersAPI();
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for getting order by ID
+export const getOrderById = createAsyncThunk(
+  "user/getOrderById",
+  async (orderId, thunkAPI) => {
+    try {
+      const response = await getOrderByIdAPI(orderId);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for creating new order
+export const createOrder = createAsyncThunk(
+  "user/createOrder",
+  async (data, thunkAPI) => {
+    try {
+      const response = await createOrderAPI(data);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for canceling order
+export const cancelOrder = createAsyncThunk(
+  "user/cancelOrder",
+  async (orderId, thunkAPI) => {
+    try {
+      const response = await cancelOrderAPI(orderId);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
     }
   }
 );
