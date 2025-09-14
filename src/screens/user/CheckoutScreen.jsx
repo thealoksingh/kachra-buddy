@@ -1,10 +1,23 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
-import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  ScrollView,
+} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 import { Colors } from '../../styles/commonStyles';
+import { updateOrder } from '../../store/thunks/userThunk';
+import { showSnackbar } from '../../store/slices/snackbarSlice';
+import { showLottieAlert } from '../../store/slices/lottieAlertSlice';
 import {
   ButtonWithLoader,
   CommonAppBar,
+  FaddedIcon,
   InputBox,
   TextArea,
 } from '../../components/commonComponents';
@@ -12,16 +25,101 @@ import ImagePreviewModal from '../../components/ImagePreviewModal';
 import { useImagePicker } from '../../components/useImagePicker';
 import ImagePickerSheet from '../../components/ImagePickerSheet';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
+import DateTimePickerField from '../../components/userComponents/DateTimePickerField';
 
 const CheckoutScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [failureAlertVisible, setFailureAlertVisible] = useState(false);
-  const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
-  const [name, setName] = useState(null);
-  const [mobNumber, setMobNUmber] = useState(null);
-  const [address, setAddress] = useState(null);
-  const [coordinate, setCoordinate] = useState(null);
+
+  // Get order data from navigation params
+  const { orderData } = route.params || {};
+  console.log('Order Data received:', orderData);
+
+  const [dateTime, setDateTime] = useState(null);
+  const [name, setName] = useState(orderData?.user?.fullName || '');
+  // console.log("date time is ",dateTime);
+  const [mobNumber, setMobNUmber] = useState(
+    orderData?.user?.contactNumber || '',
+  );
+  const [address, setAddress] = useState(orderData?.orderPickupAddress || '');
+  const [coordinate, setCoordinate] = useState({
+    latitude: orderData?.orderPickupLatitude || 0,
+    longitude: orderData?.orderPickupLongitude || 0,
+  });
+
+  const validateForm = () => {
+    if (!name.trim()) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'Name is required', autoClose: true }));
+      return false;
+    }
+    if (!mobNumber.trim()) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'Mobile number is required', autoClose: true }));
+      return false;
+    }
+    if (mobNumber.length !== 10) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'Mobile number must be 10 digits', autoClose: true }));
+      return false;
+    }
+    if (!address.trim()) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'Address is required', autoClose: true }));
+      return false;
+    }
+    if (!coordinate?.latitude || !coordinate?.longitude || (coordinate.latitude === 0 && coordinate.longitude === 0)) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'Please pick location from map', autoClose: true }));
+      return false;
+    }
+    if (!dateTime) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'Pickup date & time is required', autoClose: true }));
+      return false;
+    }
+    if (images.length === 0) {
+      dispatch(showLottieAlert({ type: 'warning', message: 'At least one image is required', autoClose: true }));
+      return false;
+    }
+    return true;
+  };
+
+  // Handle submit method
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+    
+    setLoading(true);
+    try {
+      const updateData = {
+        orderId: orderData?.id,
+        orderData: {
+          sellerName: name,
+          sellerContactNo: mobNumber,
+          pickupDate: dateTime,
+          orderPickupAddress: address,
+          orderPickupLatitude: coordinate?.latitude,
+          orderPickupLongitude: coordinate?.longitude,
+        },
+        images: images,
+        postedBy: 'USER',
+      };
+
+      console.log("payload at checkout  updateData.orderData ==>",updateData.orderData);
+
+      const response = await dispatch(updateOrder(updateData));
+
+      if (updateOrder.fulfilled.match(response)) {
+        dispatch(showLottieAlert({ type: 'success', message: 'Pickup Requested successfully!', autoClose: true }));
+        setTimeout(() => {
+          navigation.replace("userBottomNavBar");
+        }, 2500);
+      } else {
+        dispatch(showLottieAlert({ type: 'failure', message: response?.payload?.message || 'Oops!! Request Failed', autoClose: true }));
+      }
+    } catch (error) {
+      dispatch(showLottieAlert({ type: 'failure', message: 'Error updating order', autoClose: true }));
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   const [images, setImages] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
@@ -65,8 +163,8 @@ const CheckoutScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
-      <CommonAppBar navigation={navigation} label="Checkout" />
+    <ScrollView style={{ flex: 1, backgroundColor: Colors.whiteColor ,}}>
+      <CommonAppBar navigation={navigation} label="Add More Detail" />
 
       <View style={{ flex: 1, marginBottom: 20, marginHorizontal: 10 }}>
         <View style={styles.formCard}>
@@ -95,17 +193,7 @@ const CheckoutScreen = () => {
                 },
               })
             }
-            style={{
-              borderColor: Colors.secondary,
-              borderWidth: 1,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              borderRadius: 6,
-              backgroundColor: Colors.whiteColor,
-              marginVertical: 10,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
+            style={styles.outlinedBtn}
           >
             <Text style={{ color: Colors.secondary, fontWeight: '600' }}>
               Pick Location
@@ -118,6 +206,10 @@ const CheckoutScreen = () => {
             placeholder={'Enter Address'}
             label={'Address'}
             optional={false}
+          />
+          <DateTimePickerField
+            value={dateTime}
+            onChange={newDate => setDateTime(newDate)}
           />
         </View>
 
@@ -162,13 +254,7 @@ const CheckoutScreen = () => {
             name="Submit"
             loadingName="Processing..."
             isLoading={loading}
-            method={() => {
-              setLoading(true);
-              setTimeout(() => {
-                setLoading(false);
-                navigation.navigate('checkoutScreen');
-              }, 500);
-            }}
+            method={handleSubmit}
           />
         </View>
       </View>
@@ -187,29 +273,9 @@ const CheckoutScreen = () => {
         onCamera={() => pickImage('camera')}
         onGallery={() => pickImage('gallery')}
       />
-      {succesAlertVisible && (
-        <LottieAlert
-          type="success"
-          message="Order Cancelled Successfuly"
-          loop={false}
-          onClose={() => {
-            setSuccessAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
-      {failureAlertVisible && (
-        <LottieAlert
-          type="failure"
-          message="Order Cancellation Failed ,Try Again "
-          loop={false}
-          onClose={() => {
-            setFailureAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
-    </View>
+      <LottieAlert />
+      <FaddedIcon/>
+    </ScrollView>
   );
 };
 
@@ -280,5 +346,16 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: Colors.primary,
     fontWeight: 'bold',
+  },
+  outlinedBtn: {
+    borderColor: Colors.secondary,
+    borderWidth: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    backgroundColor: Colors.whiteColor,
+    marginVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

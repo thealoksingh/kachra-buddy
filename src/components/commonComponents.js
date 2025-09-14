@@ -6,8 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Image
-
+  Image,
 } from 'react-native';
 import {
   Colors,
@@ -51,7 +50,13 @@ export function AuthInput({ label, value, setter, placeholder, type }) {
   );
 }
 
-export function ButtonWithLoader({ name, loadingName, isLoading, method }) {
+export function ButtonWithLoader({
+  name,
+  loadingName,
+  isLoading,
+  method,
+  color = Colors.primary,
+}) {
   return isLoading ? (
     <View style={{ ...commonStyles.button, flexDirection: 'row', gap: 10 }}>
       <ActivityIndicator size="small" color={Colors.whiteColor} />
@@ -60,7 +65,7 @@ export function ButtonWithLoader({ name, loadingName, isLoading, method }) {
   ) : (
     <TouchableOpacity
       activeOpacity={0.7}
-      style={{ ...commonStyles.button }}
+      style={{ ...commonStyles.button, backgroundColor: color }}
       onPress={method}
     >
       <Text style={{ ...commonStyles.buttonText }}>{name}</Text>
@@ -109,26 +114,33 @@ export function commonLabel(label, optional) {
       )}
     </Text>
   );
-
 }
 
-export function InputBox({value, setter, placeholder, label, optional, type}) {
+export function InputBox({
+  value,
+  setter,
+  placeholder,
+  label,
+  optional,
+  type,
+  editable = true,
+}) {
   return (
     <>
       {commonLabel(label, optional)}
       <TextInput
-        style={styles.boxInput}
+        style={[styles.boxInput,{backgroundColor: editable?'#f5f5f5':'#ffdfdfff'}]}
         placeholder={placeholder}
         placeholderTextColor="gray"
         value={value}
-        onChangeText={(text) => {
-          setter(text);
-        }}
+        editable={editable ?? true}
+        onChangeText={text => setter(text)}
         keyboardType={type}
       />
     </>
   );
 }
+
 export function TextArea({ value, setter, placeholder, label, optional }) {
   return (
     <>
@@ -139,8 +151,8 @@ export function TextArea({ value, setter, placeholder, label, optional }) {
         placeholderTextColor="gray"
         value={value}
         onChangeText={setter}
-        multiline={true} 
-        textAlignVertical="top" 
+        multiline={true}
+        textAlignVertical="top"
       />
     </>
   );
@@ -202,38 +214,41 @@ const styles = StyleSheet.create({
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0eb',
-  }, sectionLabel: {
+  },
+  sectionLabel: {
     fontSize: 12,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: Colors.primary,
     marginBottom: 5,
   },
   label: {
     fontSize: 12,
-    color: "#F4721E",
+    color: '#F4721E',
     marginBottom: 5,
   },
   optional: {
     fontSize: 12,
-    fontWeight: "normal",
-    color: "#888",
-  },boxInput: {
+    fontWeight: 'normal',
+    color: '#888',
+  },
+  boxInput: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: '#ddd',
     borderRadius: 8,
     padding: 12,
     fontSize: 12,
-    backgroundColor: "#f5f5f5",
+   
     marginBottom: 15,
     height: 45,
-  },  textAreaInput: {
+  },
+  textAreaInput: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: '#ddd',
     borderRadius: 8,
     padding: 12,
     fontSize: 12,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: '#f5f5f5',
     marginBottom: 15,
-    height: 100, 
+    height: 100,
   },
 });

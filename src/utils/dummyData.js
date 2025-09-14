@@ -1,5 +1,5 @@
 export const products = [
-  {
+  { id:1,
     title: 'Recycled Shoes',
     material:"plastic",
     price: 500,
@@ -7,7 +7,7 @@ export const products = [
       'https://media.istockphoto.com/id/2189452303/photo/hydraulic-material-handler-sorting-scrap-tires.webp?a=1&b=1&s=612x612&w=0&k=20&c=IbWe6aeT7CZEYa8sOZ014POuv1ZX79WR_WerCo4Rlu8=',
     type: 'countable',
   },
-  {
+  {id:2,
     title: 'Plastic Bottle',
     material:"plastic",
     price: 200,
@@ -15,7 +15,7 @@ export const products = [
       'https://media.istockphoto.com/id/2189452303/photo/hydraulic-material-handler-sorting-scrap-tires.webp?a=1&b=1&s=612x612&w=0&k=20&c=IbWe6aeT7CZEYa8sOZ014POuv1ZX79WR_WerCo4Rlu8=',
     type: 'nonCountable',
   },
-  {
+  {id:3,
     title: 'Tyre',
     material:"rubber",
     price: 800,
@@ -23,7 +23,7 @@ export const products = [
       'https://media.istockphoto.com/id/2189452303/photo/hydraulic-material-handler-sorting-scrap-tires.webp?a=1&b=1&s=612x612&w=0&k=20&c=IbWe6aeT7CZEYa8sOZ014POuv1ZX79WR_WerCo4Rlu8=',
     type: 'countable',
   },
-  {
+  {id:4,
     title: 'Bamboo Sunglasses',
     material:"glass",
     price: 1200,
@@ -31,7 +31,7 @@ export const products = [
       'https://media.istockphoto.com/id/2189452303/photo/hydraulic-material-handler-sorting-scrap-tires.webp?a=1&b=1&s=612x612&w=0&k=20&c=IbWe6aeT7CZEYa8sOZ014POuv1ZX79WR_WerCo4Rlu8=',
     type: 'countable',
   },
-  {
+  {id:5,
     title: 'utensils',
     material:"aluminium",
     price: 350,
@@ -39,7 +39,7 @@ export const products = [
       'https://media.istockphoto.com/id/2189452303/photo/hydraulic-material-handler-sorting-scrap-tires.webp?a=1&b=1&s=612x612&w=0&k=20&c=IbWe6aeT7CZEYa8sOZ014POuv1ZX79WR_WerCo4Rlu8=',
     type: 'countable',
   },
-   {
+   {id:6,
     title: 'Metal Drum',
     material:"metal",
     price: 350,

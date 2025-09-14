@@ -1,25 +1,25 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-  open: false,
-  message: '',
-  severity: 'info', // 'success', 'error', 'warning', 'info'
-};
-
 const snackbarSlice = createSlice({
   name: 'snackbar',
-  initialState,
+  initialState: {
+    message: '',
+    type: 'success', // 'success' or 'error'
+    time: 0,
+  },
   reducers: {
     showSnackbar: (state, action) => {
-      state.open = true;
       state.message = action.payload.message;
-      state.severity = action.payload.severity || 'info';
+      state.type = action.payload.type || 'success';
+      state.time = action.payload.time
     },
-    hideSnackbar: (state) => {
-      state.open = false;
+    clearSnackbar: (state) => {
+      state.message = '';
+      state.type = 'success';
+      state.time = 0
     },
   },
 });
 
-export const { showSnackbar, hideSnackbar } = snackbarSlice.actions;
+export const { showSnackbar, clearSnackbar } = snackbarSlice.actions;
 export default snackbarSlice.reducer;

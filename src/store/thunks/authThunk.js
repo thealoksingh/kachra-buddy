@@ -1,23 +1,72 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { loginStart, loginSuccess, loginFailure } from '../slices/authSlice';
+import { getAllSupportTicketsAPI, sendOtpAPI, supportTicketAPI, verifyOtpAPI } from '../../utils/api/authApi';
+import { handleAxiosError } from '../../utils/handleAxiosError';
 
-// Get User By Token (protected, use refresh)
+
+// Thunk for sending OTP
 export const sendOtp = createAsyncThunk(
   "auth/sendOtp",
   async (data, thunkAPI) => {
-    return withRefreshTokenRetry(
-      async () => {
-        try {
-          const response = await loginAPI(data);
-         
-            return response?.data;
-         
-        } catch (error) {
-          return handleAxiosError(error, thunkAPI);
-        }
-      },
-      thunkAPI
-    );
+    try {
+      const response = await sendOtpAPI(data);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
   }
 );
 
+// Thunk for verifying OTP
+export const verifyOtp = createAsyncThunk(
+  "auth/verifyOtp",
+  async (data, thunkAPI) => {
+    try {
+      const response = await verifyOtpAPI(data);
+      return response?.data;
+    } catch (error) {
+      console.log(error.response);
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+// Thunk for pinging the server
+export const pingServer = createAsyncThunk(
+  "auth/pingServer",
+  async (_, thunkAPI) => {
+    try {
+      const response = await pingServerAPI();
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+//post support Ticket
+export const supportTicket = createAsyncThunk(
+  "auth/supportTicket",
+  async (data, thunkAPI) => {
+    try {
+      const response = await supportTicketAPI(data);
+      return response?.data;
+    } catch (error) {
+      console.log(error.response);
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+//Get All support Ticket
+export const getAllSupportTickets = createAsyncThunk(
+  "auth/getAllSupportTickets",
+  async (userId, thunkAPI) => {
+    try {
+      const response = await getAllSupportTicketsAPI(userId);
+      return response?.data;
+    } catch (error) {
+      console.log(error.response);
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
