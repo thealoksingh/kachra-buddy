@@ -19,7 +19,7 @@ import {
 } from '../../components/commonComponents';
 import MyStatusBar from '../../components/MyStatusBar';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { sendNotification } from '../../store/thunks/notificationThunk';
+import { sendGlobalNotification, sendNotification, sendPersonalizedNotification } from '../../store/thunks/notificationThunk';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
 
 const SendNotificationScreen = () => {
@@ -55,13 +55,75 @@ const SendNotificationScreen = () => {
       const notificationData = {
         userId: selectedUser.id,
         title,
-        message,
-        type: notificationType,
-        sendWhatsApp,
-        sendSMS,
+        body: message,
+        // type: notificationType,
+        // sendWhatsApp,
+        // sendSMS,
       };
 
-      const result = await dispatch(sendNotification(notificationData));
+      console.log("Notification Data:", notificationData);
+      
+      const result = await dispatch(sendPersonalizedNotification(notificationData));
+
+      if (sendPersonalizedNotification.fulfilled.match(result)) {
+        dispatch(
+          showSnackbar({
+            message: 'Personalized notification sent successfully',
+            type: 'success',
+            time: 3000,
+          }),
+        );
+        setTitle('');
+        setMessage('');
+        setSelectedUser(null);
+      } else {
+        dispatch(
+          showSnackbar({
+            message: 'Failed to send notification',
+            type: 'error',
+            time: 3000,
+          }),
+        );
+      } 
+    } catch (error) {
+      dispatch(
+        showSnackbar({
+          message: 'Failed to send notification',
+          type: 'error',
+          time: 3000,
+        }),
+      );
+    } finally {
+      setLoading(false);
+    }
+
+  };
+
+  const handleGlobalNotification = async () => {
+    console.log("Global notification function called");
+
+    if (!title || !message ) {
+      dispatch(
+        showSnackbar({
+          message: 'Please fill all required fields and select a user',
+          type: 'error',
+          time: 3000,
+        }),
+      );
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const broadcastData = {
+       
+        title,
+        body: message,
+      };
+
+      console.log("Notification Data:", broadcastData);
+
+      const result = await dispatch(sendGlobalNotification(broadcastData));
 
       if (sendNotification.fulfilled.match(result)) {
         dispatch(
@@ -82,7 +144,7 @@ const SendNotificationScreen = () => {
             time: 3000,
           }),
         );
-      }
+      } 
     } catch (error) {
       dispatch(
         showSnackbar({
@@ -96,10 +158,6 @@ const SendNotificationScreen = () => {
     }
   };
 
-  const handleGlobalNotification = async () => {
-  console.log("Global notification function called");
-  };
-
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: Colors.whiteColor }}
@@ -107,7 +165,7 @@ const SendNotificationScreen = () => {
     >
       <MyStatusBar />
       <CommonAppBar navigation={navigation} label="Send Notification" />
-      
+
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
@@ -142,7 +200,9 @@ const SendNotificationScreen = () => {
                   styles.selectorButton,
                   notificationMode === 'GLOBAL' && styles.selectedButton,
                 ]}
-                onPress={() => setNotificationMode('GLOBAL')}
+                onPress={() => {
+                  setNotificationMode('GLOBAL');
+                }}
               >
                 <Text
                   style={[

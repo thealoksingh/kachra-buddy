@@ -7,12 +7,20 @@ import { apiDeleteRequest } from '../http/delete';
 
 const { API_BASE_URL } = Key;
 
-export const sendNotificationAPI = async (notificationData) => {
+export const sendPersonalizedNotificationAPI = async ({ userId, title, body }) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiPostRequest({
-    apiUrl: `${API_BASE_URL}/api/notifications`,
+    apiUrl: `${API_BASE_URL}/api/push-notifications/send-to-user?userId=${userId}&title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`,
     content_type: "application/json",
-    data: notificationData,
+    accessToken,
+  });
+};
+
+export const sendGlobalNotificationAPI = async ({ title, body }) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiPostRequest({
+    apiUrl: `${API_BASE_URL}/api/push-notifications/broadcast?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`,
+    content_type: "application/json",
     accessToken,
   });
 };
@@ -20,7 +28,7 @@ export const sendNotificationAPI = async (notificationData) => {
 export const fetchNotificationsAPI = async (userId) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiGetRequest({
-    apiUrl: `${API_BASE_URL}/api/notifications/user/${userId}`,
+    apiUrl: `${API_BASE_URL}/api/push-notifications/user/${userId}`,
     accessToken,
   });
 };
@@ -28,7 +36,7 @@ export const fetchNotificationsAPI = async (userId) => {
 export const markNotificationAsReadAPI = async (notificationId) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiPatchRequest({
-    apiUrl: `${API_BASE_URL}/api/notifications/${notificationId}/read`,
+    apiUrl: `${API_BASE_URL}/api/push-notifications/${notificationId}/read`,
     accessToken,
   });
 };
@@ -36,7 +44,7 @@ export const markNotificationAsReadAPI = async (notificationId) => {
 export const deleteNotificationAPI = async (notificationId) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiDeleteRequest({
-    apiUrl: `${API_BASE_URL}/api/notifications/${notificationId}`,
+    apiUrl: `${API_BASE_URL}/api/push-notifications/${notificationId}`,
     accessToken,
   });
 };
@@ -44,7 +52,7 @@ export const deleteNotificationAPI = async (notificationId) => {
 export const registerFCMTokenAPI = async (token) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiPostRequest({
-    apiUrl: `${API_BASE_URL}/api/notifications/register-token`,
+    apiUrl: `${API_BASE_URL}/api/push-notifications/register-token`,
     content_type: "application/x-www-form-urlencoded",
     data: `token=${token}&deviceType=ANDROID`,
     accessToken,
