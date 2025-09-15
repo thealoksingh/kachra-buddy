@@ -1,4 +1,4 @@
-package com.kachrabuddy;
+package com.greenroing;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -34,10 +34,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID, "KachraBuddy Notifications",
+                CHANNEL_ID, "GreenRoing Notifications",
                 NotificationManager.IMPORTANCE_HIGH
             );
-            channel.setDescription("Notifications from KachraBuddy app");
+            channel.setDescription("Notifications from GreenRoing app");
             channel.enableVibration(true);
             channel.setShowBadge(true);
             notificationManager.createNotificationChannel(channel);

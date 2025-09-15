@@ -59,7 +59,7 @@ export default function PrivacyPolicyScreen() {
         <Text style={styles.sectionTitle}>6. Contact Us</Text>
         <Text style={styles.text}>
           For privacy concerns, contact us at:
-          {'\n'}Email: privacy@kachrabuddy.com
+          {'\n'}Email: privacy@greenroing.com
           {'\n'}Phone: +91-XXXXXXXXXX
         </Text>
       </ScrollView>

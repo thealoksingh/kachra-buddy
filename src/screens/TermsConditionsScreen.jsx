@@ -16,7 +16,7 @@ export default function TermsConditionsScreen() {
 
         <Text style={styles.sectionTitle}>1. Service Overview</Text>
         <Text style={styles.text}>
-          Kachra Buddy provides online scrap collection services. We collect recyclable materials including paper, plastic, metal, electronics, and other approved items from your location.
+          Green Roing provides online scrap collection services. We collect recyclable materials including paper, plastic, metal, electronics, and other approved items from your location.
         </Text>
 
         <Text style={styles.sectionTitle}>2. User Responsibilities</Text>
@@ -65,7 +65,7 @@ export default function TermsConditionsScreen() {
         <Text style={styles.sectionTitle}>7. Contact Information</Text>
         <Text style={styles.text}>
           For support or questions:
-          {'\n'}Email: support@kachrabuddy.com
+          {'\n'}Email: support@greenroing.com
           {'\n'}Phone: +91-XXXXXXXXXX
           {'\n'}Address: [Your Business Address]
         </Text>

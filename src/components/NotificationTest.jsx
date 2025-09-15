@@ -17,7 +17,7 @@ const NotificationTest = () => {
       // Display test notification
       await notifee.displayNotification({
         title: 'Test Notification',
-        body: 'This is a test notification from KachraBuddy!',
+        body: 'This is a test notification from GreenRoing!',
         android: {
           channelId: 'default',
           importance: AndroidImportance.HIGH,
