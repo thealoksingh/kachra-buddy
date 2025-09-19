@@ -209,3 +209,32 @@ export const updateTicketAPI = async (ticketId, ticketData) => {
     accessToken,
   });
 };
+
+// API call for updating order 
+export const updateOrderAPI = async (data) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  const formData = new FormData();
+  // console.log('=== DEBUG: Preparing to update order ===');
+  // console.log('Order Data:', data.orderJson);
+  // console.log('Posted By:', data.postedBy);
+  formData.append('order', JSON.stringify(data.orderJson));
+  formData.append('postedBy', data.postedBy);
+  formData.append('otp', data.otp);
+  
+  if (data.images && data.images.length > 0) {
+    data.images.forEach((image, index) => {
+      formData.append('files', {
+        uri: image,
+        type: 'image/jpeg',
+        name: `pickup_image_${index}.jpg`,
+      });
+    });
+  }
+  
+  return apiPutRequest({
+    apiUrl: `${API_BASE_URL}/api/orders/${data?.orderId}`,
+    content_type: "multipart/form-data",
+    data: formData,
+    accessToken,
+  });
+};

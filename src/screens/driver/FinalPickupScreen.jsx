@@ -189,7 +189,7 @@ const FinalPickupScreen = () => {
   };
 
   const submitOrder = async () => {
-    console.log('Submitting order with OTP:', otpInput);
+    // console.log('Submitting order with OTP:', otpInput);
     
     // Validate form before submission
     if (!validateForm()) {
@@ -414,6 +414,7 @@ const FinalPickupScreen = () => {
             )}
           </View>
         </View>
+
         <View style={styles.priceCard}>
           <Text style={styles.priceLabel}>
             Total Price: ₹{(calculateTotalPrice() || 0).toFixed(2)}

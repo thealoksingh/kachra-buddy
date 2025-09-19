@@ -1,5 +1,20 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchAllItems, createItem, updateItem, fetchAllOrders, fetchAllUsers, createUser, updateUser, assignDriver, createAdvertisement, fetchAllAdvertisements, updateAdvertisement, fetchAllTickets, updateTicket } from '../thunks/adminThunk';
+import {
+  fetchAllItems,
+  createItem,
+  updateItem,
+  fetchAllOrders,
+  fetchAllUsers,
+  createUser,
+  updateUser,
+  assignDriver,
+  createAdvertisement,
+  fetchAllAdvertisements,
+  updateAdvertisement,
+  fetchAllTickets,
+  updateTicket,
+  updateOrder,
+} from '../thunks/adminThunk';
 
 const initialState = {
   users: [],
@@ -10,7 +25,7 @@ const initialState = {
   orders: [],
   advertisements: [],
   allTickets: [],
-  
+
   loading: false,
   error: null,
 };
@@ -37,16 +52,16 @@ const adminSlice = createSlice({
     setError: (state, action) => {
       state.error = action.payload;
     },
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
-    resetAdminState: (state) => {
+    resetAdminState: state => {
       return initialState;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(fetchAllItems.pending, (state) => {
+      .addCase(fetchAllItems.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -58,7 +73,7 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message;
       })
-      .addCase(createItem.pending, (state) => {
+      .addCase(createItem.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -70,7 +85,7 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message;
       })
-      .addCase(updateItem.pending, (state) => {
+      .addCase(updateItem.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -86,7 +101,7 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message;
       })
-      .addCase(fetchAllOrders.pending, (state) => {
+      .addCase(fetchAllOrders.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -98,20 +113,20 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message;
       })
-      .addCase(fetchAllUsers.pending, (state) => {
+      .addCase(fetchAllUsers.pending, state => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
         state.loading = false;
         state.users = action?.payload?.data || [];
-        console.log("all users in admin slice", state.allUsers);
+        console.log('all users in admin slice', state.allUsers);
       })
       .addCase(fetchAllUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message;
       })
-      .addCase(createUser.pending, (state) => {
+      .addCase(createUser.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -123,7 +138,7 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message;
       })
-      .addCase(updateUser.pending, (state) => {
+      .addCase(updateUser.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -139,14 +154,16 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message;
       })
-      .addCase(assignDriver.pending, (state) => {
+      .addCase(assignDriver.pending, state => {
         state.loading = true;
         state.error = null;
       })
       .addCase(assignDriver.fulfilled, (state, action) => {
         state.loading = false;
         const updatedOrder = action.payload?.data;
-        const index = state.orders.findIndex(order => order.id === updatedOrder.id);
+        const index = state.orders.findIndex(
+          order => order.id === updatedOrder.id,
+        );
         if (index !== -1) {
           state.orders[index] = updatedOrder;
         }
@@ -155,7 +172,7 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message;
       })
-      .addCase(createAdvertisement.pending, (state) => {
+      .addCase(createAdvertisement.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -167,7 +184,7 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message;
       })
-      .addCase(fetchAllAdvertisements.pending, (state) => {
+      .addCase(fetchAllAdvertisements.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -179,14 +196,16 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message;
       })
-      .addCase(updateAdvertisement.pending, (state) => {
+      .addCase(updateAdvertisement.pending, state => {
         state.loading = true;
         state.error = null;
       })
       .addCase(updateAdvertisement.fulfilled, (state, action) => {
         state.loading = false;
         const updatedAd = action.payload?.data;
-        const index = state.advertisements.findIndex(ad => ad.id === updatedAd.id);
+        const index = state.advertisements.findIndex(
+          ad => ad.id === updatedAd.id,
+        );
         if (index !== -1) {
           state.advertisements[index] = updatedAd;
         }
@@ -195,7 +214,7 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message;
       })
-      .addCase(fetchAllTickets.pending, (state) => {
+      .addCase(fetchAllTickets.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -207,14 +226,16 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message;
       })
-      .addCase(updateTicket.pending, (state) => {
+      .addCase(updateTicket.pending, state => {
         state.loading = true;
         state.error = null;
       })
       .addCase(updateTicket.fulfilled, (state, action) => {
         state.loading = false;
         const updatedTicket = action.payload?.data;
-        const index = state.allTickets.findIndex(ticket => ticket.id === updatedTicket.id);
+        const index = state.allTickets.findIndex(
+          ticket => ticket.id === updatedTicket.id,
+        );
         if (index !== -1) {
           state.allTickets[index] = updatedTicket;
         }
@@ -222,18 +243,39 @@ const adminSlice = createSlice({
       .addCase(updateTicket.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message;
+      })
+      // Extra reducers for updating order
+      .addCase(updateOrder.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedOrder = action?.payload?.data || action?.payload;
+        const index = state.orders.findIndex(
+          order => order.id === updatedOrder.id,
+        );
+        
+        if (index !== -1) {
+          state.orders[index] = updatedOrder;
+        }
+        console.log('Updated order in admin slice', updatedOrder);
+       })
+      .addCase(updateOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action?.payload?.message;
       });
   },
 });
 
-export const { 
-  setLoading, 
-  setUsers, 
-  setDrivers, 
-  setRequests, 
-  setAnalytics, 
-  setError, 
+export const {
+  setLoading,
+  setUsers,
+  setDrivers,
+  setRequests,
+  setAnalytics,
+  setError,
   clearError,
-  resetAdminState 
+  resetAdminState,
 } = adminSlice.actions;
 export default adminSlice.reducer;

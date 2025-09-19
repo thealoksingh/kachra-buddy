@@ -55,9 +55,9 @@ export const sendPickupOtpAPI = async (orderId) => {
 export const updateDriverOrderAPI = async (data) => {
   const accessToken = await AsyncStorage.getItem("access_token");
   const formData = new FormData();
-  console.log('=== DEBUG: Preparing to update order ===');
-  console.log('Order Data:', data.orderJson);
-  console.log('Posted By:', data.postedBy);
+  // console.log('=== DEBUG: Preparing to update order ===');
+  // console.log('Order Data:', data.orderJson);
+  // console.log('Posted By:', data.postedBy);
   formData.append('order', JSON.stringify(data.orderJson));
   formData.append('postedBy', data.postedBy);
   formData.append('otp', data.otp);

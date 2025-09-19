@@ -305,8 +305,12 @@ const BookingDetailAdmin = () => {
           </View>
         </View>
 
-        <View style={styles.headingSection}>
+        <View style={styles.itemHeadingSection}>
+          <View></View>
           <Text style={styles.sectionTitle}>Item In this Booking</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('editOrderScreen',{booking})} >
+          <Ionicons name="create-outline" size={20} color={Colors.primary} style={{ marginRight: 10}} />
+          </TouchableOpacity>
         </View>
         <View style={styles.itemsSection}>
           {items.map(item => (
@@ -336,7 +340,7 @@ const BookingDetailAdmin = () => {
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}
-          >
+           >
            <TouchableOpacity
             activeOpacity={0.8}
              onPress={() =>
@@ -526,6 +530,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    marginHorizontal: 4,
+  },
+   itemHeadingSection: {
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: Colors.extraLightGrayColor,
+    marginVertical: 8,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginHorizontal: 4,
   },
   userCard: {
