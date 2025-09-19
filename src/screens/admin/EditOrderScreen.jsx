@@ -64,8 +64,8 @@ const EditOrderScreen = () => {
       }));
       // console.log('formattedAdditionalItems ==>:',JSON.stringify( formattedAdditionalItems,null,2));
     } catch (error) {
-    //   console.log('ERROR formatting additional items:', error);
-    //   console.log('Additional items causing error:', additionalItems);
+      //   console.log('ERROR formatting additional items:', error);
+      //   console.log('Additional items causing error:', additionalItems);
       // Fallback: use empty array if formatting fails
       formattedAdditionalItems = [];
     }
@@ -99,21 +99,19 @@ const EditOrderScreen = () => {
 
       if (updateOrder.fulfilled.match(result)) {
         dispatch(
-          showLottieAlert({
-            type: 'success',
+          showSnackbar({
             message: 'Order Updated Successfully',
-            autoClose: true,
+            type: 'success',
           }),
         );
         setTimeout(() => {
-          navigation.pop(2);
-        }, 2000);
+          navigation.pop(1);
+        }, 500);
       } else {
         dispatch(
-          showLottieAlert({
-            type: 'failure',
+          showSnackbar({
             message: result?.payload?.message || 'Operation Failed, Try Again',
-            autoClose: true,
+            type: 'error',
           }),
         );
       }

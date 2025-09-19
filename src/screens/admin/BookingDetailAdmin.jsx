@@ -13,7 +13,7 @@ import { CommonAppBar, FaddedIcon } from '../../components/commonComponents';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
 import { Colors, commonStyles, textStyles } from '../../styles/commonStyles';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectUser } from '../../store/selector';
+import { selectAdminOrders, selectUser } from '../../store/selector';
 import { assignDriver } from '../../store/thunks/adminThunk';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
 import Key from '../../constants/key';
@@ -31,7 +31,9 @@ const BookingDetailAdmin = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const { API_BASE_URL } = Key;
-  const booking = route.params?.booking || {};
+  const bookingId = route.params?.bookingId||null;
+  const booking = useSelector(selectAdminOrders).find(o => o.id === bookingId) || route.params?.booking || null;
+
   const[selectedDriver ,setSelectedDriver] =useState(booking?.driver || null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -131,8 +133,8 @@ const BookingDetailAdmin = () => {
         <View style={styles.userCard}>
           <Image
             source={{
-              uri: booking?.user?.avatarUrl ? API_BASE_URL + booking.user.avatarUrl : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-              headers: booking?.user?.avatarUrl ? { Authorization: `Bearer ${user?.accessToken}` } : undefined
+              uri: booking?.user?.avatarUrl ? API_BASE_URL + booking?.user?.avatarUrl : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+              headers: booking?.user?.avatarUrl ? { Authorization: `Bearer ${booking?.user?.accessToken}` } : undefined
             }}
             style={styles.userImage}
           />

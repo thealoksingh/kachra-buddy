@@ -86,7 +86,7 @@ const BookingCardAdmin = ({ booking }) => {
 
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate('bookingDetailAdmin', { booking })}
+      onPress={() => navigation.navigate('bookingDetailAdmin', { bookingId:booking?.id })}
       activeOpacity={0.7}
       style={[styles.card,{ borderLeftColor: getStatusColor(booking?.status) }]}
     >
