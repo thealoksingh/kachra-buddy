@@ -35,7 +35,7 @@ import { getUserLocation } from '../../utils/CommonMethods';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUser, selectAdvertisementsByDisplayOrder } from '../../store/selector';
 import { getUserById } from '../../store/thunks/userThunk';
-import { fetchAllAdvertisements } from '../../store/thunks/adminThunk';
+import { fetchAllAdvertisements, fetchAllItems } from '../../store/thunks/adminThunk';
 import Key from '../../constants/key';
 import NotificationTest from '../../components/NotificationTest';
 
@@ -158,7 +158,8 @@ export default function AdminHome() {
     if (user && userId) {
       await Promise.all([
         dispatch(getUserById({ userId })),
-        dispatch(fetchAllAdvertisements())
+        dispatch(fetchAllAdvertisements()),
+        dispatch(fetchAllItems())
       ]);
     }
   };
