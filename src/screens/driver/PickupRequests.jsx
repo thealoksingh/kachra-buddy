@@ -114,12 +114,12 @@ const PickupRequests = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [dottedLoaderVisible, setDottedLoaderVisible] = useState(false);
 
-  useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-  }, []);
+  // useEffect(() => {
+  //   setIsLoading(true);
+  //   setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 500);
+  // }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);

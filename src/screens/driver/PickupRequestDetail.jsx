@@ -295,7 +295,7 @@ const PickupRequestDetail = () => {
           ))}
         </View>
 
-       {currentOrder?.status !== 'COMPLETED' && <TouchableOpacity
+        {(currentOrder?.status !== 'COMPLETED' && currentOrder?.status === 'OUT_FOR_PICKUP') && <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => navigation.navigate('finalPickupScreen', { currentOrder })}
           style={[styles.outlinedBtn, { borderColor: Colors.primary }]}

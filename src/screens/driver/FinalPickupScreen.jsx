@@ -320,7 +320,8 @@ const FinalPickupScreen = () => {
           ))}
         </View>
 
-        <View style={styles.formCard}>
+        {/* dont remove we can use it in future */}
+          {/* <View style={styles.formCard}>
           <Text style={styles.sectionLabel}>Additional Items (Optional)</Text>
 
           {additionalItems.map((item, index) => (
@@ -345,6 +346,7 @@ const FinalPickupScreen = () => {
               onRemove={() => removeAdditionalItem(index)}
             />
           ))}
+
           <TouchableOpacity
             style={styles.addItemBtn}
             onPress={() =>
@@ -355,8 +357,8 @@ const FinalPickupScreen = () => {
             }
           >
             <Text style={styles.addItemText}>+ Add Items</Text>
-          </TouchableOpacity>
-        </View>
+          </TouchableOpacity> 
+        </View>*/}
 
         <View style={styles.formCard}>
           <InputBox
