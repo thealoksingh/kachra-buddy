@@ -189,7 +189,7 @@ function HomeScreen() {
             </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity
+       <TouchableOpacity
           onPress={navigateToNotifications}
           style={styles.notificationContainer}
         >
@@ -198,11 +198,11 @@ function HomeScreen() {
             size={28}
             color={Colors.whiteColor}
           />
-          <View style={styles.badge}>
+          {unreadNotifications?.length>0&&( <View style={styles.badge}>
             <Text style={styles.badgeText}>
               {unreadNotifications?.length || 0}
             </Text>
-          </View>
+          </View>)}
         </TouchableOpacity>
       </View>
 

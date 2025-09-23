@@ -22,6 +22,7 @@ import { openGoogleMaps, callUser } from '../../utils/CommonMethods';
 import MyStatusBar from '../../components/MyStatusBar';
 import { getOrderByIdAPI } from '../../utils/api/driverApi';
 import Key from '../../constants/key';
+import OrderStatusCard from '../../components/userComponents/OrderStatusCard';
 const { width } = Dimensions.get('window');
 const PickupRequestDetail = () => {
   const navigation = useNavigation();
@@ -142,7 +143,9 @@ const PickupRequestDetail = () => {
             ))}
           </View>
         )}
-        {user && (
+
+         <OrderStatusCard/>
+         {user && (
           <>
             <View style={styles.headingSection}>
               <Text style={styles.sectionTitle}>User Detail</Text>
@@ -167,7 +170,7 @@ const PickupRequestDetail = () => {
               </View>
             </View>
           </>
-        )}
+          )}
         <View style={styles.headingSection}>
           <Text style={styles.sectionTitle}>Booking Details</Text>
         </View>
