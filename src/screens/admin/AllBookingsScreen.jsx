@@ -44,7 +44,7 @@ const AllBookingsScreen = () => {
   );
 
   const previousOrders = orders.filter(
-    order => order.status === 'COMPLETED' || order.status === 'CANCELLED',
+    order => order.status === 'COMPLETED' ||order?.status.includes('CANCELLED'),
   );
 
   const PreviousBookings = React.useMemo(() => (

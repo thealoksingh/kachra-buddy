@@ -9,7 +9,7 @@ import { selectOrders } from '../../store/selector';
 import { Colors } from '../../styles/commonStyles';
 import { LoaderCard } from '../../components/LoaderCard';
 const ClosedBookings = ({ orders, isLoading }) => {
-  const completedOrders = orders?.filter(order => order?.status === 'COMPLETED'||order?.status === 'CANCELLED');
+  const completedOrders = orders?.filter(order => order?.status === 'COMPLETED'||order?.status.includes('CANCELLED'));
   return (
     <>
       {isLoading ? (
