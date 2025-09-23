@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Colors } from '../styles/commonStyles';
-import { CommonAppBar } from '../components/commonComponents';
+import { CommonAppBar, EmptyList, FaddedIcon } from '../components/commonComponents';
 import { useNavigation } from '@react-navigation/native';
 import {
   removeNotification,
@@ -84,19 +84,14 @@ export default function NotificationScreen() {
     return (
       <GestureDetector gesture={swipeGesture}>
         <Animated.View
-          style={[
-            styles.swipeableContainer,
-            { transform: [{ translateX }] },
-          ]}
+          style={[styles.swipeableContainer, { transform: [{ translateX }] }]}
         >
           <View
             style={[
               styles.card,
               {
                 borderLeftColor:
-                  item.status === 'UNREAD'
-                    ? Colors.primary
-                    : Colors.grayColor,
+                  item.status === 'UNREAD' ? Colors.primary : Colors.grayColor,
               },
             ]}
             onTouchEnd={() => handleCardPress(item)}
@@ -124,6 +119,9 @@ export default function NotificationScreen() {
         keyExtractor={item => item.id.toString()}
         refreshControl={
           <RefreshControl refreshing={loading} onRefresh={onRefresh} />
+        }
+        ListEmptyComponent={
+         <EmptyList message={"Notification Not Found"}/>
         }
       />
     </View>

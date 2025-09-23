@@ -1,7 +1,11 @@
 import { StyleSheet, View, FlatList, RefreshControl } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import SwipableTabs from '../../components/SwipableTabs';
-import { CommonAppBar, FaddedIcon } from '../../components/commonComponents';
+import {
+  CommonAppBar,
+  EmptyList,
+  FaddedIcon,
+} from '../../components/commonComponents';
 import { useNavigation } from '@react-navigation/native';
 import { Colors } from '../../styles/commonStyles';
 import PickupRequestCard from '../../components/driverComponents/PickupRequestCard';
@@ -39,9 +43,12 @@ const ClosedPickups = ({ orders, onRefresh, refreshing, isLoading }) => {
           data={closedOrders}
           keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => <PickupRequestCard booking={item} />}
-          ListFooterComponent={<FaddedIcon />}
+          ListFooterComponent={<>{closedOrders.length >=2 && <FaddedIcon />}</>}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          ListEmptyComponent={
+            <EmptyList message={"You Don't have any Closed Pickups yet"} />
           }
         />
       )}
@@ -58,6 +65,7 @@ const OngoingPickups = ({
   isLoading,
 }) => {
   console.log('OngoingPickups - orders:', orders);
+
   const ongoingOrders = Array.isArray(orders)
     ? orders.filter(
         order =>
@@ -80,9 +88,14 @@ const OngoingPickups = ({
               setBookingId={setBookingId}
             />
           )}
-          ListFooterComponent={<FaddedIcon />}
+          ListFooterComponent={
+            <>{ongoingOrders.length >=2 && <FaddedIcon />}</>
+          }
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          ListEmptyComponent={
+            <EmptyList message={"You Don't have any Ongoing Pickups yet"} />
           }
         />
       )}
@@ -100,8 +113,8 @@ const PickupRequests = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [dottedLoaderVisible, setDottedLoaderVisible] = useState(false);
- 
- useEffect(() => {
+
+  useEffect(() => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);

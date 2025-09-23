@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import SwipableTabs from '../../components/SwipableTabs';
-import { CommonAppBar, FaddedIcon } from '../../components/commonComponents';
+import { CommonAppBar, EmptyList, FaddedIcon } from '../../components/commonComponents';
 import BookingCard from '../../components/userComponents/BookingCard';
 import { selectOrders } from '../../store/selector';
 import { Colors } from '../../styles/commonStyles';
@@ -19,7 +19,12 @@ const ClosedBookings = ({ orders, isLoading }) => {
           data={completedOrders}
           keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => <BookingCard booking={item} />}
-          ListFooterComponent={<FaddedIcon />}
+          ListFooterComponent={
+            <>{completedOrders.length >=2 && <FaddedIcon />}</>
+          }
+           ListEmptyComponent={
+            <EmptyList message={"You Don't have any completed Order yet"} />
+          }
         />
       )}
     </>
@@ -40,7 +45,12 @@ const OngoingBookings = ({ orders, isLoading }) => {
           data={ongoingOrders}
           keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => <BookingCard booking={item} />}
-          ListFooterComponent={<FaddedIcon />}
+          ListFooterComponent={
+            <>{ongoingOrders.length >=2 && <FaddedIcon />}</>
+          }
+           ListEmptyComponent={
+            <EmptyList message={"You Don't have any Ongoing Order yet"} />
+          }
         />
       )}
     </>

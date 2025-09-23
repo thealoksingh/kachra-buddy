@@ -129,7 +129,10 @@ export function InputBox({
     <>
       {commonLabel(label, optional)}
       <TextInput
-        style={[styles.boxInput,{backgroundColor: editable?'#f5f5f5':'#ffdfdfff'}]}
+        style={[
+          styles.boxInput,
+          { backgroundColor: editable ? '#f5f5f5' : '#ffdfdfff' },
+        ]}
         placeholder={placeholder}
         placeholderTextColor="gray"
         value={value}
@@ -157,6 +160,7 @@ export function TextArea({ value, setter, placeholder, label, optional }) {
     </>
   );
 }
+
 export function FaddedIcon({}) {
   return (
     <View
@@ -177,6 +181,24 @@ export function FaddedIcon({}) {
           opacity: 0.2,
         }}
       />
+    </View>
+  );
+}
+
+export function EmptyList({ message }) {
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 200,
+      }}
+    >
+      <FaddedIcon />
+      <Text style={{ marginTop: 5, color: Colors.grayColor }}>
+        {message||"No Data Found"}
+      </Text>
     </View>
   );
 }
@@ -237,7 +259,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 12,
-   
+
     marginBottom: 15,
     height: 45,
   },
