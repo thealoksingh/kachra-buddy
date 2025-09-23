@@ -9,7 +9,7 @@ import { selectOrders } from '../../store/selector';
 import { Colors } from '../../styles/commonStyles';
 import { LoaderCard } from '../../components/LoaderCard';
 const ClosedBookings = ({ orders, isLoading }) => {
-  const completedOrders = orders?.filter(order => order.status === 'COMPLETED');
+  const completedOrders = orders?.filter(order => order?.status === 'COMPLETED'||order?.status === 'CANCELLED');
   return (
     <>
       {isLoading ? (
@@ -28,7 +28,7 @@ const ClosedBookings = ({ orders, isLoading }) => {
 
 const OngoingBookings = ({ orders, isLoading }) => {
   const ongoingOrders = orders?.filter(
-    order => order.status === 'ACTIVE' || order.status === 'INCOMPLETE',
+    order => order?.status === 'ACTIVE' || order?.status === 'INCOMPLETE',
   );
 
   return (

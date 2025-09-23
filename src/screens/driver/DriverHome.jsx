@@ -214,7 +214,7 @@ export default function DriverHome() {
           <AdSlider data={smallSizeAdv} type={"small"}/>
         </View>
 
-        <NotificationTest />
+        {/* <NotificationTest /> */}
         <FaddedIcon />
       </ScrollView>
     </LinearGradient>

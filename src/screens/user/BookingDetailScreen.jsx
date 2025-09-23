@@ -15,11 +15,14 @@ import { Colors, commonStyles, textStyles } from '../../styles/commonStyles';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../../store/selector';
-import { getOrderById } from '../../store/thunks/userThunk';
+import { getOrderById, cancelOrder } from '../../store/thunks/userThunk';
+import { showLottieAlert } from '../../store/slices/lottieAlertSlice';
 import Key from '../../constants/key';
 import { WarningWithButton } from '../../components/lottie/WarningWithButton';
 import { DottedBlackLoader } from '../../components/lottie/loaderView';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
+import { FloatingOTP } from '../../components/userComponents/FloatingOTP';
+import { getStatusColor } from '../../utils/CommonMethods';
 const { width } = Dimensions.get('window');
 
 const BookingDetailScreen = () => {
@@ -32,12 +35,12 @@ const BookingDetailScreen = () => {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [warningVisible, setWarningVisible] = useState(false);
-  const [failureAlertVisible, setFailureAlertVisible] = useState(false);
-  const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
+  const [cancelWarningVisible, setCancelWarningVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [orderData, setOrderData] = useState(null);
+  const [otpAlertVisible, setOtpAlertVisible] = useState(true);
   const flatListRef = useRef();
 
   // Get order ID from route params
@@ -73,6 +76,46 @@ const BookingDetailScreen = () => {
   // Extract order items
   const items = orderData?.orderItems || [];
 
+  const CancelOrder = async () => {
+    setIsCancelling(true);
+    setCancelWarningVisible(false);
+
+    try {
+      const result = await dispatch(cancelOrder(orderId));
+
+      if (cancelOrder.fulfilled.match(result)) {
+        dispatch(
+          showLottieAlert({
+            type: 'success',
+            message: 'Order Cancelled Successfully',
+            autoClose: true,
+          }),
+        );
+        setTimeout(() => {
+          navigation.goBack();
+        }, 2000);
+      } else {
+        dispatch(
+          showLottieAlert({
+            type: 'failure',
+            message: 'Order Cancellation Failed, Try Again',
+            autoClose: true,
+          }),
+        );
+      }
+    } catch (error) {
+      dispatch(
+        showLottieAlert({
+          type: 'failure',
+          message: 'Network error. Please try again.',
+          autoClose: true,
+        }),
+      );
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
       <CommonAppBar navigation={navigation} label="Booking Details" />
@@ -80,7 +123,7 @@ const BookingDetailScreen = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         {orderData?.status == 'INCOMPLETE' ? (
           <Image
-            source={require("../../../assets/images/pendingBooking.png")}
+            source={require('../../../assets/images/pendingBooking.png')}
             style={styles.image}
           />
         ) : (
@@ -181,7 +224,14 @@ const BookingDetailScreen = () => {
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Order Status</Text>
-            <Text style={textStyles.small}>{orderData?.status || 'N/A'}</Text>
+            <Text
+              style={[
+                textStyles.small,
+                { color: getStatusColor(orderData?.status) },
+              ]}
+            >
+              {orderData?.status || 'N/A'}
+            </Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Driver Allocation</Text>
@@ -296,7 +346,7 @@ const BookingDetailScreen = () => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => setWarningVisible(true)}
+                onPress={() => setCancelWarningVisible(true)}
                 style={[styles.cancelBtn, { borderColor: Colors.secondary }]}
               >
                 <Text
@@ -311,7 +361,7 @@ const BookingDetailScreen = () => {
           {/* New Order → only Cancel */}
           {orderData?.status === 'ACTIVE' && (
             <TouchableOpacity
-              onPress={() => setWarningVisible(true)}
+              onPress={() => setCancelWarningVisible(true)}
               style={[styles.cancelBtn, { borderColor: Colors.secondary }]}
             >
               <Text style={[styles.cancelBtnText, { color: Colors.secondary }]}>
@@ -321,7 +371,7 @@ const BookingDetailScreen = () => {
           )}
 
           {/* Completed Order → Rate Now */}
-          {orderData?.status === 'COMPLETED' && (
+          {/* {orderData?.status === 'COMPLETED' && (
             <TouchableOpacity
               style={[styles.cancelBtn, { borderColor: Colors.primary }]}
             >
@@ -329,7 +379,7 @@ const BookingDetailScreen = () => {
                 Rate Now
               </Text>
             </TouchableOpacity>
-          )}
+          )} */}
         </View>
 
         <FaddedIcon />
@@ -345,38 +395,22 @@ const BookingDetailScreen = () => {
         visibility={previewVisible}
         setVisibility={setPreviewVisible}
       />
-      {warningVisible && (
+      {cancelWarningVisible && (
         <WarningWithButton
-          message="Are you sure you want to cancel this Order?"
-          onYes={() => {
-            setWarningVisible(false);
-          }}
-          onClose={() => setWarningVisible(false)}
+          message="Are you sure you want to cancel this Booking?"
+          onYes={CancelOrder}
+          onClose={() => setCancelWarningVisible(false)}
         />
       )}
-      {isLoading && <DottedBlackLoader />}
-      {succesAlertVisible && (
-        <LottieAlert
-          type="success"
-          message="Order Cancelled Successfuly"
-          loop={false}
-          onClose={() => {
-            setSuccessAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
-      {failureAlertVisible && (
-        <LottieAlert
-          type="failure"
-          message="Order Cancellation Failed ,Try Again "
-          loop={false}
-          onClose={() => {
-            setFailureAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
+      {(isLoading || isCancelling) && <DottedBlackLoader />}
+
+      <FloatingOTP
+        visible={otpAlertVisible}
+        title={'087654'}
+        message={'Please Share the OTP with the collector.'}
+        onClose={() => setOtpAlertVisible(false)}
+        expiryTime={new Date('2025-09-28T14:30:00Z')}
+      />
     </View>
   );
 };

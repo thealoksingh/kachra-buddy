@@ -13,6 +13,7 @@ import { AdminStack } from './src/roleStack/AdminStack';
 import { Colors } from './src/styles/commonStyles';
 import store from './src/store/store';
 import { Snackbar } from './src/components/Snackbar';
+import { LottieAlert } from './src/components/lottie/LottieAlert';
 import RoleBasedNavigator from './src/components/RoleBasedNavigator';
 import NotificationManager from './src/components/NotificationManager';
 import NoInternetScreen from './src/screens/NoInternetScreen';
@@ -90,6 +91,7 @@ export default function App() {
       <SafeAreaView style={styles.safeArea}>
         <NavigationContainer>
           <Snackbar />
+          <LottieAlert />
           {isConnected ? (
             <RootStack />
           ) : (

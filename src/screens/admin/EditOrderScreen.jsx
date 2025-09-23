@@ -205,7 +205,6 @@ const EditOrderScreen = () => {
             <EditableOrderCardAdmin
               key={orderItem.id || idx}
               price={orderItem.price}
-              type={orderItem.item.countable ? 'countable' : 'weighable'}
               itemName={orderItem.item.name}
               quantity={orderItem.quantity}
               unit={orderItem.unit}

@@ -31,8 +31,8 @@ const MiniProductScrollSection = ({ products }) => {
             title={product?.name}
             price={product?.pricePerUnit}
             image={product?.imageUrl}
-            isCountable={product?.isCountable}
-          />
+            unit={product?.unit}
+            />
         ))}
       </ScrollView>
 
@@ -45,8 +45,7 @@ const MiniProductScrollSection = ({ products }) => {
               title={product?.name}
               price={product?.pricePerUnit}
               image={product?.imageUrl}
-              isCountable={product?.isCountable}
-            />
+             />
           ))}
         </ScrollView>
       )}

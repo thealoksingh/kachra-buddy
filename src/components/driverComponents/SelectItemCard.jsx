@@ -12,7 +12,7 @@ import { selectUser } from '../../store/selector';
 const SelectItemCard = ({ product, selected }) => {
   const { API_BASE_URL } = Key;
   const user = useSelector(selectUser);
-//   console.log('image url', product?.imageUrl);
+  //   console.log('image url', product?.imageUrl);
   return (
     <View
       style={[
@@ -46,9 +46,7 @@ const SelectItemCard = ({ product, selected }) => {
       </Text>
 
       <Text style={styles.price}>
-        {product?.isCountable
-          ? `₹ ${product?.pricePerUnit} / piece`
-          : `₹ ${product?.pricePerUnit} / kg`}
+        {product?.pricePerUnit}/{product?.unit}
       </Text>
     </View>
   );

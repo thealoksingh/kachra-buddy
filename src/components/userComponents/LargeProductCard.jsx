@@ -43,7 +43,7 @@ const LargeProductCard = ({ product }) => {
       const data = {
         itemId: itemId,
         quantity: 1,
-        unit: product?.isCountable ? 'PIECE' : 'KG',
+        unit: product?.unit,
       };
 
       const response = await dispatch(addItemToCart(data));
@@ -138,9 +138,7 @@ const LargeProductCard = ({ product }) => {
       </Text>
 
       <Text style={styles.price}>
-        {product?.isCountable
-          ? `₹ ${product?.pricePerUnit} / piece`
-          : `₹ ${product?.pricePerUnit} / kg`}
+      {product?.pricePerUnit}/{product?.unit}
       </Text>
 
       {isItemInCart ? (

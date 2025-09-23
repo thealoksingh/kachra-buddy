@@ -79,7 +79,7 @@ const CartCard = ({ cartItem, user, onQuantityChange, currentQuantity }) => {
         {/* Input for quantity */}
         <View style={styles.inputRow}>
           <Text style={styles.label}>
-            {cartItem?.item?.countable ? 'Qty:' : 'Weight (Kg):'}
+            {cartItem?.item?.unit}
           </Text>
           <TextInput
             value={quantity}

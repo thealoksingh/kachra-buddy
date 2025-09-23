@@ -22,7 +22,7 @@ import {
 import { showSnackbar } from '../../store/slices/snackbarSlice';
 import Key from '../../constants/key';
 
-const MiniProductCard = ({ title, price, image, isCountable, itemId }) => {
+const MiniProductCard = ({ title, price, image, unit, itemId }) => {
   const { API_BASE_URL } = Key;
   const user = useSelector(selectUser);
   const cart = useSelector(selectCart);
@@ -39,7 +39,7 @@ const MiniProductCard = ({ title, price, image, isCountable, itemId }) => {
       const data = {
         itemId: itemId,
         quantity: 1,
-        unit: isCountable ? 'PIECE' : 'KG',
+        unit: unit,
       };
 
       const response = await dispatch(addItemToCart(data));
@@ -115,7 +115,7 @@ const MiniProductCard = ({ title, price, image, isCountable, itemId }) => {
   };
   // console.log('User in mini product card', user);
   // console.log('Cart in mini product card', cart);
-  // console.log('Product in mini product card', title, price, image, isCountable);
+  // console.log('Product in mini product card', title, price, image,unit);
   // console.log('Is item in cart:', isItemInCart);
   return (
     <View style={styles.card}>
@@ -141,7 +141,7 @@ const MiniProductCard = ({ title, price, image, isCountable, itemId }) => {
       </Text>
 
       <Text style={styles.price}>
-        {isCountable ? `₹ ${price} / piece` : `₹ ${price} / kg`}
+        {price}/{unit}
       </Text>
 
       {/* Show different button based on whether item is in cart */}

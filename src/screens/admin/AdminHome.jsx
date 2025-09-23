@@ -269,7 +269,7 @@ export default function AdminHome() {
           <AdSlider data={smallSizeAdv} type={"small"} />
         </View>
 
-        <NotificationTest />
+        {/* <NotificationTest /> */}
         <FaddedIcon />
       </ScrollView>
     </LinearGradient>

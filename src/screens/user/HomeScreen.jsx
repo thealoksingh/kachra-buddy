@@ -291,7 +291,7 @@ function HomeScreen() {
             color={Colors.grayColor}
           />
         </TouchableOpacity>
-        <NotificationTest />
+        {/* <NotificationTest /> */}
         <FaddedIcon />
       </ScrollView>
       <PendingOrderAlert

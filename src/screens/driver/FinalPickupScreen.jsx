@@ -309,8 +309,7 @@ const FinalPickupScreen = () => {
             <EditableOrderCard
               key={orderItem.id || idx}
               price={orderItem.price}
-              type={orderItem.item.countable ? 'countable' : 'weighable'}
-              itemName={orderItem.item.name}
+               itemName={orderItem.item.name}
               quantity={orderItem.quantity}
               unit={orderItem.unit}
               orderItem={orderItem}
