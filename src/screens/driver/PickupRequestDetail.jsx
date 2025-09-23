@@ -148,13 +148,19 @@ const PickupRequestDetail = () => {
               <Text style={styles.sectionTitle}>User Detail</Text>
             </View>
             <View style={styles.userCard}>
-              <Image
-                source={{
-                  uri: user?.avatarUrl ? `${Key.API_BASE_URL}${user?.avatarUrl}` : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                  headers: user?.avatarUrl ? { Authorization: `Bearer ${user?.accessToken}` } : undefined
-                }}
-                style={styles.userImage}
-              />
+              {user?.avatarUrl ? (
+                <Image
+                  source={{
+                    uri: `${Key.API_BASE_URL}${user.avatarUrl}`,
+                    headers: { Authorization: `Bearer ${user?.accessToken}` }
+                  }}
+                  style={styles.userImage}
+                />
+              ) : (
+                <View style={[styles.userImage, styles.userIconContainer]}>
+                  <Ionicons name="person" size={30} color={Colors.grayColor} />
+                </View>
+              )}
               <View style={{ marginLeft: 12 }}>
                 <Text style={styles.userName}>{user.fullName || 'N/A'}</Text>
                 <Text style={styles.userPhone}>{user.contactNumber || 'N/A'}</Text>
@@ -474,6 +480,11 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
+  },
+  userIconContainer: {
+    backgroundColor: Colors.extraLightGrayColor,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   userName: {
     fontSize: 15,

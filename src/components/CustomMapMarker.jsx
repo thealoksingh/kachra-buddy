@@ -3,7 +3,7 @@ import { View, Image, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Colors } from '../styles/commonStyles';
 
-const CustomMapMarker = ({ avatarUrl="https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d", size = 40 }) => {
+const CustomMapMarker = ({ avatarUrl, size = 40 }) => {
   return (
     <View style={[styles.markerContainer, { width: size + 8, height: size + 16 }]}>
       <View style={[styles.markerCircle, { width: size, height: size, borderRadius: size / 2 }]}>

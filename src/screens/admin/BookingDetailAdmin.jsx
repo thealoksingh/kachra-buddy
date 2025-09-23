@@ -31,10 +31,13 @@ const BookingDetailAdmin = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const { API_BASE_URL } = Key;
-  const bookingId = route.params?.bookingId||null;
-  const booking = useSelector(selectAdminOrders).find(o => o.id === bookingId) || route.params?.booking || null;
+  const bookingId = route.params?.bookingId || null;
+  const booking =
+    useSelector(selectAdminOrders).find(o => o.id === bookingId) ||
+    route.params?.booking ||
+    null;
 
-  const[selectedDriver ,setSelectedDriver] =useState(booking?.driver || null);
+  const [selectedDriver, setSelectedDriver] = useState(booking?.driver || null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
@@ -44,40 +47,52 @@ const BookingDetailAdmin = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const flatListRef = useRef();
   // console.log("this is booking at admin =>",booking);
-  const images = booking?.orderImages?.map(img => API_BASE_URL + img.imageUrl) || [];
+  const images =
+    booking?.orderImages?.map(img => API_BASE_URL + img.imageUrl) || [];
 
   const items = booking?.orderItems || [];
 
   // Pickup images from driver
-  const pickupImages = booking?.orderImages?.filter(img => img.postedBy === 'DRIVER').map(img => ({
-    id: img.id,
-    uri: API_BASE_URL + img.imageUrl
-  })) || [];
+  const pickupImages =
+    booking?.orderImages
+      ?.filter(img => img.postedBy === 'DRIVER')
+      .map(img => ({
+        id: img.id,
+        uri: API_BASE_URL + img.imageUrl,
+      })) || [];
 
-  const handleDriverSelect = async (driver) => {
+  const handleDriverSelect = async driver => {
     setSelectedDriver(driver);
     setIsLoading(true);
     try {
-      const result = await dispatch(assignDriver({ orderId: booking.id, driverId: driver.id }));
+      const result = await dispatch(
+        assignDriver({ orderId: booking.id, driverId: driver.id }),
+      );
       if (assignDriver.fulfilled.match(result)) {
-        dispatch(showSnackbar({
-          message: 'Driver assigned successfully',
-          type: 'success',
-          time: 3000
-        }));
+        dispatch(
+          showSnackbar({
+            message: 'Driver assigned successfully',
+            type: 'success',
+            time: 3000,
+          }),
+        );
       } else {
-        dispatch(showSnackbar({
-          message: 'Failed to assign driver',
-          type: 'error',
-          time: 3000
-        }));
+        dispatch(
+          showSnackbar({
+            message: 'Failed to assign driver',
+            type: 'error',
+            time: 3000,
+          }),
+        );
       }
     } catch (error) {
-      dispatch(showSnackbar({
-        message: 'Failed to assign driver',
-        type: 'error',
-        time: 3000
-      }));
+      dispatch(
+        showSnackbar({
+          message: 'Failed to assign driver',
+          type: 'error',
+          time: 3000,
+        }),
+      );
     } finally {
       setIsLoading(false);
     }
@@ -89,76 +104,96 @@ const BookingDetailAdmin = () => {
       <CommonAppBar navigation={navigation} label="Booking Detail" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <FlatList
-          ref={flatListRef}
-          data={images}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(_, i) => i.toString()}
-          onMomentumScrollEnd={e => {
-            const index = Math.round(e.nativeEvent.contentOffset.x / width);
-            setActiveIndex(index);
-          }}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={() => {
-                setPreviewImage(item);
-                setPreviewVisible(true);
+        {images.length > 0 && (
+          <>
+            <FlatList
+              ref={flatListRef}
+              data={images}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(_, i) => i.toString()}
+              onMomentumScrollEnd={e => {
+                const index = Math.round(e.nativeEvent.contentOffset.x / width);
+                setActiveIndex(index);
               }}
-            >
-              <Image 
-                source={{ 
-                  uri: item,
-                  headers: { Authorization: `Bearer ${user?.accessToken}` }
-                }} 
-                style={styles.image} 
-              />
-            </TouchableOpacity>
-          )}
-        />
-
-        <View style={styles.dotsContainer}>
-          {images.map((_, i) => (
-            <View
-              key={i}
-              style={[styles.dot, activeIndex === i && styles.activeDot]}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => {
+                    setPreviewImage(item);
+                    setPreviewVisible(true);
+                  }}
+                >
+                  <Image
+                    source={{
+                      uri: item,
+                      headers: {
+                        Authorization: `Bearer ${user?.accessToken}`,
+                      },
+                    }}
+                    style={styles.image}
+                  />
+                </TouchableOpacity>
+              )}
             />
-          ))}
-        </View>
+
+            <View style={styles.dotsContainer}>
+              {images.map((_, i) => (
+                <View
+                  key={i}
+                  style={[styles.dot, activeIndex === i && styles.activeDot]}
+                />
+              ))}
+            </View>
+          </>
+        )}
         <View style={styles.headingSection}>
           <Text style={styles.sectionTitle}>User Detail</Text>
         </View>
         <View style={styles.userCard}>
           <Image
             source={{
-              uri: booking?.user?.avatarUrl ? API_BASE_URL + booking?.user?.avatarUrl : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-              headers: booking?.user?.avatarUrl ? { Authorization: `Bearer ${booking?.user?.accessToken}` } : undefined
+              uri: booking?.user?.avatarUrl
+                ? API_BASE_URL + booking?.user?.avatarUrl
+                : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+              headers: booking?.user?.avatarUrl
+                ? { Authorization: `Bearer ${booking?.user?.accessToken}` }
+                : undefined,
             }}
             style={styles.userImage}
           />
           <View style={{ marginLeft: 12 }}>
-            <Text style={styles.userName}>{booking?.user?.fullName || 'N/A'}</Text>
-            <Text style={styles.userPhone}>{booking?.user?.contactNumber || 'N/A'}</Text>
+            <Text style={styles.userName}>
+              {booking?.user?.fullName || 'N/A'}
+            </Text>
+            <Text style={styles.userPhone}>
+              {booking?.user?.contactNumber || 'N/A'}
+            </Text>
           </View>
         </View>
         {selectedDriver && (
           <>
-            <View style={styles.headingSection}>
-              <Text style={styles.sectionTitle}>Driver Detail</Text>
+          <View style={styles.headingSection}>
+            <Text style={styles.sectionTitle}>Driver Detail</Text>
             </View>
             <View style={styles.userCard}>
               <Image
-                source={{ 
-                  uri: selectedDriver?.avatarUrl ? API_BASE_URL + selectedDriver.avatarUrl : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625',
-                  headers: selectedDriver?.avatarUrl ? { Authorization: `Bearer ${user?.accessToken}` } : undefined
+                source={{
+                  uri: selectedDriver?.avatarUrl
+                    ? API_BASE_URL + selectedDriver.avatarUrl
+                    : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625',
+                  headers: selectedDriver?.avatarUrl
+                    ? { Authorization: `Bearer ${user?.accessToken}` }
+                    : undefined,
                 }}
                 style={styles.userImage}
               />
               <View style={{ marginLeft: 12 }}>
                 <Text style={styles.userName}>{selectedDriver?.fullName}</Text>
-                <Text style={styles.userPhone}>{selectedDriver?.contactNumber}</Text>
+                <Text style={styles.userPhone}>
+                  {selectedDriver?.contactNumber}
+                </Text>
               </View>
             </View>
           </>
@@ -175,7 +210,11 @@ const BookingDetailAdmin = () => {
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Pickup Date Time</Text>
-            <Text style={textStyles.small}>{booking?.pickupDate ? new Date(booking.pickupDate).toLocaleString() : 'N/A'}</Text>
+            <Text style={textStyles.small}>
+              {booking?.pickupDate
+                ? new Date(booking.pickupDate).toLocaleString()
+                : 'N/A'}
+            </Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Status</Text>
@@ -193,11 +232,17 @@ const BookingDetailAdmin = () => {
         <View style={{ padding: 10 }}>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Customer Name</Text>
-            <Text style={textStyles.small}>{booking?.sellerName || booking?.user?.fullName || 'N/A'}</Text>
+            <Text style={textStyles.small}>
+              {booking?.sellerName || booking?.user?.fullName || 'N/A'}
+            </Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Customer Mobile Number</Text>
-            <Text style={textStyles.small}>{booking?.sellerContactNo || booking?.user?.contactNumber || 'N/A'}</Text>
+            <Text style={textStyles.small}>
+              {booking?.sellerContactNo ||
+                booking?.user?.contactNumber ||
+                'N/A'}
+            </Text>
           </View>
 
           <Text
@@ -231,7 +276,13 @@ const BookingDetailAdmin = () => {
                   gap: 6,
                 },
               ]}
-              onPress={() => openGoogleMaps(booking?.orderPickupLatitude,booking?.orderPickupLongitude,booking?.sellerName)}
+              onPress={() =>
+                openGoogleMaps(
+                  booking?.orderPickupLatitude,
+                  booking?.orderPickupLongitude,
+                  booking?.sellerName,
+                )
+              }
             >
               <Ionicons name="map-outline" size={18} color={Colors.secondary} />
               <Text
@@ -285,7 +336,14 @@ const BookingDetailAdmin = () => {
             <Text style={textStyles.smallBold}>Remark By Driver : </Text>
             This is remark Given by Driver it could be quite long
           </Text>
-          <View style={{display:"flex",flexDirection:"row",gap:10,justifyContent:"space-evenly"}}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 10,
+              justifyContent: 'space-evenly',
+            }}
+          >
             {pickupImages.map((image, index) => (
               <TouchableOpacity
                 key={index}
@@ -296,9 +354,9 @@ const BookingDetailAdmin = () => {
                 }}
               >
                 <Image
-                  source={{ 
+                  source={{
                     uri: image.uri,
-                    headers: { Authorization: `Bearer ${user?.accessToken}` }
+                    headers: { Authorization: `Bearer ${user?.accessToken}` },
                   }}
                   style={styles.pickupImage}
                 />
@@ -310,28 +368,37 @@ const BookingDetailAdmin = () => {
         <View style={styles.itemHeadingSection}>
           <View></View>
           <Text style={styles.sectionTitle}>Item In this Booking</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('editOrderScreen',{booking})} >
-          <Ionicons name="create-outline" size={20} color={Colors.primary} style={{ marginRight: 10}} />
+          <TouchableOpacity
+            onPress={() => navigation.navigate('editOrderScreen', { booking })}
+          >
+            <Ionicons
+              name="create-outline"
+              size={20}
+              color={Colors.primary}
+              style={{ marginRight: 10 }}
+            />
           </TouchableOpacity>
         </View>
         <View style={styles.itemsSection}>
           {items.map(item => (
             <View key={item.id} style={styles.itemCard}>
-              <Image 
-                source={{ 
-                  uri: item.item?.imageUrl ? API_BASE_URL + item.item.imageUrl : 'https://via.placeholder.com/60',
-                  headers: item.item?.imageUrl ? { Authorization: `Bearer ${user?.accessToken}` } : undefined
-                }} 
-                style={styles.itemImage} 
+              <Image
+                source={{
+                  uri: item.item?.imageUrl
+                    ? API_BASE_URL + item.item.imageUrl
+                    : 'https://via.placeholder.com/60',
+                  headers: item.item?.imageUrl
+                    ? { Authorization: `Bearer ${user?.accessToken}` }
+                    : undefined,
+                }}
+                style={styles.itemImage}
               />
               <View style={{ flex: 1, marginLeft: 12 }}>
                 <Text style={styles.itemTitle}>{item.item?.name || 'N/A'}</Text>
                 <Text style={styles.itemInfo}>
-                 Quantity: {item.quantity} {item.unit}
+                  Quantity: {item.quantity} {item.unit}
                 </Text>
-                 <Text style={styles.itemInfo}>
-                 Price: ₹{item.price}
-                </Text>
+                <Text style={styles.itemInfo}>Price: ₹{item.price}</Text>
               </View>
             </View>
           ))}
@@ -342,17 +409,17 @@ const BookingDetailAdmin = () => {
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}
-           >
-           <TouchableOpacity
+        >
+          <TouchableOpacity
             activeOpacity={0.8}
-             onPress={() =>
+            onPress={() =>
               navigation.navigate('allUsersScreen', {
                 fromSelectUser: 'driver',
                 onUserSelect: handleDriverSelect,
               })
             }
             style={[styles.outlinedBtn, { borderColor: Colors.primary }]}
-           >
+          >
             <Text style={[styles.outlinedBtnText, { color: Colors.primary }]}>
               Assign Driver
             </Text>
@@ -534,7 +601,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 4,
   },
-   itemHeadingSection: {
+  itemHeadingSection: {
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: Colors.extraLightGrayColor,

@@ -26,6 +26,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import MyStatusBar from '../../components/MyStatusBar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { CommonAppBar } from '../../components/commonComponents';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { fetchAllUsers } from '../../store/thunks/adminThunk';
@@ -170,12 +171,9 @@ const AllUsersScreen = () => {
             style={styles.avatar} 
           />
         ) : (
-          <Icon
-            name="account-circle"
-            size={50}
-            color={Colors.grayColor}
-            style={styles.avatar}
-          />
+          <View style={[styles.avatar, styles.avatarIconContainer]}>
+            <Ionicons name="person" size={25} color={Colors.grayColor} />
+          </View>
         )}
 
         <View style={styles.userInfo}>
@@ -468,6 +466,11 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
+  },
+  avatarIconContainer: {
+    backgroundColor: Colors.extraLightGrayColor,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   userInfo: {
     flex: 1,

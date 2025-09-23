@@ -197,15 +197,21 @@ export default function AdminHome() {
           onPress={() => navigation.navigate('adminProfile')}
           style={styles.profileSection}
         >
-          <Image
-            source={{
-              uri: user?.avatarUrl ? API_BASE_URL + user?.avatarUrl : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1170&auto=format&fit=crop',
-              headers: user?.avatarUrl ? {
-                Authorization: `Bearer ${user?.accessToken}`,
-              } : undefined,
-            }}
-            style={styles.profileImage}
-          />
+          {user?.avatarUrl ? (
+            <Image
+              source={{
+                uri: API_BASE_URL + user.avatarUrl,
+                headers: {
+                  Authorization: `Bearer ${user?.accessToken}`,
+                },
+              }}
+              style={styles.profileImage}
+            />
+          ) : (
+            <View style={[styles.profileImage, styles.profileIconContainer]}>
+              <Ionicons name="person" size={20} color={Colors.grayColor} />
+            </View>
+          )}
           <View>
             <Text style={styles.userName}>{user?.fullName || 'Admin'}</Text>
             <Text
@@ -295,6 +301,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
     borderWidth: 1,
     borderColor: '#ccc',
+  },
+  profileIconContainer: {
+    backgroundColor: Colors.extraLightGrayColor,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   userName: {

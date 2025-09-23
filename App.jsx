@@ -17,7 +17,12 @@ import { LottieAlert } from './src/components/lottie/LottieAlert';
 import RoleBasedNavigator from './src/components/RoleBasedNavigator';
 import NotificationManager from './src/components/NotificationManager';
 import NoInternetScreen from './src/screens/NoInternetScreen';
-import { createDefaultChannel, initializeFCM, setupForegroundListener } from './src/services/fcmService';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  createDefaultChannel,
+  initializeFCM,
+  setupForegroundListener,
+} from './src/services/fcmService';
 // import ErrorScreen from './src/screens/ErrorScreen'; // you can add later if needed
 
 const Stack = createNativeStackNavigator();
@@ -67,7 +72,7 @@ export default function App() {
     });
 
     let unsubscribeMessage;
-    
+
     (async () => {
       try {
         await initializeFCM();
@@ -87,23 +92,27 @@ export default function App() {
   }, []);
 
   return (
-    <Provider store={store}>
-      <SafeAreaView style={styles.safeArea}>
-        <NavigationContainer>
-          <Snackbar />
-          <LottieAlert />
-          {isConnected ? (
-            <RootStack />
-          ) : (
-            <NoInternetScreen
-              onRetry={() =>
-              NetInfo.fetch().then(state => setIsConnected(state.isConnected))
-              }
-            />
-          )}
-        </NavigationContainer>
-      </SafeAreaView>
-    </Provider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={store}>
+        <SafeAreaView style={styles.safeArea}>
+          <NavigationContainer>
+            <Snackbar />
+            <LottieAlert />
+            {isConnected ? (
+              <RootStack />
+            ) : (
+              <NoInternetScreen
+                onRetry={() =>
+                  NetInfo.fetch().then(state =>
+                    setIsConnected(state.isConnected),
+                  )
+                }
+              />
+            )}
+          </NavigationContainer>
+        </SafeAreaView>
+      </Provider>
+    </GestureHandlerRootView>
   );
 }
 

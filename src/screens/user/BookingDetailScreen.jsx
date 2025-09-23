@@ -17,13 +17,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../../store/selector';
 import { getOrderById, cancelOrder } from '../../store/thunks/userThunk';
 import { showLottieAlert } from '../../store/slices/lottieAlertSlice';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Key from '../../constants/key';
 import { WarningWithButton } from '../../components/lottie/WarningWithButton';
 import { DottedBlackLoader } from '../../components/lottie/loaderView';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
 import { FloatingOTP } from '../../components/userComponents/FloatingOTP';
 import { getStatusColor } from '../../utils/CommonMethods';
+import OrderStatusCard from '../../components/userComponents/OrderStatusCard';
 const { width } = Dimensions.get('window');
+
 
 const BookingDetailScreen = () => {
   // console.log('Rendering BookingDetailScreen');
@@ -82,8 +85,10 @@ const BookingDetailScreen = () => {
 
     try {
       const result = await dispatch(cancelOrder(orderId));
+      console.log('Cancel order result:', result);
+      console.log('Result type:', result.type);
 
-      if (cancelOrder.fulfilled.match(result)) {
+      if (result.type === 'user/cancelOrder/fulfilled') {
         dispatch(
           showLottieAlert({
             type: 'success',
@@ -95,15 +100,19 @@ const BookingDetailScreen = () => {
           navigation.goBack();
         }, 2000);
       } else {
+        console.log('Failure payload:', result.payload);
         dispatch(
           showLottieAlert({
             type: 'failure',
-            message: 'Order Cancellation Failed, Try Again',
+            message:
+              result?.payload?.message ||
+              'Order Cancellation Failed, Try Again',
             autoClose: true,
           }),
         );
       }
     } catch (error) {
+      console.log('Cancel error:', error);
       dispatch(
         showLottieAlert({
           type: 'failure',
@@ -121,12 +130,7 @@ const BookingDetailScreen = () => {
       <CommonAppBar navigation={navigation} label="Booking Details" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {orderData?.status == 'INCOMPLETE' ? (
-          <Image
-            source={require('../../../assets/images/pendingBooking.png')}
-            style={styles.image}
-          />
-        ) : (
+         {images.length> 0 &&(<>
           <FlatList
             ref={flatListRef}
             data={images}
@@ -158,7 +162,7 @@ const BookingDetailScreen = () => {
               </TouchableOpacity>
             )}
           />
-        )}
+        
 
         <View style={styles.dotsContainer}>
           {images.map((_, i) => (
@@ -168,31 +172,41 @@ const BookingDetailScreen = () => {
             />
           ))}
         </View>
+         </>)}
+         
+        <OrderStatusCard/>
+
         {orderData?.driver && (
           <>
             <View style={styles.headingSection}>
               <Text style={styles.sectionTitle}>Driver Details</Text>
             </View>
             <View style={styles.driverCard}>
-              <Image
-                source={{
-                  uri: orderData?.driver?.avatarUrl
-                    ? API_BASE_URL + orderData.driver.avatarUrl
-                    : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                  headers: {
-                    Authorization: `Bearer ${user?.accessToken}`,
-                  },
-                }}
-                style={styles.driverImage}
-              />
-              <View style={{ flex: 1, marginLeft: 12 }}>
+              {orderData?.driver?.avatarUrl ? (
+                <Image
+                  source={{
+                    uri: API_BASE_URL + orderData.driver.avatarUrl,
+                    headers: {
+                      Authorization: `Bearer ${user?.accessToken}`,
+                    },
+                  }}
+                  style={styles.driverImage}
+                />
+              ) : (
+                <View style={[styles.driverImage, styles.driverIconContainer]}>
+                  <Ionicons name="person" size={30} color={Colors.grayColor} />
+                </View>
+              )}
+
+              
+              <View style={{  marginLeft: 12 }}>
                 <Text style={styles.driverName}>
                   {orderData?.driver?.fullName || 'Driver name'}
                 </Text>
                 <Text style={styles.driverPhone}>
                   {orderData?.driver?.contactNumber || '+91 98765 43210'}
                 </Text>
-                <View style={{ flexDirection: 'row', marginTop: 4 }}>
+                {/* <View style={{ flexDirection: 'row', marginTop: 4 }}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Text
                       key={i}
@@ -204,11 +218,12 @@ const BookingDetailScreen = () => {
                       ★
                     </Text>
                   ))}
-                </View>
+                </View> */}
               </View>
             </View>
           </>
         )}
+
         <View style={styles.headingSection}>
           <Text style={styles.sectionTitle}>Booking Details</Text>
         </View>
@@ -534,15 +549,21 @@ const styles = StyleSheet.create({
   },
   driverCard: {
     flexDirection: 'row',
+      alignItems: 'center',
     backgroundColor: Colors.whiteColor,
     padding: 12,
     marginHorizontal: 12,
     marginVertical: 10,
   },
   driverImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  driverIconContainer: {
+    backgroundColor: Colors.extraLightGrayColor,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   driverName: {
     fontSize: 15,
