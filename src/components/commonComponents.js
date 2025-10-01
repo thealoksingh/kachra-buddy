@@ -80,7 +80,7 @@ export function OtpFields({ otpInput, setOtpInput }) {
         marginVertical: Sizes.fixPadding * 2.0,
       }}
       handleTextChange={setOtpInput}
-      inputCount={4}
+      inputCount={6}
       keyboardType="numeric"
       tintColor={Colors.primary}
       offTintColor={Colors.extraLightGrayColor}

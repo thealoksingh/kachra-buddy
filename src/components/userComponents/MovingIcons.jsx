@@ -5,6 +5,7 @@ import {
   Image,
   Animated,
   StyleSheet,
+  Easing,
 } from 'react-native';
 import { Colors, textStyles } from '../../styles/commonStyles';
 
@@ -31,20 +32,18 @@ export default function MovingIcons({ icons }) {
   
   const doubledIcons = useMemo(() => icons.concat(icons), [icons]);
 
-  useEffect(() => {
-    const startAnimation = () => {
-      translateX.setValue(0);
-      Animated.loop(
-        Animated.timing(translateX, {
-          toValue: -totalWidth,
-          duration: totalWidth * 50,
-          useNativeDriver: true,
-        })
-      ).start();
-    };
-    
-    startAnimation();
-  }, [translateX, totalWidth]);
+ useEffect(() => {
+  translateX.setValue(0);
+  Animated.loop(
+    Animated.timing(translateX, {
+      toValue: -totalWidth,
+      duration: totalWidth * 80, // fixed duration
+      useNativeDriver: true,
+      easing: Easing.linear,
+      isInteraction: false, // keeps animation smooth even during JS work
+    })
+  ).start();
+}, [translateX, totalWidth]);
 
   return (
     <View style={styles.container}>

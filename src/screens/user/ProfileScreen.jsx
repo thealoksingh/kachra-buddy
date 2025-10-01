@@ -27,6 +27,7 @@ import { performLogout } from '../../store/thunks/logoutThunk';
 const ProfileScreen = () => {
   const { API_BASE_URL } = Key;
   const user = useSelector(selectUser);
+ 
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [isEditingName, setIsEditingName] = useState(false);
@@ -38,7 +39,7 @@ const ProfileScreen = () => {
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
   const { openCamera, openGallery } = useImagePicker();
-
+  // console.log("User data in ProfileScreen:", user);
   const pickImage = async source => {
     try {
       let result = null;
@@ -55,6 +56,7 @@ const ProfileScreen = () => {
       console.log('Error picking image:', error);
     } finally {
       setPickerSheetVisible(false);
+      
     }
   };
 

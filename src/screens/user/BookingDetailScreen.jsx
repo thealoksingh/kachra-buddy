@@ -35,7 +35,6 @@ const BookingDetailScreen = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const { API_BASE_URL } = Key;
-
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [cancelWarningVisible, setCancelWarningVisible] = useState(false);
@@ -43,7 +42,8 @@ const BookingDetailScreen = () => {
   const [isCancelling, setIsCancelling] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [orderData, setOrderData] = useState(null);
-  const [otpAlertVisible, setOtpAlertVisible] = useState(true);
+  const [otpAlertVisible, setOtpAlertVisible] = useState(orderData?.confirmationOtp?true:false);
+  
   const flatListRef = useRef();
 
   // Get order ID from route params
@@ -174,7 +174,7 @@ const BookingDetailScreen = () => {
         </View>
          </>)}
          
-        <OrderStatusCard/>
+        <OrderStatusCard bookingData={orderData}/>
 
         {orderData?.driver && (
           <>
@@ -248,18 +248,18 @@ const BookingDetailScreen = () => {
               {orderData?.status || 'N/A'}
             </Text>
           </View>
-          <View style={commonStyles.rowSpaceBetween}>
+          {/* <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Driver Allocation</Text>
             <Text style={textStyles.small}>
               {orderData?.driver ? 'Allocated' : 'Not Allocated'}
             </Text>
-          </View>
+          </View> */}
           {orderData?.orderType == 'GENERAL' && (
             <>
-              <View style={commonStyles.rowSpaceBetween}>
+              {/* <View style={commonStyles.rowSpaceBetween}>
                 <Text style={textStyles.smallBold}>Items</Text>
                 <Text style={textStyles.small}>{items.length}</Text>
-              </View>
+              </View> */}
               <View style={commonStyles.rowSpaceBetween}>
                 <Text style={textStyles.smallBold}>Final Price</Text>
                 <Text style={[textStyles.small, { color: Colors.primary }]}>
@@ -421,10 +421,10 @@ const BookingDetailScreen = () => {
 
       <FloatingOTP
         visible={otpAlertVisible}
-        title={'087654'}
+        title={orderData?.confirmationOtp}
         message={'Please Share the OTP with the collector.'}
         onClose={() => setOtpAlertVisible(false)}
-        expiryTime={new Date('2025-09-28T14:30:00Z')}
+        expiryTime={orderData?.confirmationOtpExpiry}
       />
     </View>
   );

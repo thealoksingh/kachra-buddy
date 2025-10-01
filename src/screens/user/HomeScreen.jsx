@@ -90,7 +90,7 @@ function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [pendingAlertVisible, setPendingAlertVisible] = useState(true);
   const unreadNotifications = useSelector(selectUnreadNotifications);
-
+  console.log("User data in HomeScreen:", user);
   // Memoized computed values to prevent unnecessary re-calculations
   const pendingOrders = useMemo(() => 
     orders?.filter(order => order.status === 'INCOMPLETE') || [], 
@@ -111,6 +111,7 @@ function HomeScreen() {
     getUserLocation(
       locationData => {
         setUserAddress(locationData.address);
+          console.log("User data in HomeScreen:", user);
         console.log('Address:', locationData.address);
       },
       error => {
@@ -232,6 +233,7 @@ function HomeScreen() {
             Best Deals
           </Text>
           <TouchableOpacity onPress={navigateToSearch}>
+            
             <Text style={styles.seeAllText}>
               See All
             </Text>

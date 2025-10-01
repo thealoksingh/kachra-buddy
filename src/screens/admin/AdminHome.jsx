@@ -150,7 +150,7 @@ export default function AdminHome() {
   const { API_BASE_URL } = Key;
   const [userAddress, setUserAddress] = useState('Getting location...');
   const [refreshing, setRefreshing] = useState(false);
-
+  console.log("Admin user data:", user);
   const bigSizeAdv = advertisement?.filter((ad) => ad.adSize === 'BIG') || [];
   const smallSizeAdv = advertisement?.filter((ad) => ad.adSize === 'SMALL') || [];
 
