@@ -76,7 +76,7 @@ export function OtpFields({ otpInput, setOtpInput }) {
   return (
     <OTPTextView
       containerStyle={{
-        margin: Sizes.fixPadding * 2.0,
+        // margin: Sizes.fixPadding * 2.0,
         marginVertical: Sizes.fixPadding * 2.0,
       }}
       handleTextChange={setOtpInput}
