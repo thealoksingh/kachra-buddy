@@ -26,6 +26,7 @@ import { useDispatch } from 'react-redux';
 import { sendOtp, verifyOtp } from '../../store/thunks/authThunk';
 import { completeProfile, completeUserProfile } from '../../store/thunks/userThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Key } from '../../constants/key';
 
 
 const LoginScreen = () => {
@@ -340,7 +341,7 @@ const LoginScreen = () => {
                 textAlign: 'center',
               }}
               onPress={() =>
-                Linking.openURL('https://www.termsandconditionsgenerator.com/')
+                Linking.openURL(Key.tncLink)
               }
             >
               Terms & Conditions

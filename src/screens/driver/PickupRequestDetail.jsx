@@ -144,7 +144,7 @@ const PickupRequestDetail = () => {
           </View>
         )}
 
-         <OrderStatusCard/>
+         <OrderStatusCard bookingData={currentOrder}/>
          {user && (
           <>
             <View style={styles.headingSection}>

@@ -27,7 +27,7 @@ const AllBookingsScreen = () => {
   const orders = useSelector(selectAdminOrders);
   const [refreshing, setRefreshing] = useState(false);
 
-  const ongoingFilters = ['all', 'active', 'new', 'out for pickup'];
+  const ongoingFilters = ['all', 'active', 'incomplete', 'out for pickup'];
   const completedFilters = ['all', 'completed', 'cancelled'];
   console.log('orders in all bookings screen', orders);
 
@@ -61,10 +61,10 @@ const AllBookingsScreen = () => {
     if (ongoingFilter === 'all') return baseOrders;
     if (ongoingFilter === 'active')
       return baseOrders.filter(
-        order => order.status === 'ACTIVE' || order.status === 'INCOMPLETE',
+        order => order.status === 'ACTIVE',
       );
-    if (ongoingFilter === 'new')
-      return baseOrders.filter(order => order.status === 'NEW');
+    if (ongoingFilter === 'incomplete')
+      return baseOrders.filter(order => order.status === 'INCOMPLETE');
     if (ongoingFilter === 'out for pickup')
       return baseOrders.filter(order => order.status === 'OUT_FOR_PICKUP');
     return baseOrders;
