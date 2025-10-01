@@ -10,8 +10,8 @@ const OrderStatusCard = ({ bookingData }) => {
     switch (status) {
       case 'INCOMPLETE':
         return [
-          { label: 'Order Pending', status: 'warning' },
-          { label: 'Order Confirmed', status: 'pending' },
+          { label: 'Booking Pending', status: 'warning' },
+          { label: 'Booking Confirmed', status: 'pending' },
           { label: 'Driver Allocated', status: 'pending' },
           { label: 'Out for Pickup', status: 'pending' },
           { label: 'Picked up', status: 'pending' },
@@ -19,7 +19,7 @@ const OrderStatusCard = ({ bookingData }) => {
 
       case 'COMPLETED':
         return [
-          { label: 'Order Confirmed', status: 'done' },
+          { label: 'Booking Confirmed', status: 'done' },
           { label: 'Driver Allocated', status: 'done' },
           { label: 'Out for Pickup', status: 'done' },
           { label: 'Picked up', status: 'done' },
@@ -27,7 +27,7 @@ const OrderStatusCard = ({ bookingData }) => {
 
       case 'ACTIVE':
         return [
-          { label: 'Order Confirmed', status: 'done' },
+          { label: 'Booking Confirmed', status: 'done' },
           {
             label: 'Driver Allocated',
             status: driverName ? 'done' : 'pending',
@@ -38,25 +38,25 @@ const OrderStatusCard = ({ bookingData }) => {
 
       case 'CANCELLED_BY_ADMIN':
         return [
-          { label: 'Order Confirmed', status: 'done' },
+          { label: 'Booking Confirmed', status: 'done' },
           { label: 'Cancelled by Admin', status: 'cancelled' },
         ];
 
       case 'CANCELLED_BY_DRIVER':
         return [
-          { label: 'Order Confirmed', status: 'done' },
+          { label: 'Booking Confirmed', status: 'done' },
           { label: 'Cancelled by Driver', status: 'cancelled' },
         ];
 
       case 'CANCELLED_BY_USER':
         return [
-          { label: 'Order Confirmed', status: 'done' },
+          { label: 'Booking Confirmed', status: 'done' },
           { label: 'Cancelled by User', status: 'cancelled' },
         ];
 
       case 'OUT_FOR_PICKUP':
         return [
-          { label: 'Order Confirmed', status: 'done' },
+          { label: 'Booking Confirmed', status: 'done' },
           { label: 'Driver Allocated', status: 'done' },
           { label: 'Out for Pickup', status: 'done' },
           { label: 'Picked up', status: 'pending' },
@@ -64,7 +64,7 @@ const OrderStatusCard = ({ bookingData }) => {
 
       default:
         return [
-          { label: 'Order Confirmed', status: 'pending' },
+          { label: 'Booking Confirmed', status: 'pending' },
           { label: 'Driver Allocated', status: 'pending' },
           { label: 'Out for Pickup', status: 'pending' },
           { label: 'Picked up', status: 'pending' },
@@ -86,7 +86,7 @@ const OrderStatusCard = ({ bookingData }) => {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Order Status</Text>
+      <Text style={styles.title}>Booking Status</Text>
       <View style={styles.progressContainer}>
         {steps.map((step, index) => {
           const icon = getIcon(step.status);

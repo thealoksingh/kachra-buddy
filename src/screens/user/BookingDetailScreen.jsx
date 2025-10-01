@@ -57,11 +57,11 @@ const BookingDetailScreen = () => {
         try {
           const response = await dispatch(getOrderById(orderId));
           if (getOrderById.fulfilled.match(response)) {
-            console.log('Fetched order data:', response?.payload?.data);
+            // console.log('Fetched Booking data:', response?.payload?.data);
             setOrderData(response?.payload?.data || response?.payload);
           }
         } catch (error) {
-          console.log('Error fetching order:', error);
+          console.log('Error fetching Booking:', error);
         } finally {
           setIsLoading(false);
         }
@@ -85,14 +85,14 @@ const BookingDetailScreen = () => {
 
     try {
       const result = await dispatch(cancelOrder(orderId));
-      console.log('Cancel order result:', result);
-      console.log('Result type:', result.type);
+      // console.log('Cancel order result:', result);
+      // console.log('Result type:', result.type);
 
       if (result.type === 'user/cancelOrder/fulfilled') {
         dispatch(
           showLottieAlert({
             type: 'success',
-            message: 'Order Cancelled Successfully',
+            message: 'Booking Cancelled Successfully',
             autoClose: true,
           }),
         );
@@ -106,7 +106,7 @@ const BookingDetailScreen = () => {
             type: 'failure',
             message:
               result?.payload?.message ||
-              'Order Cancellation Failed, Try Again',
+              'Booking Cancellation Failed, Try Again',
             autoClose: true,
           }),
         );
@@ -238,7 +238,7 @@ const BookingDetailScreen = () => {
             </Text>
           </View>
           <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Order Status</Text>
+            <Text style={textStyles.smallBold}>Booking Status</Text>
             <Text
               style={[
                 textStyles.small,

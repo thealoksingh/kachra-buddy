@@ -22,6 +22,7 @@ import { WarningWithButton } from '../../components/lottie/WarningWithButton';
 import { DottedBlackLoader } from '../../components/lottie/loaderView';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { openGoogleMaps, callUser } from '../../utils/CommonMethods';
 import MyStatusBar from '../../components/MyStatusBar';
 const { width } = Dimensions.get('window');
@@ -152,17 +153,19 @@ const BookingDetailAdmin = () => {
           <Text style={styles.sectionTitle}>User Detail</Text>
         </View>
         <View style={styles.userCard}>
-          <Image
-            source={{
-              uri: booking?.user?.avatarUrl
-                ? API_BASE_URL + booking?.user?.avatarUrl
-                : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-              headers: booking?.user?.avatarUrl
-                ? { Authorization: `Bearer ${booking?.user?.accessToken}` }
-                : undefined,
-            }}
-            style={styles.userImage}
-          />
+          {booking?.user?.avatarUrl ? (
+            <Image
+              source={{
+                uri: API_BASE_URL + booking?.user?.avatarUrl,
+                headers: { Authorization: `Bearer ${booking?.user?.accessToken}` },
+              }}
+              style={styles.userImage}
+            />
+          ) : (
+            <View style={[styles.userImage, styles.iconContainer]}>
+              <MaterialIcons name="account-circle" size={40} color="#999" />
+            </View>
+          )}
           <View style={{ marginLeft: 12 }}>
             <Text style={styles.userName}>
               {booking?.user?.fullName || 'N/A'}
@@ -178,17 +181,19 @@ const BookingDetailAdmin = () => {
             <Text style={styles.sectionTitle}>Driver Detail</Text>
             </View>
             <View style={styles.userCard}>
-              <Image
-                source={{
-                  uri: selectedDriver?.avatarUrl
-                    ? API_BASE_URL + selectedDriver.avatarUrl
-                    : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625',
-                  headers: selectedDriver?.avatarUrl
-                    ? { Authorization: `Bearer ${user?.accessToken}` }
-                    : undefined,
-                }}
-                style={styles.userImage}
-              />
+              {selectedDriver?.avatarUrl ? (
+                <Image
+                  source={{
+                    uri: API_BASE_URL + selectedDriver.avatarUrl,
+                    headers: { Authorization: `Bearer ${user?.accessToken}` },
+                  }}
+                  style={styles.userImage}
+                />
+              ) : (
+                <View style={[styles.userImage, styles.iconContainer]}>
+                  <MaterialIcons name="account-circle" size={60} color="#999" />
+                </View>
+              )}
               <View style={{ marginLeft: 12 }}>
                 <Text style={styles.userName}>{selectedDriver?.fullName}</Text>
                 <Text style={styles.userPhone}>
@@ -421,7 +426,7 @@ const BookingDetailAdmin = () => {
             style={[styles.outlinedBtn, { borderColor: Colors.primary }]}
           >
             <Text style={[styles.outlinedBtnText, { color: Colors.primary }]}>
-              Assign Driver
+              {selectedDriver?"Change Driver":"Assign Driver"}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -641,5 +646,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.extraLightGrayColor,
     marginTop: 10,
+  },
+  iconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eee',
   },
 });
