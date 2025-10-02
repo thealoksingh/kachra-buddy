@@ -87,7 +87,7 @@ const BookingCardAdmin = ({ booking }) => {
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate('bookingDetailAdmin', { bookingId:booking?.id })}
-      activeOpacity={0.7}
+      activeOpacity={0.9}
       style={[styles.card,{ borderLeftColor: getStatusColor(booking?.status) }]}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

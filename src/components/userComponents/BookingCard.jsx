@@ -96,7 +96,7 @@ const BookingCard = ({ booking }) => {
       onPress={() =>
         navigation.navigate('bookingDetailScreen', { orderId: booking?.id })
       }
-      activeOpacity={0.7}
+      activeOpacity={0.9}
       style={[
         styles.card,
         { borderLeftColor: getStatusColor(booking?.status) },

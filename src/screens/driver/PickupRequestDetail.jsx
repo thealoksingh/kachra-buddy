@@ -177,10 +177,6 @@ const PickupRequestDetail = () => {
 
         <View style={styles.itemsSection}>
           <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Items</Text>
-            <Text style={textStyles.small}>{totalItems}</Text>
-          </View>
-          <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Pickup Date Time</Text>
             <Text style={textStyles.small}>{formatDate(currentOrder?.pickupDate)}</Text>
           </View>
@@ -188,14 +184,24 @@ const PickupRequestDetail = () => {
             <Text style={textStyles.smallBold}>Pickup Status</Text>
             <Text style={textStyles.small}>{currentOrder?.status || 'N/A'}</Text>
           </View>
-          <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Expected Price</Text>
-            <Text style={[textStyles.small,{fontWeight:"700",color:Colors.darkBlue}]}>₹{currentOrder?.finalPrice || 0}</Text>
-          </View>
-           {currentOrder?.givenAmount&&(<View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Given Amount</Text>
-            <Text style={[textStyles.small,{fontWeight:"700",color:Colors.primary}]}>₹{currentOrder?.givenAmount || 0}</Text>
-          </View>)}
+          {currentOrder?.orderType === 'GENERAL' && (
+            <>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Items</Text>
+                <Text style={textStyles.small}>{totalItems}</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Expected Price</Text>
+                <Text style={[textStyles.small,{fontWeight:"700",color:Colors.darkBlue}]}>₹{currentOrder?.finalPrice || 0}</Text>
+              </View>
+              {currentOrder?.givenAmount && (
+                <View style={commonStyles.rowSpaceBetween}>
+                  <Text style={textStyles.smallBold}>Given Amount</Text>
+                  <Text style={[textStyles.small,{fontWeight:"700",color:Colors.primary}]}>₹{currentOrder?.givenAmount || 0}</Text>
+                </View>
+              )}
+            </>
+          )}
         </View>
         <View style={styles.headingSection}>
           <Text style={styles.sectionTitle}>Customer Detail</Text>
@@ -271,29 +277,61 @@ const PickupRequestDetail = () => {
           </View>
         </View>
 
-        <View style={styles.headingSection}>
-          <Text style={styles.sectionTitle}>Item In this Booking</Text>
-        </View>
-        <View style={styles.itemsSection}>
-          {orderItems.map(orderItem => (
-            <View key={orderItem.id} style={styles.itemCard}>
-              <Image 
-                source={{ 
-                  uri: orderItem.item.imageUrl ? `${Key.API_BASE_URL}${orderItem.item.imageUrl}` : 'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                  headers: orderItem.item.imageUrl ? { Authorization: `Bearer ${Key.ACCESS_TOKEN}` } : undefined
-                }} 
-                style={styles.itemImage} 
-              />
-              <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.itemTitle}>{orderItem.item.name}</Text>
-                <Text style={styles.itemDesc}>₹{orderItem.item.pricePerUnit} per {orderItem.item.unit}</Text>
-                <Text style={styles.itemInfo}>
-                  Qty: {orderItem.quantity} {orderItem.unit} | ₹{orderItem.price}
-                </Text>
-              </View>
+        {currentOrder?.orderType === 'VEHICLE' && (
+          <>
+            <View style={styles.headingSection}>
+              <Text style={styles.sectionTitle}>Vehicle Details</Text>
             </View>
-          ))}
-        </View>
+            <View style={styles.itemsSection}>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Vehicle Type</Text>
+                <Text style={textStyles.small}>Cargo Vehicle</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Vehicle Brand</Text>
+                <Text style={textStyles.small}>TATA</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Vehicle Number</Text>
+                <Text style={textStyles.small}>MH14FE4940</Text>
+              </View>
+             
+              {currentOrder?.givenAmount && (
+                <View style={commonStyles.rowSpaceBetween}>
+                  <Text style={textStyles.smallBold}>Given Amount</Text>
+                  <Text style={[textStyles.small,{fontWeight:"700",color:Colors.primary}]}>₹{currentOrder?.givenAmount || 0}</Text>
+                </View>
+              )}
+            </View>
+          </>
+        )}
+        {currentOrder?.orderType === 'GENERAL' && (
+          <>
+            <View style={styles.headingSection}>
+              <Text style={styles.sectionTitle}>Item In this Booking</Text>
+            </View>
+            <View style={styles.itemsSection}>
+              {orderItems.map(orderItem => (
+                <View key={orderItem.id} style={styles.itemCard}>
+                  <Image 
+                    source={{ 
+                      uri: orderItem.item.imageUrl ? `${Key.API_BASE_URL}${orderItem.item.imageUrl}` : 'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                      headers: orderItem.item.imageUrl ? { Authorization: `Bearer ${Key.ACCESS_TOKEN}` } : undefined
+                    }} 
+                    style={styles.itemImage} 
+                  />
+                  <View style={{ flex: 1, marginLeft: 12 }}>
+                    <Text style={styles.itemTitle}>{orderItem.item.name}</Text>
+                    <Text style={styles.itemDesc}>₹{orderItem.item.pricePerUnit} per {orderItem.item.unit}</Text>
+                    <Text style={styles.itemInfo}>
+                      Qty: {orderItem.quantity} {orderItem.unit} | ₹{orderItem.price}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
 
         {(currentOrder?.status !== 'COMPLETED' && currentOrder?.status === 'OUT_FOR_PICKUP') && <TouchableOpacity
           activeOpacity={0.8}

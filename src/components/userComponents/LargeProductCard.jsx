@@ -143,7 +143,7 @@ const LargeProductCard = ({ product }) => {
 
       {isItemInCart ? (
         <TouchableOpacity
-          activeOpacity={0.7}
+          activeOpacity={0.9}
           style={[styles.cartButton, { backgroundColor: Colors.secondary }]}
           onPress={handleRemoveFromCart}
           disabled={isLoading}
@@ -163,7 +163,7 @@ const LargeProductCard = ({ product }) => {
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
-          activeOpacity={0.7}
+          activeOpacity={0.9}
           style={[styles.cartButton, { backgroundColor: Colors.primary }]}
           onPress={handleAddToCart}
           disabled={isLoading}

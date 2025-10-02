@@ -64,7 +64,7 @@ export function ButtonWithLoader({
     </View>
   ) : (
     <TouchableOpacity
-      activeOpacity={0.7}
+      activeOpacity={0.9}
       style={{ ...commonStyles.button, backgroundColor: color }}
       onPress={method}
     >
@@ -93,7 +93,7 @@ export function CommonAppBar({ label, navigation }) {
   return (
     <View style={styles.appBar}>
       <TouchableOpacity
-        activeOpacity={0.7}
+        activeOpacity={0.9}
         onPress={() => navigation?.goBack()}
       >
         <Ionicons name="arrow-back" size={24} color="black" />

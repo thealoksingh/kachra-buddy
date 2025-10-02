@@ -266,7 +266,7 @@ const BookingDetailScreen = () => {
                   ₹{orderData?.finalPrice || 0}
                 </Text>
               </View>
-              {orderData?.status=="COMPLETED"&&(<View style={commonStyles.rowSpaceBetween}>
+              {orderData?.givenAmount&&(<View style={commonStyles.rowSpaceBetween}>
                 <Text style={textStyles.smallBold}>Given Amount</Text>
                 <Text style={[textStyles.small, { color: Colors.primary }]}>
                   ₹{orderData?.givenAmount || 0}
@@ -306,12 +306,13 @@ const BookingDetailScreen = () => {
                 <Text style={textStyles.smallBold}>Vehicle Number</Text>
                 <Text style={textStyles.small}>MH14FE4940</Text>
               </View>
-              <View style={commonStyles.rowSpaceBetween}>
-                <Text style={textStyles.smallBold}>Final Price</Text>
-                <Text style={textStyles.small}>
-                  ₹{orderData?.finalPrice || 0}
+             
+               {orderData?.status=="COMPLETED"&&(<View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Given Amount</Text>
+                <Text style={[textStyles.small, { color: Colors.primary }]}>
+                  ₹{orderData?.givenAmount || 0}
                 </Text>
-              </View>
+              </View>)}
             </View>
           </>
         )}

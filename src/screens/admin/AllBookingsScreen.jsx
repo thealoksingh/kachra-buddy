@@ -108,7 +108,7 @@ const AllBookingsScreen = () => {
       isLoading ? (
         <LoaderCard count={5} cardHeight={20} />
       ) : (
-        <>
+        <View style={{ flex: 1 }}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -135,6 +135,7 @@ const AllBookingsScreen = () => {
             ))}
           </ScrollView>
           <FlatList
+            style={{ flex: 1 }}
             data={completedOrders}
             keyExtractor={item => item.id.toString()}
             renderItem={({ item }) => <BookingCardAdmin booking={item} />}
@@ -143,9 +144,9 @@ const AllBookingsScreen = () => {
             }
             ListFooterComponent={<FaddedIcon />}
           />
-        </>
+        </View>
       ),
-    [isLoading, completedOrders, refreshing],
+    [isLoading, completedOrders, refreshing, completedFilter],
   );
 
   const OngoingBookings = React.useMemo(

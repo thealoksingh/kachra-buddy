@@ -214,10 +214,6 @@ const BookingDetailAdmin = () => {
 
         <View style={styles.itemsSection}>
           <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Items</Text>
-            <Text style={textStyles.small}>{items.length}</Text>
-          </View>
-          <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Pickup Date Time</Text>
             <Text style={textStyles.small}>
               {booking?.pickupDate
@@ -229,18 +225,19 @@ const BookingDetailAdmin = () => {
             <Text style={textStyles.smallBold}>Status</Text>
             <Text style={textStyles.small}>{booking?.status || 'N/A'}</Text>
           </View>
-
-          <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Expected Amount</Text>
-            <Text style={textStyles.small}>₹{booking?.finalPrice || 0}</Text>
-          </View>
-          {booking?.status == 'COMPLETED' && (
-            <View style={commonStyles.rowSpaceBetween}>
-              <Text style={textStyles.smallBold}>Given Amount</Text>
-              <Text style={[textStyles.small, { color: Colors.primary }]}>
-                ₹{booking?.givenAmount || 0}
-              </Text>
-            </View>
+          {booking?.orderType === 'GENERAL' && (
+            <>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Items</Text>
+                <Text style={textStyles.small}>{items.length}</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Expected Amount</Text>
+                <Text style={[textStyles.small, { color: Colors.primary }]}>
+                  ₹{booking?.finalPrice || 0}
+                </Text>
+              </View>
+            </>
           )}
         </View>
         <View style={styles.headingSection}>
@@ -336,91 +333,140 @@ const BookingDetailAdmin = () => {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.headingSection}>
-          <Text style={styles.sectionTitle}>Pickup Details</Text>
-        </View>
-        <View style={{ padding: 10 }}>
-          <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Amount Received</Text>
-            <Text style={textStyles.small}>₹{booking?.finalPrice || 0}</Text>
+        {booking.status==="COMPLETED"&&(<>
+          <View style={styles.headingSection}>
+            <Text style={styles.sectionTitle}>Pickup Details</Text>
           </View>
-          <Text
-            style={[
-              textStyles.small,
-              { flex: 1, textAlign: 'right', textAlign: 'justify' },
-            ]}
-          >
-            <Text style={textStyles.smallBold}>Remark By Driver : </Text>
-            This is remark Given by Driver it could be quite long
-          </Text>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              gap: 10,
-              justifyContent: 'space-evenly',
-            }}
-          >
-            {pickupImages.map((image, index) => (
-              <TouchableOpacity
-                key={index}
-                activeOpacity={0.8}
-                onPress={() => {
-                  setPreviewImage(image.uri);
-                  setPreviewVisible(true);
-                }}
+          <View style={{ padding: 10 }}>
+            {booking?.givenAmount && (
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Given Amount</Text>
+                <Text style={[textStyles.small, { color: Colors.primary }]}>
+                  ₹{booking?.givenAmount || 0}
+                </Text>
+              </View>
+            )}
+
+            {booking?.remark && (
+              <Text
+                style={[
+                  textStyles.small,
+                  { flex: 1, textAlign: 'right', textAlign: 'justify' },
+                ]}
               >
-                <Image
-                  source={{
-                    uri: image.uri,
-                    headers: { Authorization: `Bearer ${user?.accessToken}` },
+                <Text style={textStyles.smallBold}>Remark By Driver : </Text>
+                {booking?.remark || 'NA'}
+              </Text>
+            )}
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: 10,
+                justifyContent: 'space-evenly',
+              }}
+            >
+              {pickupImages.map((image, index) => (
+                <TouchableOpacity
+                  key={index}
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    setPreviewImage(image.uri);
+                    setPreviewVisible(true);
                   }}
-                  style={styles.pickupImage}
+                >
+                  <Image
+                    source={{
+                      uri: image.uri,
+                      headers: { Authorization: `Bearer ${user?.accessToken}` },
+                    }}
+                    style={styles.pickupImage}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </>)}
+        {booking?.orderType === 'VEHICLE' && (
+          <>
+            <View style={styles.headingSection}>
+              <Text style={styles.sectionTitle}>Vehicle Details</Text>
+            </View>
+            <View style={styles.itemsSection}>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Vehicle Type</Text>
+                <Text style={textStyles.small}>Cargo Vehicle</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Vehicle Brand</Text>
+                <Text style={textStyles.small}>TATA</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Vehicle Number</Text>
+                <Text style={textStyles.small}>MH14FE4940</Text>
+              </View>
+              {/* <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Final Price</Text>
+                <Text style={[textStyles.small, { color: Colors.primary }]}>₹{booking?.finalPrice || 0}</Text>
+              </View> */}
+              {booking?.status === 'COMPLETED' && (
+                <View style={commonStyles.rowSpaceBetween}>
+                  <Text style={textStyles.smallBold}>Given Amount</Text>
+                  <Text style={[textStyles.small, { color: Colors.primary }]}>
+                    ₹{booking?.givenAmount || 0}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </>
+        )}
+        {booking?.orderType === 'GENERAL' && (
+          <>
+            <View style={styles.itemHeadingSection}>
+              <View></View>
+              <Text style={styles.sectionTitle}>Item In this Booking</Text>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('editOrderScreen', { booking })
+                }
+              >
+                <Ionicons
+                  name="create-outline"
+                  size={20}
+                  color={Colors.primary}
+                  style={{ marginRight: 10 }}
                 />
               </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.itemHeadingSection}>
-          <View></View>
-          <Text style={styles.sectionTitle}>Item In this Booking</Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('editOrderScreen', { booking })}
-          >
-            <Ionicons
-              name="create-outline"
-              size={20}
-              color={Colors.primary}
-              style={{ marginRight: 10 }}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.itemsSection}>
-          {items.map(item => (
-            <View key={item.id} style={styles.itemCard}>
-              <Image
-                source={{
-                  uri: item.item?.imageUrl
-                    ? API_BASE_URL + item.item.imageUrl
-                    : 'https://via.placeholder.com/60',
-                  headers: item.item?.imageUrl
-                    ? { Authorization: `Bearer ${user?.accessToken}` }
-                    : undefined,
-                }}
-                style={styles.itemImage}
-              />
-              <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.itemTitle}>{item.item?.name || 'N/A'}</Text>
-                <Text style={styles.itemInfo}>
-                  Quantity: {item.quantity} {item.unit}
-                </Text>
-                <Text style={styles.itemInfo}>Price: ₹{item.price}</Text>
-              </View>
             </View>
-          ))}
-        </View>
-        <View
+            <View style={styles.itemsSection}>
+              {items.map(item => (
+                <View key={item.id} style={styles.itemCard}>
+                  <Image
+                    source={{
+                      uri: item.item?.imageUrl
+                        ? API_BASE_URL + item.item.imageUrl
+                        : 'https://via.placeholder.com/60',
+                      headers: item.item?.imageUrl
+                        ? { Authorization: `Bearer ${user?.accessToken}` }
+                        : undefined,
+                    }}
+                    style={styles.itemImage}
+                  />
+                  <View style={{ flex: 1, marginLeft: 12 }}>
+                    <Text style={styles.itemTitle}>
+                      {item.item?.name || 'N/A'}
+                    </Text>
+                    <Text style={styles.itemInfo}>
+                      Quantity: {item.quantity} {item.unit}
+                    </Text>
+                    <Text style={styles.itemInfo}>Price: ₹{item.price}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+       {booking?.status !== 'COMPLETED' && !(booking?.status.includes('CANCELLED')) && ( <View
           style={{
             display: 'flex',
             flexDirection: 'row',
@@ -450,7 +496,7 @@ const BookingDetailAdmin = () => {
               Cancel Order
             </Text>
           </TouchableOpacity>
-        </View>
+        </View>)}
 
         <FaddedIcon />
         <View style={{ height: 80 }} />
