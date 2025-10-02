@@ -25,6 +25,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { openGoogleMaps, callUser } from '../../utils/CommonMethods';
 import MyStatusBar from '../../components/MyStatusBar';
+import OrderStatusCard from '../../components/userComponents/OrderStatusCard';
 const { width } = Dimensions.get('window');
 const BookingDetailAdmin = () => {
   const navigation = useNavigation();
@@ -149,6 +150,7 @@ const BookingDetailAdmin = () => {
             </View>
           </>
         )}
+        <OrderStatusCard bookingData={booking} />
         <View style={styles.headingSection}>
           <Text style={styles.sectionTitle}>User Detail</Text>
         </View>
@@ -157,7 +159,9 @@ const BookingDetailAdmin = () => {
             <Image
               source={{
                 uri: API_BASE_URL + booking?.user?.avatarUrl,
-                headers: { Authorization: `Bearer ${booking?.user?.accessToken}` },
+                headers: {
+                  Authorization: `Bearer ${booking?.user?.accessToken}`,
+                },
               }}
               style={styles.userImage}
             />
@@ -177,8 +181,8 @@ const BookingDetailAdmin = () => {
         </View>
         {selectedDriver && (
           <>
-          <View style={styles.headingSection}>
-            <Text style={styles.sectionTitle}>Driver Detail</Text>
+            <View style={styles.headingSection}>
+              <Text style={styles.sectionTitle}>Driver Detail</Text>
             </View>
             <View style={styles.userCard}>
               {selectedDriver?.avatarUrl ? (
@@ -227,9 +231,17 @@ const BookingDetailAdmin = () => {
           </View>
 
           <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Final Price</Text>
+            <Text style={textStyles.smallBold}>Expected Amount</Text>
             <Text style={textStyles.small}>₹{booking?.finalPrice || 0}</Text>
           </View>
+          {booking?.status == 'COMPLETED' && (
+            <View style={commonStyles.rowSpaceBetween}>
+              <Text style={textStyles.smallBold}>Given Amount</Text>
+              <Text style={[textStyles.small, { color: Colors.primary }]}>
+                ₹{booking?.givenAmount || 0}
+              </Text>
+            </View>
+          )}
         </View>
         <View style={styles.headingSection}>
           <Text style={styles.sectionTitle}>Customer Detail</Text>
@@ -426,7 +438,7 @@ const BookingDetailAdmin = () => {
             style={[styles.outlinedBtn, { borderColor: Colors.primary }]}
           >
             <Text style={[styles.outlinedBtnText, { color: Colors.primary }]}>
-              {selectedDriver?"Change Driver":"Assign Driver"}
+              {selectedDriver ? 'Change Driver' : 'Assign Driver'}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity

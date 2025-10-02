@@ -237,7 +237,7 @@ const BookingDetailScreen = () => {
                 : 'N/A'}
             </Text>
           </View>
-          <View style={commonStyles.rowSpaceBetween}>
+          {/* <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Booking Status</Text>
             <Text
               style={[
@@ -247,7 +247,7 @@ const BookingDetailScreen = () => {
             >
               {orderData?.status || 'N/A'}
             </Text>
-          </View>
+          </View> */}
           {/* <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Driver Allocation</Text>
             <Text style={textStyles.small}>
@@ -261,11 +261,17 @@ const BookingDetailScreen = () => {
                 <Text style={textStyles.small}>{items.length}</Text>
               </View> */}
               <View style={commonStyles.rowSpaceBetween}>
-                <Text style={textStyles.smallBold}>Final Price</Text>
+                <Text style={textStyles.smallBold}>Expected Amount</Text>
                 <Text style={[textStyles.small, { color: Colors.primary }]}>
                   ₹{orderData?.finalPrice || 0}
                 </Text>
               </View>
+              {orderData?.status=="COMPLETED"&&(<View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Given Amount</Text>
+                <Text style={[textStyles.small, { color: Colors.primary }]}>
+                  ₹{orderData?.givenAmount || 0}
+                </Text>
+              </View>)}
             </>
           )}
           <View style={commonStyles.rowSpaceBetween}>

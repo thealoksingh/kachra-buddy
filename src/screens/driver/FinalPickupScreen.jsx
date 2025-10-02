@@ -424,7 +424,7 @@ const FinalPickupScreen = () => {
         {otpSent && !isVerified && (
           <View style={styles.formCard}>
             <Text style={styles.sectionLabel}>
-              Enter OTP sent to Customer Whatsapp number
+             Enter the OTP sent from the Customer App (Order Details screen)
               <Text style={{ color: Colors.secondary }}>*</Text>
             </Text>
             <OtpFields otpInput={otpInput} setOtpInput={setOtpInput} />

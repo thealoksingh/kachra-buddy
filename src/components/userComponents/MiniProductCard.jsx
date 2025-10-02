@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   price: {
-    ...textStyles.small,
+    fontSize: 10,
     color: Colors.blackColor,
     fontWeight: 'bold',
     marginTop: 2,

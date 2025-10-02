@@ -1,38 +1,63 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, View, ScrollView, TouchableOpacity, Text } from 'react-native';
-import { useSelector } from 'react-redux';
+import {
+  FlatList,
+  StyleSheet,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Text,
+} from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 import SwipableTabs from '../../components/SwipableTabs';
-import { CommonAppBar, EmptyList, FaddedIcon } from '../../components/commonComponents';
+import {
+  CommonAppBar,
+  EmptyList,
+  FaddedIcon,
+} from '../../components/commonComponents';
 import BookingCard from '../../components/userComponents/BookingCard';
 import { selectOrders } from '../../store/selector';
 import { Colors } from '../../styles/commonStyles';
 import { LoaderCard } from '../../components/LoaderCard';
-const ClosedBookings = ({ orders, isLoading, completedFilter, setCompletedFilter }) => {
+import { RefreshControl } from 'react-native-gesture-handler';
+import { fetchOrders } from '../../store/thunks/userThunk';
+const ClosedBookings = ({
+  orders,
+  isLoading,
+  completedFilter,
+  setCompletedFilter,
+  onRefresh,
+  refreshing,
+}) => {
   const completedFilters = ['all', 'completed', 'cancelled'];
-  
+
   const getCompletedOrders = () => {
-    const baseOrders = orders?.filter(order => 
-      order?.status === 'COMPLETED' ||
-      order?.status === 'CANCELLED_BY_USER' ||
-      order?.status === 'CANCELLED_BY_ADMIN' ||
-      order?.status === 'CANCELLED_BY_DRIVER' ||
-      order?.status.includes('CANCELLED')
-    ) || [];
-    
+    const baseOrders =
+      orders?.filter(
+        order =>
+          order?.status === 'COMPLETED' ||
+          order?.status === 'CANCELLED_BY_USER' ||
+          order?.status === 'CANCELLED_BY_ADMIN' ||
+          order?.status === 'CANCELLED_BY_DRIVER' ||
+          order?.status.includes('CANCELLED'),
+      ) || [];
+
     if (completedFilter === 'all') return baseOrders;
-    if (completedFilter === 'completed') return baseOrders.filter(order => order?.status === 'COMPLETED');
-    if (completedFilter === 'cancelled') return baseOrders.filter(order => 
-      order?.status === 'CANCELLED_BY_USER' ||
-      order?.status === 'CANCELLED_BY_ADMIN' ||
-      order?.status === 'CANCELLED_BY_DRIVER' ||
-      order?.status.includes('CANCELLED')
-    );
+    if (completedFilter === 'completed')
+      return baseOrders.filter(order => order?.status === 'COMPLETED');
+    if (completedFilter === 'cancelled')
+      return baseOrders.filter(
+        order =>
+          order?.status === 'CANCELLED_BY_USER' ||
+          order?.status === 'CANCELLED_BY_ADMIN' ||
+          order?.status === 'CANCELLED_BY_DRIVER' ||
+          order?.status.includes('CANCELLED'),
+      );
     return baseOrders;
   };
-  
+
   const completedOrders = getCompletedOrders();
-  
+
   return (
     <>
       {isLoading ? (
@@ -70,10 +95,13 @@ const ClosedBookings = ({ orders, isLoading, completedFilter, setCompletedFilter
             keyExtractor={item => item.id.toString()}
             renderItem={({ item }) => <BookingCard booking={item} />}
             ListFooterComponent={
-              <>{completedOrders.length >=2 && <FaddedIcon />}</>
+              <>{completedOrders.length >= 2 && <FaddedIcon />}</>
             }
             ListEmptyComponent={
               <EmptyList message={"You Don't have any completed Order yet"} />
+            }
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
           />
         </View>
@@ -82,25 +110,36 @@ const ClosedBookings = ({ orders, isLoading, completedFilter, setCompletedFilter
   );
 };
 
-const OngoingBookings = ({ orders, isLoading, ongoingFilter, setOngoingFilter }) => {
+const OngoingBookings = ({
+  orders,
+  isLoading,
+  ongoingFilter,
+  setOngoingFilter,
+  onRefresh,
+  refreshing,
+}) => {
   const ongoingFilters = ['all', 'active', 'incomplete', 'out for pickup'];
-  
+
   const getOngoingOrders = () => {
-    const baseOrders = orders?.filter(
-      order =>
-        order?.status === 'ACTIVE' ||
-        order?.status === 'INCOMPLETE' ||
-        order?.status === 'NEW' ||
-        order?.status === 'OUT_FOR_PICKUP',
-    ) || [];
-    
+    const baseOrders =
+      orders?.filter(
+        order =>
+          order?.status === 'ACTIVE' ||
+          order?.status === 'INCOMPLETE' ||
+          order?.status === 'NEW' ||
+          order?.status === 'OUT_FOR_PICKUP',
+      ) || [];
+
     if (ongoingFilter === 'all') return baseOrders;
-    if (ongoingFilter === 'active') return baseOrders.filter(order => order?.status === 'ACTIVE');
-    if (ongoingFilter === 'incomplete') return baseOrders.filter(order => order?.status === 'INCOMPLETE');
-    if (ongoingFilter === 'out for pickup') return baseOrders.filter(order => order?.status === 'OUT_FOR_PICKUP');
+    if (ongoingFilter === 'active')
+      return baseOrders.filter(order => order?.status === 'ACTIVE');
+    if (ongoingFilter === 'incomplete')
+      return baseOrders.filter(order => order?.status === 'INCOMPLETE');
+    if (ongoingFilter === 'out for pickup')
+      return baseOrders.filter(order => order?.status === 'OUT_FOR_PICKUP');
     return baseOrders;
   };
-  
+
   const ongoingOrders = getOngoingOrders();
 
   return (
@@ -140,7 +179,10 @@ const OngoingBookings = ({ orders, isLoading, ongoingFilter, setOngoingFilter })
             keyExtractor={item => item.id.toString()}
             renderItem={({ item }) => <BookingCard booking={item} />}
             ListFooterComponent={
-              <>{ongoingOrders.length >=2 && <FaddedIcon />}</>
+              <>{ongoingOrders.length >= 2 && <FaddedIcon />}</>
+            }
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
             ListEmptyComponent={
               <EmptyList message={"You Don't have any Ongoing Order yet"} />
@@ -157,35 +199,51 @@ const BookingScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [ongoingFilter, setOngoingFilter] = useState('all');
   const [completedFilter, setCompletedFilter] = useState('all');
-  
+  const [refreshing, setRefreshing] = useState(false);
   useEffect(() => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
   }, []);
-  
+
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const orders = useSelector(selectOrders);
   // console.log("orders in booking screen", orders);
   
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await dispatch(fetchOrders());
+    } catch (error) {
+      console.log('Error refreshing orders:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
       <CommonAppBar navigation={navigation} label={'Bookings'} />
       <SwipableTabs
         titles={['Ongoing Bookings', 'Closed Bookings']}
         components={[
-          <OngoingBookings 
-            orders={orders} 
-            isLoading={isLoading} 
+          <OngoingBookings
+            orders={orders}
+            isLoading={isLoading}
             ongoingFilter={ongoingFilter}
             setOngoingFilter={setOngoingFilter}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
           />,
-          <ClosedBookings 
-            orders={orders} 
-            isLoading={isLoading} 
+          <ClosedBookings
+            orders={orders}
+            isLoading={isLoading}
             completedFilter={completedFilter}
             setCompletedFilter={setCompletedFilter}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
           />,
         ]}
       />

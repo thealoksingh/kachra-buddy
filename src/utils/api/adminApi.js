@@ -94,6 +94,16 @@ export const updateItemAPI = async (itemId, itemData, file) => {
   });
 };
 
+export const deleteItemAPI = async (itemId) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+
+  return apiDeleteRequest({
+    apiUrl: `${API_BASE_URL}/items/${itemId}`,
+    content_type: "multipart/form-data",
+     accessToken,
+  });
+};
+
 export const fetchAllOrdersAPI = async () => {
   const accessToken = await AsyncStorage.getItem("access_token");
   return apiGetRequest({

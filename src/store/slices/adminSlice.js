@@ -3,6 +3,7 @@ import {
   fetchAllItems,
   createItem,
   updateItem,
+  deleteItem,
   fetchAllOrders,
   fetchAllUsers,
   createUser,
@@ -98,6 +99,21 @@ const adminSlice = createSlice({
         }
       })
       .addCase(updateItem.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message;
+      })
+      .addCase(deleteItem.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteItem.fulfilled, (state, action) => {
+        state.loading = false;
+        // The deleted item ID should be from the thunk meta.arg since API might not return the item
+        const deletedItemId = action.meta.arg.itemId;
+        state.items = state.items.filter(item => item.id !== deletedItemId);
+        console.log('Item deleted from state, remaining items:', state.items.length);
+      })
+      .addCase(deleteItem.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message;
       })

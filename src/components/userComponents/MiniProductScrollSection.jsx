@@ -40,12 +40,13 @@ const MiniProductScrollSection = ({ products }) => {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {row2Products.map((product, index) => (
             <MiniProductCard
-              key={product?.id}
-              itemId={product?.id}
-              title={product?.name}
-              price={product?.pricePerUnit}
-              image={product?.imageUrl}
-             />
+            key={product?.id}
+            itemId={product?.id}
+            title={product?.name}
+            price={product?.pricePerUnit}
+            image={product?.imageUrl}
+            unit={product?.unit}
+            />
           ))}
         </ScrollView>
       )}

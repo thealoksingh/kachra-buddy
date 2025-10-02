@@ -192,7 +192,7 @@ const PickupRequestDetail = () => {
             <Text style={textStyles.smallBold}>Expected Price</Text>
             <Text style={[textStyles.small,{fontWeight:"700",color:Colors.darkBlue}]}>₹{currentOrder?.finalPrice || 0}</Text>
           </View>
-          {currentOrder?.givenAmount&&(<View style={commonStyles.rowSpaceBetween}>
+           {currentOrder?.givenAmount&&(<View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Given Amount</Text>
             <Text style={[textStyles.small,{fontWeight:"700",color:Colors.primary}]}>₹{currentOrder?.givenAmount || 0}</Text>
           </View>)}
