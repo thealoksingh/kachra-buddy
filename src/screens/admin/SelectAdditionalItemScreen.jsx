@@ -112,7 +112,7 @@ const SelectAdditionalItemScreen = () => {
             style={[
               styles.filterButton,
               selectedFilter === item && {
-                borderColor: Colors.primaryColor,
+                borderColor: Colors.primary,
                 backgroundColor: '#f0f8ff',
               },
             ]}
@@ -122,7 +122,7 @@ const SelectAdditionalItemScreen = () => {
               style={[
                 styles.filterText,
                 selectedFilter === item && {
-                  color: Colors.primaryColor,
+                  color: Colors.primary,
                   fontWeight: '600',
                 },
               ]}

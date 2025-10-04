@@ -14,6 +14,7 @@ import {
   ButtonWithLoader,
   CommonAppBar,
   FaddedIcon,
+  InputBox,
 } from '../../components/commonComponents';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
 import { useDispatch } from 'react-redux';
@@ -30,6 +31,9 @@ const EditOrderScreen = () => {
   const [updatedQuantities, setUpdatedQuantities] = useState({});
   const [existingItems, setExistingItems] = useState(booking?.orderItems || []);
   const [additionalItems, setAdditionalItems] = useState([]);
+  const [givenAmount, setGivenAmount] = useState(
+    booking?.givenAmount?.toString() || '',
+  );
 
   const submitOrder = async () => {
     // Validate form before submission
@@ -75,7 +79,7 @@ const EditOrderScreen = () => {
       id: booking.id,
       orderItems: [...updatedOrderItems, ...formattedAdditionalItems],
       finalPrice: calculateTotalPrice(),
-      givenAmount: 0,
+      givenAmount: parseFloat(givenAmount) || 0,
       remark: '',
     };
 
@@ -262,10 +266,20 @@ const EditOrderScreen = () => {
             <Text style={styles.addItemText}>+ Add Items</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.priceCard}>
-          <Text style={styles.priceLabel}>
-            Total Price: ₹{(calculateTotalPrice() || 0).toFixed(2)}
-          </Text>
+        <View style={styles.formCard}>
+          <View style={styles.priceCard}>
+            <Text style={styles.priceLabel}>
+              Total Price: ₹{(calculateTotalPrice() || 0).toFixed(2)}
+            </Text>
+          </View>
+         {booking?.givenAmount&&(<InputBox
+            value={givenAmount}
+            setter={setGivenAmount}
+            placeholder="Enter given amount"
+            label="Given Amount"
+            optional={true}
+            type="numeric"
+          />)}
         </View>
         <View style={{ marginHorizontal: 10, marginVertical: 10 }}>
           <ButtonWithLoader
@@ -321,19 +335,18 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   priceCard: {
-    margin: 12,
-    padding: 16,
+    padding: 10,
     backgroundColor: Colors.whiteColor,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 3,
+    borderRadius: 10,
+    borderColor: '#cdcdcdff',
+    borderWidth: 1,
     alignItems: 'center',
+    marginVertical: 20,
   },
   priceLabel: {
     fontSize: 18,
     fontWeight: 'bold',
+    textAlign: 'center',
     color: Colors.blackColor,
   },
 });
