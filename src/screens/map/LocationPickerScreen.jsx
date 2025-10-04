@@ -90,7 +90,7 @@ const LocationPickerScreen = ({ navigation, route }) => {
     }
 
     Geolocation.getCurrentPosition(
-      position => {
+      async position => {
         console.log('[loc] position:', position);
         const { latitude, longitude } = position.coords;
         const newRegion = {
@@ -103,6 +103,7 @@ const LocationPickerScreen = ({ navigation, route }) => {
         setRegion(newRegion);
         setCurrentLocation({ latitude, longitude });
         setSelectedLocation({ latitude, longitude });
+        await fetchAddressFromCoordinates(latitude, longitude);
 
         mapRef.current?.animateToRegion(newRegion, 1000);
       },

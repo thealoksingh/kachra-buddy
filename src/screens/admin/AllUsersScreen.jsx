@@ -31,6 +31,7 @@ import { CommonAppBar } from '../../components/commonComponents';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { fetchAllUsers } from '../../store/thunks/adminThunk';
 import { selectAllUsers } from '../../store/selector';
+import { getStatusColor } from '../../utils/CommonMethods';
 import Key from '../../constants/key';
 
 // Dummy users data for UI
@@ -181,16 +182,7 @@ const AllUsersScreen = () => {
           <Text style={styles.userMobile}>{user?.contactNumber || 'N/A'}</Text>
           <Text style={[styles.userMobile, { color: Colors.blackColor }]}>
             Status:{' '}
-            <Text
-              style={{
-                color:
-                  user?.status === 'Active'
-                    ? Colors.primary
-                    : user?.status === 'Blocked'
-                    ? Colors.redColor
-                    : Colors.secondary,
-              }}
-            >
+            <Text style={{ color: getStatusColor(user?.status) }}>
               {user?.status || 'N/A'}
             </Text>
           </Text>

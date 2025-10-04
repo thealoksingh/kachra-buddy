@@ -15,7 +15,7 @@ import { Colors, commonStyles, textStyles } from '../../styles/commonStyles';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAdminOrders, selectUser } from '../../store/selector';
 import { assignDriver } from '../../store/thunks/adminThunk';
-import { showSnackbar } from '../../store/slices/snackbarSlice';
+import { showLottieAlert } from '../../store/slices/lottieAlertSlice';
 import Key from '../../constants/key';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { WarningWithButton } from '../../components/lottie/WarningWithButton';
@@ -43,17 +43,18 @@ const BookingDetailAdmin = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [warningVisible, setWarningVisible] = useState(false);
-  const [failureAlertVisible, setFailureAlertVisible] = useState(false);
-  const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const flatListRef = useRef();
   // console.log("this is booking at admin =>",booking);
   const images =
-    booking?.orderImages?.map(img => API_BASE_URL + img.imageUrl) || [];
+    booking?.orderImages
+      ?.filter(img => img.postedBy === 'USER')
+      .map(img => API_BASE_URL + img.imageUrl) || [];
 
   const items = booking?.orderItems || [];
 
+ 
   // Pickup images from driver
   const pickupImages =
     booking?.orderImages
@@ -62,6 +63,9 @@ const BookingDetailAdmin = () => {
         id: img.id,
         uri: API_BASE_URL + img.imageUrl,
       })) || [];
+
+
+
 
   const handleDriverSelect = async driver => {
     setSelectedDriver(driver);
@@ -72,27 +76,27 @@ const BookingDetailAdmin = () => {
       );
       if (assignDriver.fulfilled.match(result)) {
         dispatch(
-          showSnackbar({
-            message: 'Driver assigned successfully',
+          showLottieAlert({
             type: 'success',
-            time: 3000,
+            message: 'Driver assigned successfully',
+            autoClose: true,
           }),
         );
       } else {
         dispatch(
-          showSnackbar({
+          showLottieAlert({
+            type: 'failure',
             message: 'Failed to assign driver',
-            type: 'error',
-            time: 3000,
+            autoClose: true,
           }),
         );
       }
     } catch (error) {
       dispatch(
-        showSnackbar({
+        showLottieAlert({
+          type: 'failure',
           message: 'Failed to assign driver',
-          type: 'error',
-          time: 3000,
+          autoClose: true,
         }),
       );
     } finally {
@@ -265,15 +269,6 @@ const BookingDetailAdmin = () => {
               { flex: 1, textAlign: 'right', textAlign: 'justify' },
             ]}
           >
-            <Text style={textStyles.smallBold}>Landmark: </Text>
-            221B Baker Street, London 221B Baker Street,
-          </Text>
-          <Text
-            style={[
-              textStyles.small,
-              { flex: 1, textAlign: 'right', textAlign: 'justify' },
-            ]}
-          >
             <Text style={textStyles.smallBold}>Address: </Text>
             {booking?.pickupAddress || booking?.orderPickupAddress || 'N/A'}
           </Text>
@@ -363,7 +358,7 @@ const BookingDetailAdmin = () => {
                 display: 'flex',
                 flexDirection: 'row',
                 gap: 10,
-                justifyContent: 'space-evenly',
+                // justifyContent: 'space-evenly',
               }}
             >
               {pickupImages.map((image, index) => (
@@ -522,28 +517,7 @@ const BookingDetailAdmin = () => {
       )}
 
       {isLoading && <DottedBlackLoader />}
-      {succesAlertVisible && (
-        <LottieAlert
-          type="success"
-          message="Order Cancelled Successfuly"
-          loop={false}
-          onClose={() => {
-            setSuccessAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
-      {failureAlertVisible && (
-        <LottieAlert
-          type="failure"
-          message="Order Cancellation Failed ,Try Again "
-          loop={false}
-          onClose={() => {
-            setFailureAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
+
     </View>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import {
   appFonts,
@@ -83,7 +84,8 @@ export default function DriverHome() {
   console.log("driver items", driverItems);
   const navigation = useNavigation();
   const [userAddress, setUserAddress] = useState('Getting location...');
-   const unreadNotifications = useSelector(selectUnreadNotifications);
+  const [refreshing, setRefreshing] = useState(false);
+  const unreadNotifications = useSelector(selectUnreadNotifications);
   const bigSizeAdv = advertisement?.filter((ad) => ad.adSize === 'BIG') || [];
   const smallSizeAdv = advertisement?.filter((ad) => ad.adSize === 'SMALL') || [];
 
@@ -106,6 +108,22 @@ export default function DriverHome() {
       dispatch(fetchAllAdvertisements());
     }
   }, [user, dispatch]);
+
+  const fetchAllData = useCallback(async () => {
+    if (user) {
+      await Promise.all([
+        dispatch(fetchAllItems()),
+        dispatch(fetchDriverOrders()),
+        dispatch(fetchAllAdvertisements()),
+      ]);
+    }
+  }, [user, dispatch]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchAllData();
+    setRefreshing(false);
+  }, [fetchAllData]);
 
   return (
     <LinearGradient
@@ -168,7 +186,12 @@ export default function DriverHome() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.mainSection}>
+      <ScrollView 
+        style={styles.mainSection}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <MovingIcons icons={icons} />
         <AdSlider data={bigSizeAdv} type={"big"} />
         <View

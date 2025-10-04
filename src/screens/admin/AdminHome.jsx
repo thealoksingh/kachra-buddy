@@ -33,9 +33,16 @@ import { FaddedIcon } from '../../components/commonComponents';
 import CurvedCard from '../../screens/driver/CurvedCard';
 import { getUserLocation } from '../../utils/CommonMethods';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectUser, selectAdvertisementsByDisplayOrder } from '../../store/selector';
+import {
+  selectUser,
+  selectAdvertisementsByDisplayOrder,
+  selectUnreadNotifications,
+} from '../../store/selector';
 import { getUserById } from '../../store/thunks/userThunk';
-import { fetchAllAdvertisements, fetchAllItems } from '../../store/thunks/adminThunk';
+import {
+  fetchAllAdvertisements,
+  fetchAllItems,
+} from '../../store/thunks/adminThunk';
 import Key from '../../constants/key';
 import NotificationTest from '../../components/NotificationTest';
 
@@ -78,7 +85,6 @@ export const icons = [
 
 // Admin dashboard cards configuration
 const adminCards = [
-
   {
     id: 1,
     icon: 'storefront-outline',
@@ -87,7 +93,7 @@ const adminCards = [
     description: 'Add or update in product listings',
     firstColor: '#f093fb',
     secondColor: '#f5576c',
-    screen: 'allProductsScreen'
+    screen: 'allProductsScreen',
   },
   {
     id: 2,
@@ -97,7 +103,7 @@ const adminCards = [
     description: 'Create and manage promotional campaigns',
     firstColor: '#00f2fe',
     secondColor: '#4facfe',
-    screen: 'allAdvertisementsScreen'
+    screen: 'allAdvertisementsScreen',
   },
   {
     id: 3,
@@ -107,7 +113,7 @@ const adminCards = [
     description: 'Send notifications to all users and drivers',
     firstColor: '#667eea',
     secondColor: '#764ba2',
-    screen: 'sendNotificationScreen'
+    screen: 'sendNotificationScreen',
   },
   // {
   //   id: 4,
@@ -137,7 +143,7 @@ const adminCards = [
     description: 'Handle customer support and complaints',
     firstColor: '#38f9d7',
     secondColor: '#43e97b',
-    screen: 'allSupportIssues'
+    screen: 'allSupportIssues',
   },
 ];
 
@@ -146,26 +152,27 @@ export default function AdminHome() {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const advertisement = useSelector(selectAdvertisementsByDisplayOrder);
+  const unreadNotifications = useSelector(selectUnreadNotifications);
   const userId = user?.id;
   const { API_BASE_URL } = Key;
   const [userAddress, setUserAddress] = useState('Getting location...');
   const [refreshing, setRefreshing] = useState(false);
-  console.log("Admin user data:", user);
-  const bigSizeAdv = advertisement?.filter((ad) => ad.adSize === 'BIG') || [];
-  const smallSizeAdv = advertisement?.filter((ad) => ad.adSize === 'SMALL') || [];
+  console.log('Admin user data:', user);
+  const bigSizeAdv = advertisement?.filter(ad => ad.adSize === 'BIG') || [];
+  const smallSizeAdv = advertisement?.filter(ad => ad.adSize === 'SMALL') || [];
 
   const fetchAllData = async () => {
     if (user && userId) {
       await Promise.all([
         dispatch(getUserById({ userId })),
         dispatch(fetchAllAdvertisements()),
-        dispatch(fetchAllItems())
+        dispatch(fetchAllItems()),
       ]);
     }
   };
 
   const onRefresh = async () => {
-    console.log("Refreshing admin data...");
+    console.log('Refreshing admin data...');
     setRefreshing(true);
     await fetchAllData();
     setRefreshing(false);
@@ -173,14 +180,14 @@ export default function AdminHome() {
 
   useEffect(() => {
     getUserLocation(
-      (locationData) => {
+      locationData => {
         setUserAddress(locationData.address);
         console.log('Address:', locationData.address);
       },
-      (error) => {
+      error => {
         setUserAddress('Unable to get location');
         console.log('Error:', error);
-      }
+      },
     );
     fetchAllData();
   }, []);
@@ -189,7 +196,6 @@ export default function AdminHome() {
       colors={[Colors.primary, Colors.whiteColor]}
       style={{ flex: 1 }}
     >
-
       <MyStatusBar />
       <View style={styles.topBar}>
         <TouchableOpacity
@@ -230,14 +236,15 @@ export default function AdminHome() {
             size={28}
             color={Colors.whiteColor}
           />
-
-          <View style={styles.badge}>
-            <Text
-              style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
-            >
-              0
-            </Text>
-          </View>
+          {unreadNotifications?.length > 0 && (
+            <View style={styles.badge}>
+              <Text
+                style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
+              >
+                {unreadNotifications?.length || 0}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -248,8 +255,11 @@ export default function AdminHome() {
         }
       >
         <MovingIcons icons={icons} />
-        <Graph />
-        <AdSlider data={bigSizeAdv} type={"big"} />
+        {user?.contactNumber !== '9000000001' &&
+          user?.contactNumber !== '9000000002' &&
+          user?.contactNumber !== '9000000003' && <Graph />}
+
+        <AdSlider data={bigSizeAdv} type={'big'} />
 
         {/* Admin Action Cards */}
         <View style={styles.cardsContainer}>
@@ -272,7 +282,7 @@ export default function AdminHome() {
           ))}
         </View>
         <View style={{ marginVertical: 20 }}>
-          <AdSlider data={smallSizeAdv} type={"small"} />
+          <AdSlider data={smallSizeAdv} type={'small'} />
         </View>
 
         {/* <NotificationTest /> */}

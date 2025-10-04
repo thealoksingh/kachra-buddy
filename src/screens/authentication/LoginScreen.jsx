@@ -10,6 +10,7 @@ import {
   ScrollView,
   Keyboard,
   Platform,
+  Alert,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -170,9 +171,15 @@ const LoginScreen = () => {
           setIsActive(true);
           navigation.replace(role.toLowerCase());
           return;
-        } else {
+        } else if (status.toLowerCase() === 'new') {
           setIsVerified(true);
           setIsActive(false);
+        } else {
+          if (role && role.toLowerCase()) {
+            navigation.replace(role.toLowerCase());
+          } else {
+            Alert.alert("Something Wrong with You Please contact roinggreen@gmail.com");
+          }
         }
         await dispatch(
           showSnackbar({
@@ -192,7 +199,7 @@ const LoginScreen = () => {
       }
     } catch (e) {
       await dispatch(
-        showSnackbar({ message: validationError, type: 'error', time: 3000 }),
+        showSnackbar({ message: 'OTP verification failed', type: 'error', time: 3000 }),
       );
     } finally {
       setLoading(false);

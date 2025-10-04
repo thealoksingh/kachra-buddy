@@ -13,6 +13,7 @@ import {
 } from '../../components/commonComponents';
 import { useImagePicker } from '../../components/useImagePicker';
 import ImagePickerSheet from '../../components/ImagePickerSheet';
+import ImagePreviewModal from '../../components/ImagePreviewModal';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const dummyUser = {
@@ -38,6 +39,8 @@ const UpdateUserScreen = () => {
   // const [email, setEmail] = useState(user.email || ''); // Commented out as not required
   const [role, setRole] = useState(user.role || 'USER');
   const [status, setStatus] = useState(user.status || 'ACTIVE');
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
   // const [pickerSheetVisible, setPickerSheetVisible] = useState(false); // Commented out as not required
   // const [avatar, setAvatar] = useState(user.avatarUrl ? API_BASE_URL + user.avatarUrl : null); // Commented out as not required
 
@@ -108,38 +111,29 @@ const UpdateUserScreen = () => {
       <CommonAppBar navigation={navigation} label="Update User" />
 
       <View style={{ flex: 1, marginHorizontal: 16, marginTop: 20 }}>
-        {/* Avatar upload commented out as not required
         <View style={styles.avatarContainer}>
-          {avatar ? (
-            <Image source={{ uri: avatar }} style={styles.avatar} />
-          ) : (
+          {user?.avatarUrl ? (
             <TouchableOpacity
-              style={styles.avatarPlaceholder}
-              onPress={() => setPickerSheetVisible(true)}
+              onPress={() => {
+                setPreviewImage(API_BASE_URL + user.avatarUrl);
+                setPreviewVisible(true);
+              }}
             >
-              <View style={styles.userIconStyle}>
-                <Icon name="person-off" size={60} color="#e0e0eb" />
-              </View>
-            </TouchableOpacity>
-          )}
-
-          {avatar ? (
-            <TouchableOpacity
-              style={[styles.addIcon, { backgroundColor: Colors.secondary }]}
-              onPress={() => setAvatar(null)}
-            >
-              <Text style={styles.addText}>✕</Text>
+              <Image 
+                source={{ 
+                  uri: API_BASE_URL + user.avatarUrl,
+                  headers: { Authorization: `Bearer ${user?.accessToken}` }
+                }} 
+                style={styles.avatar} 
+              />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity
-              style={styles.addIcon}
-              onPress={() => setPickerSheetVisible(true)}
-            >
-              <Text style={styles.addText}>＋</Text>
-            </TouchableOpacity>
+            <View style={styles.avatarPlaceholder}>
+              <Icon name="person" size={80} color={Colors.extraLightGrayColor} />
+            </View>
           )}
         </View>
-        */}
+       
 
         <View style={styles.formCard}>
           <InputBox
@@ -291,6 +285,12 @@ const UpdateUserScreen = () => {
         </View>
       </View>
 
+      <ImagePreviewModal
+        image={previewImage}
+        visibility={previewVisible}
+        setVisibility={setPreviewVisible}
+      />
+
       {/* Image picker commented out as not required
       <ImagePickerSheet
         visible={pickerSheetVisible}
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   formCard: {
     marginTop: 60,
     padding: 16,
-    // paddingTop: 60,
+    paddingTop: 60,
     backgroundColor: Colors.whiteColor,
     borderRadius: 16,
     shadowColor: '#000',
@@ -331,12 +331,14 @@ const styles = StyleSheet.create({
     borderColor: 'lightgray',
   },
   avatarPlaceholder: {
-    width: screenWidth / 3.5,
-    height: screenWidth / 3.5,
+    width: 120,
+    height: 120,
     borderRadius: 60,
-    backgroundColor: Colors.extraLightGrayColor,
+    backgroundColor: "#fdfcfcff",
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'lightgray',
   },
   addIcon: {
     position: 'absolute',

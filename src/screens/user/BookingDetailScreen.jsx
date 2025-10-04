@@ -42,7 +42,7 @@ const BookingDetailScreen = () => {
   const [isCancelling, setIsCancelling] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [orderData, setOrderData] = useState(null);
-  const [otpAlertVisible, setOtpAlertVisible] = useState(orderData?.confirmationOtp?true:false);
+  const [otpAlertVisible, setOtpAlertVisible] = useState(false);
   
   const flatListRef = useRef();
 
@@ -58,7 +58,9 @@ const BookingDetailScreen = () => {
           const response = await dispatch(getOrderById(orderId));
           if (getOrderById.fulfilled.match(response)) {
             // console.log('Fetched Booking data:', response?.payload?.data);
-            setOrderData(response?.payload?.data || response?.payload);
+            const data = response?.payload?.data || response?.payload;
+            setOrderData(data);
+            setOtpAlertVisible(!!data?.confirmationOtp);
           }
         } catch (error) {
           console.log('Error fetching Booking:', error);
@@ -266,12 +268,7 @@ const BookingDetailScreen = () => {
                   ₹{orderData?.finalPrice || 0}
                 </Text>
               </View>
-              {orderData?.givenAmount&&(<View style={commonStyles.rowSpaceBetween}>
-                <Text style={textStyles.smallBold}>Given Amount</Text>
-                <Text style={[textStyles.small, { color: Colors.primary }]}>
-                  ₹{orderData?.givenAmount || 0}
-                </Text>
-              </View>)}
+             
             </>
           )}
           <View style={commonStyles.rowSpaceBetween}>
@@ -316,6 +313,57 @@ const BookingDetailScreen = () => {
             </View>
           </>
         )}
+         {orderData?.status === 'COMPLETED' && (
+          <>
+            <View style={styles.headingSection}>
+              <Text style={styles.sectionTitle}>Pickup Details</Text>
+            </View>
+            <View style={{ padding: 10 }}>
+              {orderData?.givenAmount && (
+                <View style={commonStyles.rowSpaceBetween}>
+                  <Text style={textStyles.smallBold}>Given Amount</Text>
+                  <Text style={[textStyles.small, { color: Colors.primary }]}>
+                    ₹{orderData?.givenAmount || 0}
+                  </Text>
+                </View>
+              )}
+
+             
+              
+              {orderData?.orderImages?.filter(img => img.postedBy === 'DRIVER').length > 0 && (
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: 10,
+                    marginTop: 10,
+                  }}
+                >
+                  {orderData?.orderImages
+                    ?.filter(img => img.postedBy === 'DRIVER')
+                    .map((image, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        activeOpacity={0.8}
+                        onPress={() => {
+                          setPreviewImage(API_BASE_URL + image.imageUrl);
+                          setPreviewVisible(true);
+                        }}
+                      >
+                        <Image
+                          source={{
+                            uri: API_BASE_URL + image.imageUrl,
+                            headers: { Authorization: `Bearer ${user?.accessToken}` },
+                          }}
+                          style={styles.pickupImage}
+                        />
+                      </TouchableOpacity>
+                    ))}
+                </View>
+              )}
+            </View>
+          </>
+        )}
         {orderData?.orderType == 'GENERAL' && (
           <>
             <View style={styles.headingSection}>
@@ -350,6 +398,9 @@ const BookingDetailScreen = () => {
             </View>
           </>
         )}
+
+       
+
         <View
           style={{ flexDirection: 'row', justifyContent: 'center', gap: 2 }}
         >
@@ -579,5 +630,12 @@ const styles = StyleSheet.create({
   driverPhone: {
     fontSize: 13,
     color: '#777',
+  },
+  pickupImage: {
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.extraLightGrayColor,
   },
 });

@@ -75,7 +75,16 @@ const PickupRequestDetail = () => {
 
   }, [orderId]);
 
-  const images = currentOrder?.orderImages?.map(img => `${Key.API_BASE_URL}${img.imageUrl}`) || [];
+  const images =
+    currentOrder?.orderImages
+      ?.filter(img => img.postedBy === 'USER')
+      .map(img => ({
+        id: img.id,
+        uri: Key.API_BASE_URL+ img.imageUrl,
+      })) || [];
+
+
+  // const images = currentOrder?.orderImages?.map(img => `${Key.API_BASE_URL}${img.imageUrl}`) || [];
   const orderItems = currentOrder?.orderItems || [];
   const user = currentOrder?.user;
   const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -113,13 +122,13 @@ const PickupRequestDetail = () => {
               <TouchableOpacity
                 activeOpacity={0.9}
                 onPress={() => {
-                  setPreviewImage(item);
+                  setPreviewImage(item.uri);
                   setPreviewVisible(true);
                 }}
               >
                 <Image 
                   source={{ 
-                    uri: item,
+                    uri: item.uri,
                     headers: { Authorization: `Bearer ${Key.ACCESS_TOKEN}` }
                   }} 
                   style={styles.image} 
@@ -194,12 +203,7 @@ const PickupRequestDetail = () => {
                 <Text style={textStyles.smallBold}>Expected Price</Text>
                 <Text style={[textStyles.small,{fontWeight:"700",color:Colors.darkBlue}]}>₹{currentOrder?.finalPrice || 0}</Text>
               </View>
-              {currentOrder?.givenAmount && (
-                <View style={commonStyles.rowSpaceBetween}>
-                  <Text style={textStyles.smallBold}>Given Amount</Text>
-                  <Text style={[textStyles.small,{fontWeight:"700",color:Colors.primary}]}>₹{currentOrder?.givenAmount || 0}</Text>
-                </View>
-              )}
+             
             </>
           )}
         </View>
@@ -305,6 +309,65 @@ const PickupRequestDetail = () => {
             </View>
           </>
         )}
+          {currentOrder?.status === 'COMPLETED' && (
+          <>
+            <View style={styles.headingSection}>
+              <Text style={styles.sectionTitle}>Pickup Details</Text>
+            </View>
+            <View style={{ padding: 10 }}>
+              {currentOrder?.givenAmount && (
+                <View style={commonStyles.rowSpaceBetween}>
+                  <Text style={textStyles.smallBold}>Given Amount</Text>
+                  <Text style={[textStyles.small,{fontWeight:"700",color:Colors.primary}]}>₹{currentOrder?.givenAmount || 0}</Text>
+                </View>
+              )}
+
+              {currentOrder?.remark && (
+                <Text
+                  style={[
+                    textStyles.small,
+                    { flex: 1, textAlign: 'justify', marginTop: 8 },
+                  ]}
+                >
+                  <Text style={textStyles.smallBold}>Remark By Driver : </Text>
+                  {currentOrder?.remark || 'NA'}
+                </Text>
+              )}
+              
+              {currentOrder?.orderImages?.filter(img => img.postedBy === 'DRIVER').length > 0 && (
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: 10,
+                    marginTop: 10,
+                  }}
+                >
+                  {currentOrder?.orderImages
+                    ?.filter(img => img.postedBy === 'DRIVER')
+                    .map((image, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        activeOpacity={0.8}
+                        onPress={() => {
+                          setPreviewImage(`${Key.API_BASE_URL}${image.imageUrl}`);
+                          setPreviewVisible(true);
+                        }}
+                      >
+                        <Image
+                          source={{
+                            uri: `${Key.API_BASE_URL}${image.imageUrl}`,
+                            headers: { Authorization: `Bearer ${Key.ACCESS_TOKEN}` },
+                          }}
+                          style={styles.pickupImage}
+                        />
+                      </TouchableOpacity>
+                    ))}
+                </View>
+              )}
+            </View>
+          </>
+        )}
         {currentOrder?.orderType === 'GENERAL' && (
           <>
             <View style={styles.headingSection}>
@@ -332,6 +395,8 @@ const PickupRequestDetail = () => {
             </View>
           </>
         )}
+
+      
 
         {(currentOrder?.status !== 'COMPLETED' && currentOrder?.status === 'OUT_FOR_PICKUP') && <TouchableOpacity
           activeOpacity={0.8}
@@ -534,5 +599,12 @@ const styles = StyleSheet.create({
   userPhone: {
     fontSize: 13,
     color: '#777',
+  },
+  pickupImage: {
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.extraLightGrayColor,
   },
 });

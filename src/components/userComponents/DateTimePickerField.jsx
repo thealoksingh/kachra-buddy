@@ -24,7 +24,9 @@ export default function DateTimePickerField({ value, onChange }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Pickup Date & Time</Text>
+      <Text style={styles.label}>Pickup Date & Time
+         <Text style={{ color: Colors.secondary }}>*</Text>
+      </Text>
       
       <View style={styles.inputContainer}>
         <View style={styles.displayBox}>

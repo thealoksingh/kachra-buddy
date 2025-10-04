@@ -59,6 +59,7 @@ function RootStack() {
           </>
         )}
       </Stack.Screen>
+     
     </Stack.Navigator>
   );
 }

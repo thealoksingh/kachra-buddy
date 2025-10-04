@@ -119,23 +119,7 @@ const FinalPickupScreen = () => {
 
     return originalTotal + additionalTotal;
   };
-
-  const sendOtp = async () => {
-    setOtpLoading(true);
-    try {
-      await sendPickupOtpAPI(currentOrder.id);
-      dispatch(showSnackbar({ message: 'OTP sent successfully!', type: 'success' }));
-      setOtpSent(true);
-      setResendTimer(30); // Start 30-second timer
-    } catch (error) {
-      console.error('Error sending OTP:', error);
-      dispatch(showLottieAlert({ type: 'failure', message: 'Failed to send OTP', autoClose: true }));
-    } finally {
-      setOtpLoading(false);
-    }
-  };
-
-  const validateForm = () => {
+ const validateForm = () => {
     // Validate given amount
     if (!givenAmount || givenAmount.trim() === '') {
       dispatch(showSnackbar({ message: 'Please enter given amount', type: 'error' }));
@@ -160,11 +144,7 @@ const FinalPickupScreen = () => {
       return false;
     }
 
-    // Validate OTP
-    if (!otpInput || otpInput.trim() === '') {
-      dispatch(showSnackbar({ message: 'Please enter OTP', type: 'error' }));
-      return false;
-    }
+   
 
     // Validate quantities in original order items
     for (const orderItem of currentOrder?.orderItems || []) {
@@ -187,6 +167,25 @@ const FinalPickupScreen = () => {
 
     return true;
   };
+  const sendOtp = async () => {
+     if (!validateForm()) {
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      await sendPickupOtpAPI(currentOrder.id);
+      dispatch(showSnackbar({ message: 'OTP sent successfully!', type: 'success' }));
+      setOtpSent(true);
+      setResendTimer(30); // Start 30-second timer
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      dispatch(showLottieAlert({ type: 'failure', message: 'Failed to send OTP', autoClose: true }));
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+ 
 
   const submitOrder = async () => {
     // console.log('Submitting order with OTP:', otpInput);
@@ -195,7 +194,11 @@ const FinalPickupScreen = () => {
     if (!validateForm()) {
       return;
     }
-    
+     // Validate OTP
+    if (!otpInput || otpInput.trim() === '') {
+      dispatch(showSnackbar({ message: 'Please enter OTP', type: 'error' }));
+      return ;
+    }
     // Prepare updated order items with new quantities
     const updatedOrderItems = currentOrder.orderItems.map(orderItem => ({
       id: orderItem.id,
@@ -242,7 +245,7 @@ const FinalPickupScreen = () => {
       orderJson: orderDto,
       postedBy: 'DRIVER',
       otp: otpInput,
-      files: images // Array of image URIs
+      images: images // Array of image URIs
     };
 
     console.log('=== DEBUGGING ORDER SUBMISSION ===');
