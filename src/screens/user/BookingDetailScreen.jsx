@@ -15,12 +15,18 @@ import { Colors, commonStyles, textStyles } from '../../styles/commonStyles';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUser } from '../../store/selector';
-import { getOrderById } from '../../store/thunks/userThunk';
+import { getOrderById, cancelOrder } from '../../store/thunks/userThunk';
+import { showLottieAlert } from '../../store/slices/lottieAlertSlice';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Key from '../../constants/key';
 import { WarningWithButton } from '../../components/lottie/WarningWithButton';
 import { DottedBlackLoader } from '../../components/lottie/loaderView';
 import { LottieAlert } from '../../components/lottie/LottieAlert';
+import { FloatingOTP } from '../../components/userComponents/FloatingOTP';
+import { getStatusColor } from '../../utils/CommonMethods';
+import OrderStatusCard from '../../components/userComponents/OrderStatusCard';
 const { width } = Dimensions.get('window');
+
 
 const BookingDetailScreen = () => {
   // console.log('Rendering BookingDetailScreen');
@@ -29,15 +35,15 @@ const BookingDetailScreen = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const { API_BASE_URL } = Key;
-
   const [activeIndex, setActiveIndex] = useState(0);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [warningVisible, setWarningVisible] = useState(false);
-  const [failureAlertVisible, setFailureAlertVisible] = useState(false);
-  const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
+  const [cancelWarningVisible, setCancelWarningVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [orderData, setOrderData] = useState(null);
+  const [otpAlertVisible, setOtpAlertVisible] = useState(false);
+  
   const flatListRef = useRef();
 
   // Get order ID from route params
@@ -51,11 +57,13 @@ const BookingDetailScreen = () => {
         try {
           const response = await dispatch(getOrderById(orderId));
           if (getOrderById.fulfilled.match(response)) {
-            console.log('Fetched order data:', response?.payload?.data);
-            setOrderData(response?.payload?.data || response?.payload);
+            // console.log('Fetched Booking data:', response?.payload?.data);
+            const data = response?.payload?.data || response?.payload;
+            setOrderData(data);
+            setOtpAlertVisible(!!data?.confirmationOtp);
           }
         } catch (error) {
-          console.log('Error fetching order:', error);
+          console.log('Error fetching Booking:', error);
         } finally {
           setIsLoading(false);
         }
@@ -73,17 +81,58 @@ const BookingDetailScreen = () => {
   // Extract order items
   const items = orderData?.orderItems || [];
 
+  const CancelOrder = async () => {
+    setIsCancelling(true);
+    setCancelWarningVisible(false);
+
+    try {
+      const result = await dispatch(cancelOrder(orderId));
+      // console.log('Cancel order result:', result);
+      // console.log('Result type:', result.type);
+
+      if (result.type === 'user/cancelOrder/fulfilled') {
+        dispatch(
+          showLottieAlert({
+            type: 'success',
+            message: 'Booking Cancelled Successfully',
+            autoClose: true,
+          }),
+        );
+        setTimeout(() => {
+          navigation.goBack();
+        }, 2000);
+      } else {
+        console.log('Failure payload:', result.payload);
+        dispatch(
+          showLottieAlert({
+            type: 'failure',
+            message:
+              result?.payload?.message ||
+              'Booking Cancellation Failed, Try Again',
+            autoClose: true,
+          }),
+        );
+      }
+    } catch (error) {
+      console.log('Cancel error:', error);
+      dispatch(
+        showLottieAlert({
+          type: 'failure',
+          message: 'Network error. Please try again.',
+          autoClose: true,
+        }),
+      );
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
       <CommonAppBar navigation={navigation} label="Booking Details" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {orderData?.status == 'INCOMPLETE' ? (
-          <Image
-            source={require("../../../assets/images/pendingBooking.png")}
-            style={styles.image}
-          />
-        ) : (
+         {images.length> 0 &&(<>
           <FlatList
             ref={flatListRef}
             data={images}
@@ -115,7 +164,7 @@ const BookingDetailScreen = () => {
               </TouchableOpacity>
             )}
           />
-        )}
+        
 
         <View style={styles.dotsContainer}>
           {images.map((_, i) => (
@@ -125,31 +174,41 @@ const BookingDetailScreen = () => {
             />
           ))}
         </View>
+         </>)}
+         
+        <OrderStatusCard bookingData={orderData}/>
+
         {orderData?.driver && (
           <>
             <View style={styles.headingSection}>
               <Text style={styles.sectionTitle}>Driver Details</Text>
             </View>
             <View style={styles.driverCard}>
-              <Image
-                source={{
-                  uri: orderData?.driver?.avatarUrl
-                    ? API_BASE_URL + orderData.driver.avatarUrl
-                    : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                  headers: {
-                    Authorization: `Bearer ${user?.accessToken}`,
-                  },
-                }}
-                style={styles.driverImage}
-              />
-              <View style={{ flex: 1, marginLeft: 12 }}>
+              {orderData?.driver?.avatarUrl ? (
+                <Image
+                  source={{
+                    uri: API_BASE_URL + orderData.driver.avatarUrl,
+                    headers: {
+                      Authorization: `Bearer ${user?.accessToken}`,
+                    },
+                  }}
+                  style={styles.driverImage}
+                />
+              ) : (
+                <View style={[styles.driverImage, styles.driverIconContainer]}>
+                  <Ionicons name="person" size={30} color={Colors.grayColor} />
+                </View>
+              )}
+
+              
+              <View style={{  marginLeft: 12 }}>
                 <Text style={styles.driverName}>
                   {orderData?.driver?.fullName || 'Driver name'}
                 </Text>
                 <Text style={styles.driverPhone}>
                   {orderData?.driver?.contactNumber || '+91 98765 43210'}
                 </Text>
-                <View style={{ flexDirection: 'row', marginTop: 4 }}>
+                {/* <View style={{ flexDirection: 'row', marginTop: 4 }}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Text
                       key={i}
@@ -161,11 +220,12 @@ const BookingDetailScreen = () => {
                       ★
                     </Text>
                   ))}
-                </View>
+                </View> */}
               </View>
             </View>
           </>
         )}
+
         <View style={styles.headingSection}>
           <Text style={styles.sectionTitle}>Booking Details</Text>
         </View>
@@ -179,28 +239,36 @@ const BookingDetailScreen = () => {
                 : 'N/A'}
             </Text>
           </View>
-          <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Order Status</Text>
-            <Text style={textStyles.small}>{orderData?.status || 'N/A'}</Text>
-          </View>
-          <View style={commonStyles.rowSpaceBetween}>
+          {/* <View style={commonStyles.rowSpaceBetween}>
+            <Text style={textStyles.smallBold}>Booking Status</Text>
+            <Text
+              style={[
+                textStyles.small,
+                { color: getStatusColor(orderData?.status) },
+              ]}
+            >
+              {orderData?.status || 'N/A'}
+            </Text>
+          </View> */}
+          {/* <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Driver Allocation</Text>
             <Text style={textStyles.small}>
               {orderData?.driver ? 'Allocated' : 'Not Allocated'}
             </Text>
-          </View>
+          </View> */}
           {orderData?.orderType == 'GENERAL' && (
             <>
-              <View style={commonStyles.rowSpaceBetween}>
+              {/* <View style={commonStyles.rowSpaceBetween}>
                 <Text style={textStyles.smallBold}>Items</Text>
                 <Text style={textStyles.small}>{items.length}</Text>
-              </View>
+              </View> */}
               <View style={commonStyles.rowSpaceBetween}>
-                <Text style={textStyles.smallBold}>Final Price</Text>
+                <Text style={textStyles.smallBold}>Expected Amount</Text>
                 <Text style={[textStyles.small, { color: Colors.primary }]}>
                   ₹{orderData?.finalPrice || 0}
                 </Text>
               </View>
+             
             </>
           )}
           <View style={commonStyles.rowSpaceBetween}>
@@ -235,12 +303,64 @@ const BookingDetailScreen = () => {
                 <Text style={textStyles.smallBold}>Vehicle Number</Text>
                 <Text style={textStyles.small}>MH14FE4940</Text>
               </View>
-              <View style={commonStyles.rowSpaceBetween}>
-                <Text style={textStyles.smallBold}>Final Price</Text>
-                <Text style={textStyles.small}>
-                  ₹{orderData?.finalPrice || 0}
+             
+               {orderData?.status=="COMPLETED"&&(<View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Given Amount</Text>
+                <Text style={[textStyles.small, { color: Colors.primary }]}>
+                  ₹{orderData?.givenAmount || 0}
                 </Text>
-              </View>
+              </View>)}
+            </View>
+          </>
+        )}
+         {orderData?.status === 'COMPLETED' && (
+          <>
+            <View style={styles.headingSection}>
+              <Text style={styles.sectionTitle}>Pickup Details</Text>
+            </View>
+            <View style={{ padding: 10 }}>
+              {orderData?.givenAmount && (
+                <View style={commonStyles.rowSpaceBetween}>
+                  <Text style={textStyles.smallBold}>Given Amount</Text>
+                  <Text style={[textStyles.small, { color: Colors.primary }]}>
+                    ₹{orderData?.givenAmount || 0}
+                  </Text>
+                </View>
+              )}
+
+             
+              
+              {orderData?.orderImages?.filter(img => img.postedBy === 'DRIVER').length > 0 && (
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: 10,
+                    marginTop: 10,
+                  }}
+                >
+                  {orderData?.orderImages
+                    ?.filter(img => img.postedBy === 'DRIVER')
+                    .map((image, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        activeOpacity={0.8}
+                        onPress={() => {
+                          setPreviewImage(API_BASE_URL + image.imageUrl);
+                          setPreviewVisible(true);
+                        }}
+                      >
+                        <Image
+                          source={{
+                            uri: API_BASE_URL + image.imageUrl,
+                            headers: { Authorization: `Bearer ${user?.accessToken}` },
+                          }}
+                          style={styles.pickupImage}
+                        />
+                      </TouchableOpacity>
+                    ))}
+                </View>
+              )}
             </View>
           </>
         )}
@@ -278,6 +398,9 @@ const BookingDetailScreen = () => {
             </View>
           </>
         )}
+
+       
+
         <View
           style={{ flexDirection: 'row', justifyContent: 'center', gap: 2 }}
         >
@@ -296,7 +419,7 @@ const BookingDetailScreen = () => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => setWarningVisible(true)}
+                onPress={() => setCancelWarningVisible(true)}
                 style={[styles.cancelBtn, { borderColor: Colors.secondary }]}
               >
                 <Text
@@ -311,7 +434,7 @@ const BookingDetailScreen = () => {
           {/* New Order → only Cancel */}
           {orderData?.status === 'ACTIVE' && (
             <TouchableOpacity
-              onPress={() => setWarningVisible(true)}
+              onPress={() => setCancelWarningVisible(true)}
               style={[styles.cancelBtn, { borderColor: Colors.secondary }]}
             >
               <Text style={[styles.cancelBtnText, { color: Colors.secondary }]}>
@@ -321,7 +444,7 @@ const BookingDetailScreen = () => {
           )}
 
           {/* Completed Order → Rate Now */}
-          {orderData?.status === 'COMPLETED' && (
+          {/* {orderData?.status === 'COMPLETED' && (
             <TouchableOpacity
               style={[styles.cancelBtn, { borderColor: Colors.primary }]}
             >
@@ -329,7 +452,7 @@ const BookingDetailScreen = () => {
                 Rate Now
               </Text>
             </TouchableOpacity>
-          )}
+          )} */}
         </View>
 
         <FaddedIcon />
@@ -345,38 +468,22 @@ const BookingDetailScreen = () => {
         visibility={previewVisible}
         setVisibility={setPreviewVisible}
       />
-      {warningVisible && (
+      {cancelWarningVisible && (
         <WarningWithButton
-          message="Are you sure you want to cancel this Order?"
-          onYes={() => {
-            setWarningVisible(false);
-          }}
-          onClose={() => setWarningVisible(false)}
+          message="Are you sure you want to cancel this Booking?"
+          onYes={CancelOrder}
+          onClose={() => setCancelWarningVisible(false)}
         />
       )}
-      {isLoading && <DottedBlackLoader />}
-      {succesAlertVisible && (
-        <LottieAlert
-          type="success"
-          message="Order Cancelled Successfuly"
-          loop={false}
-          onClose={() => {
-            setSuccessAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
-      {failureAlertVisible && (
-        <LottieAlert
-          type="failure"
-          message="Order Cancellation Failed ,Try Again "
-          loop={false}
-          onClose={() => {
-            setFailureAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
+      {(isLoading || isCancelling) && <DottedBlackLoader />}
+
+      <FloatingOTP
+        visible={otpAlertVisible}
+        title={orderData?.confirmationOtp}
+        message={'Please Share the OTP with the collector.'}
+        onClose={() => setOtpAlertVisible(false)}
+        expiryTime={orderData?.confirmationOtpExpiry}
+      />
     </View>
   );
 };
@@ -500,15 +607,21 @@ const styles = StyleSheet.create({
   },
   driverCard: {
     flexDirection: 'row',
+      alignItems: 'center',
     backgroundColor: Colors.whiteColor,
     padding: 12,
     marginHorizontal: 12,
     marginVertical: 10,
   },
   driverImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  driverIconContainer: {
+    backgroundColor: Colors.extraLightGrayColor,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   driverName: {
     fontSize: 15,
@@ -517,5 +630,12 @@ const styles = StyleSheet.create({
   driverPhone: {
     fontSize: 13,
     color: '#777',
+  },
+  pickupImage: {
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.extraLightGrayColor,
   },
 });

@@ -9,7 +9,8 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Keyboard,
-  Platform
+  Platform,
+  Alert,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -24,9 +25,12 @@ import { useNavigation } from '@react-navigation/native';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
 import { useDispatch } from 'react-redux';
 import { sendOtp, verifyOtp } from '../../store/thunks/authThunk';
-import { completeProfile, completeUserProfile } from '../../store/thunks/userThunk';
+import {
+  completeProfile,
+  completeUserProfile,
+} from '../../store/thunks/userThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { Key } from '../../constants/key';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -62,11 +66,11 @@ const LoginScreen = () => {
     // Keyboard listeners
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
-      () => setKeyboardVisible(true)
+      () => setKeyboardVisible(true),
     );
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
-      () => setKeyboardVisible(false)
+      () => setKeyboardVisible(false),
     );
 
     return () => {
@@ -75,7 +79,6 @@ const LoginScreen = () => {
       keyboardDidHideListener?.remove();
     };
   }, []);
-
 
   // step 1: send otp
 
@@ -149,29 +152,34 @@ const LoginScreen = () => {
       const response = await dispatch(verifyOtp(data));
 
       if (verifyOtp.fulfilled.match(response)) {
-
         const status = response?.payload?.data?.status;
         const role = response?.payload?.data?.role;
         await AsyncStorage.setItem(
-          "user_id",
-          String(response?.payload?.data?.id)
+          'user_id',
+          String(response?.payload?.data?.id),
         );
         //Saving accessToken in async storage
 
-        const user_id = await AsyncStorage.getItem("user_id");
-        console.log("user id after storing in async storage", user_id);
+        const user_id = await AsyncStorage.getItem('user_id');
+        console.log('user id after storing in async storage', user_id);
         await AsyncStorage.setItem(
-          "access_token",
-          String(response?.payload?.data?.accessToken)
+          'access_token',
+          String(response?.payload?.data?.accessToken),
         );
-        console.log("user id and accessToken stored in async storage");
+        console.log('user id and accessToken stored in async storage');
         if (status.toLowerCase() === 'active') {
           setIsActive(true);
           navigation.replace(role.toLowerCase());
           return;
-        } else {
+        } else if (status.toLowerCase() === 'new') {
           setIsVerified(true);
           setIsActive(false);
+        } else {
+          if (role && role.toLowerCase()) {
+            navigation.replace(role.toLowerCase());
+          } else {
+            Alert.alert("Something Wrong with You Please contact roinggreen@gmail.com");
+          }
         }
         await dispatch(
           showSnackbar({
@@ -191,7 +199,7 @@ const LoginScreen = () => {
       }
     } catch (e) {
       await dispatch(
-        showSnackbar({ message: validationError, type: 'error', time: 3000 }),
+        showSnackbar({ message: 'OTP verification failed', type: 'error', time: 3000 }),
       );
     } finally {
       setLoading(false);
@@ -201,18 +209,18 @@ const LoginScreen = () => {
   // step 3: signup new user
   const handleSignup = async () => {
     const data = {
-      userId: await AsyncStorage.getItem("user_id"),
+      userId: await AsyncStorage.getItem('user_id'),
       fullName: name,
     };
     setLoading(true);
     try {
       const response = await dispatch(completeUserProfile(data));
-      console.log("response from completeUserProfile", response?.payload);
-      
+      console.log('response from completeUserProfile', response?.payload);
+
       if (completeUserProfile.fulfilled.match(response)) {
         const role = response?.payload?.data?.role;
         const status = response?.payload?.data?.status;
-        
+
         await dispatch(
           showSnackbar({
             message: 'Profile completed successfully!',
@@ -220,7 +228,7 @@ const LoginScreen = () => {
             time: 3000,
           }),
         );
-        
+
         if (status.toLowerCase() === 'active') {
           navigation.replace(role.toLowerCase());
         }
@@ -235,18 +243,22 @@ const LoginScreen = () => {
       }
     } catch (e) {
       await dispatch(
-        showSnackbar({ message: 'Failed to complete profile', type: 'error', time: 3000 }),
+        showSnackbar({
+          message: 'Failed to complete profile',
+          type: 'error',
+          time: 3000,
+        }),
       );
     } finally {
       setLoading(false);
     }
   };
 
- return (
+  return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: Colors.whiteColor }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
@@ -258,7 +270,12 @@ const LoginScreen = () => {
         <MyStatusBar />
 
         {/* Logo Section */}
-        <View style={[styles.logoContainer, keyboardVisible && styles.logoContainerSmall]}>
+        <View
+          style={[
+            styles.logoContainer,
+            keyboardVisible && styles.logoContainerSmall,
+          ]}
+        >
           <Image
             source={require('../../../assets/images/logo.png')}
             style={[styles.logo, { tintColor: 'white' }]}
@@ -291,7 +308,33 @@ const LoginScreen = () => {
 
           {/* OTP Input */}
           {otpSent && !isVerified && (
-            <OtpFields otpInput={otpInput} setOtpInput={setOtpInput} />
+            <>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Image
+                  source={require('../../../assets/images/whatsappIcon.png')}
+                  style={{ width: 30, height: 30, marginVertical: 5 }}
+                  resizeMode="contain"
+                />
+                <Text
+                  style={{
+                    color: '#444',
+                    fontSize: 12,
+                    marginVertical: 10,
+                    marginLeft: 10,
+                  }}
+                >
+                  Please check your WhatsApp for the OTP.
+                </Text>
+              </View>
+
+              <OtpFields otpInput={otpInput} setOtpInput={setOtpInput} />
+            </>
           )}
 
           {/* Name Input for new users */}
@@ -339,9 +382,7 @@ const LoginScreen = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
               }}
-              onPress={() =>
-                Linking.openURL('https://www.termsandconditionsgenerator.com/')
-              }
+              onPress={() => Linking.openURL(Key.tncLink)}
             >
               Terms & Conditions
             </Text>

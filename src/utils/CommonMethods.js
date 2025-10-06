@@ -193,3 +193,5 @@ export  const openGoogleMaps = (latitude, longitude, label = 'Seller Location') 
       default: return '#757575';
     }
 };
+
+    

@@ -5,6 +5,8 @@ import { useDispatch } from 'react-redux';
 import { Colors } from '../../styles/commonStyles';
 import { updateItem } from '../../store/thunks/adminThunk';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
+import { showLottieAlert } from '../../store/slices/lottieAlertSlice';
+import { deleteItem } from '../../store/thunks/adminThunk';
 import {
   ButtonWithLoader,
   CommonAppBar,
@@ -20,36 +22,53 @@ import { selectUser } from '../../store/selector';
 import Key from '../../constants/key';
 import MultiSelectDropdown from '../../components/MultiSelectDropdown';
 import SingleSelectDropdown from '../../components/SingleSelectDropdown';
+import { WarningWithButton } from '../../components/lottie/WarningWithButton';
 
 const UpdateProductScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();
   const item = route?.params?.item || {};
-  console.log("item in update product screen", item);
+  console.log('item in update product screen', item);
   const user = useSelector(selectUser);
   const { API_BASE_URL } = Key;
-  const [loading, setLoading] = useState(false);
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
   const [failureAlertVisible, setFailureAlertVisible] = useState(false);
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
   const [name, setName] = useState(item?.name || '');
   const [rate, setRate] = useState(item?.pricePerUnit?.toString() || '');
   const [unit, setUnit] = useState(item?.unit || 'KG');
-  const [tags, setTags] = useState(item?.tags ? item.tags.split(',').map(tag => tag.trim()) : []);
-  console.log("item = ", tags);
-  
-  const unitOptions = ['KG', 'LITRE', 'PIECE', 'BUNDLE', 'BOX', 'PACKET', 'TONNE', 'METRE'];
+  const [tags, setTags] = useState(
+    item?.tags ? item.tags.split(',').map(tag => tag.trim()) : [],
+  );
+  console.log('item = ', tags);
+
+  const unitOptions = [
+    'KG',
+    'LITRE',
+    'PIECE',
+    'BUNDLE',
+    'BOX',
+    'PACKET',
+    'TONNE',
+    'METRE',
+  ];
   const tagOptions = [
-    'Plastic', 'Metal', 'Paper',  'Glass', 
+    'Plastic',
+    'Metal',
+    'Paper',
+    'Glass',
     'Rubber',
-     'E-waste', 'Best-Deals'
+    'E-waste',
+    'Best-Deals',
   ];
   const [image, setImage] = useState(null);
   const [showServerImage, setShowServerImage] = useState(true);
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
   const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
-
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const { openCamera, openGallery } = useImagePicker();
 
   const pickImage = async source => {
@@ -93,63 +112,109 @@ const UpdateProductScreen = () => {
 
   const handleUpdateItem = async () => {
     console.log('Updating item');
-    
+
     // Validation: Check if image exists (either local or server)
     const hasImage = image || (item?.imageUrl && showServerImage);
-    
+
     if (!name || !rate || !unit || tags.length === 0 || !hasImage) {
-      dispatch(showSnackbar({
-        message: 'Please fill all required fields including image',
-        type: 'error',
-        time: 3000
-      }));
+      dispatch(
+        showSnackbar({
+          message: 'Please fill all required fields including image',
+          type: 'error',
+          time: 3000,
+        }),
+      );
       return;
     }
-    
-    setLoading(true);
+
+    setLoadingUpdate(true);
     try {
       const itemData = {
         name,
         pricePerUnit: parseFloat(rate),
         unit,
         tags: tags.join(','),
-        isCountable: unit === 'PIECE'
+        isCountable: unit === 'PIECE',
       };
-      console.log("item data in update product screen", itemData);
-      
+      console.log('item data in update product screen', itemData);
+
       // Only send file if new image is selected
       const file = image ? image : null;
       console.log('Image file to upload:', file);
-      
-      const result = await dispatch(updateItem({ itemId: item.id, itemData, file }));
-      
+
+      const result = await dispatch(
+        updateItem({ itemId: item.id, itemData, file }),
+      );
+
       if (updateItem.fulfilled.match(result)) {
         // Reset image states after successful update
         setImage(null);
         setShowServerImage(true);
-        
-        dispatch(showSnackbar({
-          message: 'Item updated successfully',
-          type: 'success',
-          time: 3000
-        }));
+
+        dispatch(
+          showLottieAlert({
+            message: 'Item updated successfully',
+            type: 'success',
+            autoClose: true,
+          }),
+        );
         navigation.goBack();
       } else {
-        dispatch(showSnackbar({
-          message: 'Failed to update item',
-          type: 'error',
-          time: 3000
-        }));
+        dispatch(
+          showLottieAlert({
+            message: 'Failed to update item',
+            type: 'failure',
+            autoClose: true,
+          }),
+        );
       }
     } catch (error) {
-      dispatch(showSnackbar({
-        message: 'Failed to update item',
-        type: 'error',
-        time: 3000
-      }));
+      dispatch(
+        showLottieAlert({
+          message: 'Failed to update item',
+          type: 'failure',
+          autoClose: true,
+        }),
+      );
     } finally {
-      setLoading(false);
-    }  
+      setLoadingUpdate(false);
+    }
+  };
+
+  const handleDeleteItem = async () => {
+    setLoadingDelete(true);
+    try {
+      const result = await dispatch(deleteItem({ itemId: item.id }));
+
+      if (deleteItem.fulfilled.match(result)) {
+        dispatch(
+          showLottieAlert({
+            message: 'Item deleted successfully',
+            type: 'success',
+            autoClose: true,
+          }),
+        );
+        navigation.goBack();
+      } else {
+        dispatch(
+          showLottieAlert({
+            message: 'Failed to delete item',
+            type: 'failure',
+            autoClose: true,
+          }),
+        );
+      }
+    } catch (error) {
+      dispatch(
+        showLottieAlert({
+          message: 'Failed to delete item',
+          type: 'failure',
+          autoClose: true,
+        }),
+      );
+    } finally {
+      setLoadingDelete(false);
+    }
   };
 
   return (
@@ -191,18 +256,20 @@ const UpdateProductScreen = () => {
             optional={false}
           />
           <Text style={styles.sectionLabel}>
-            Upload Image{' '}
-            <Text style={{ color: Colors.secondary }}>*</Text>
+            Upload Image <Text style={{ color: Colors.secondary }}>*</Text>
           </Text>
           <View style={styles.imageRow}>
-            {(image || (item?.imageUrl && showServerImage)) ? (
+            {image || (item?.imageUrl && showServerImage) ? (
               <View style={styles.imageBox}>
                 <TouchableOpacity onPress={handleImagePreview}>
-                  <Image 
+                  <Image
                     source={{
-                      uri: image || (API_BASE_URL + item?.imageUrl),
-                      headers: !image && item?.imageUrl ? { Authorization: `Bearer ${user?.accessToken}` } : undefined
-                    }} 
+                      uri: image || API_BASE_URL + item?.imageUrl,
+                      headers:
+                        !image && item?.imageUrl
+                          ? { Authorization: `Bearer ${user?.accessToken}` }
+                          : undefined,
+                    }}
                     style={styles.image}
                   />
                 </TouchableOpacity>
@@ -222,17 +289,34 @@ const UpdateProductScreen = () => {
               </TouchableOpacity>
             )}
           </View>
-
-
         </View>
 
-        <View style={{ marginHorizontal: 10, marginVertical: 10 }}>
-          <ButtonWithLoader
-            name="Update"
-            loadingName="Updating..."
-            isLoading={loading}
-            method={handleUpdateItem}
-          />
+        <View
+          style={{
+            marginHorizontal: 10,
+            marginVertical: 10,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            gap: 10,
+          }}
+        >
+           <View style={{ flex: 1 }}>
+            <ButtonWithLoader
+              name="Delete"
+              loadingName="Deleting..."
+              isLoading={loadingDelete}
+              color={Colors.secondary}
+              method={() => setShowDeleteAlert(true)}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <ButtonWithLoader
+              name="Update"
+              loadingName="Updating..."
+              isLoading={loadingUpdate}
+              method={handleUpdateItem}
+            />
+          </View>
         </View>
       </View>
 
@@ -253,26 +337,13 @@ const UpdateProductScreen = () => {
         onCamera={() => pickImage('camera')}
         onGallery={() => pickImage('gallery')}
       />
-      {succesAlertVisible && (
-        <LottieAlert
-          type="success"
-          message="Order Cancelled Successfuly"
-          loop={false}
-          onClose={() => {
-            setSuccessAlertVisible(false);
-          }}
-          autoClose={true}
-        />
-      )}
-      {failureAlertVisible && (
-        <LottieAlert
-          type="failure"
-          message="Order Cancellation Failed ,Try Again "
-          loop={false}
-          onClose={() => {
-            setFailureAlertVisible(false);
-          }}
-          autoClose={true}
+
+      {showDeleteAlert && (
+        <WarningWithButton
+          onYes={handleDeleteItem}
+          message="Are you sure you want to Delete?"
+          buttonText="Delete"
+          onClose={() => setShowDeleteAlert(false)}
         />
       )}
     </View>

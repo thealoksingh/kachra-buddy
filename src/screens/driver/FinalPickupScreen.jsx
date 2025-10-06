@@ -119,23 +119,7 @@ const FinalPickupScreen = () => {
 
     return originalTotal + additionalTotal;
   };
-
-  const sendOtp = async () => {
-    setOtpLoading(true);
-    try {
-      await sendPickupOtpAPI(currentOrder.id);
-      dispatch(showSnackbar({ message: 'OTP sent successfully!', type: 'success' }));
-      setOtpSent(true);
-      setResendTimer(30); // Start 30-second timer
-    } catch (error) {
-      console.error('Error sending OTP:', error);
-      dispatch(showLottieAlert({ type: 'failure', message: 'Failed to send OTP', autoClose: true }));
-    } finally {
-      setOtpLoading(false);
-    }
-  };
-
-  const validateForm = () => {
+ const validateForm = () => {
     // Validate given amount
     if (!givenAmount || givenAmount.trim() === '') {
       dispatch(showSnackbar({ message: 'Please enter given amount', type: 'error' }));
@@ -160,11 +144,7 @@ const FinalPickupScreen = () => {
       return false;
     }
 
-    // Validate OTP
-    if (!otpInput || otpInput.trim() === '') {
-      dispatch(showSnackbar({ message: 'Please enter OTP', type: 'error' }));
-      return false;
-    }
+   
 
     // Validate quantities in original order items
     for (const orderItem of currentOrder?.orderItems || []) {
@@ -187,15 +167,38 @@ const FinalPickupScreen = () => {
 
     return true;
   };
+  const sendOtp = async () => {
+     if (!validateForm()) {
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      await sendPickupOtpAPI(currentOrder.id);
+      dispatch(showSnackbar({ message: 'OTP sent successfully!', type: 'success' }));
+      setOtpSent(true);
+      setResendTimer(30); // Start 30-second timer
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      dispatch(showLottieAlert({ type: 'failure', message: 'Failed to send OTP', autoClose: true }));
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+ 
 
   const submitOrder = async () => {
-    console.log('Submitting order with OTP:', otpInput);
+    // console.log('Submitting order with OTP:', otpInput);
     
     // Validate form before submission
     if (!validateForm()) {
       return;
     }
-    
+     // Validate OTP
+    if (!otpInput || otpInput.trim() === '') {
+      dispatch(showSnackbar({ message: 'Please enter OTP', type: 'error' }));
+      return ;
+    }
     // Prepare updated order items with new quantities
     const updatedOrderItems = currentOrder.orderItems.map(orderItem => ({
       id: orderItem.id,
@@ -242,7 +245,7 @@ const FinalPickupScreen = () => {
       orderJson: orderDto,
       postedBy: 'DRIVER',
       otp: otpInput,
-      files: images // Array of image URIs
+      images: images // Array of image URIs
     };
 
     console.log('=== DEBUGGING ORDER SUBMISSION ===');
@@ -309,8 +312,7 @@ const FinalPickupScreen = () => {
             <EditableOrderCard
               key={orderItem.id || idx}
               price={orderItem.price}
-              type={orderItem.item.countable ? 'countable' : 'weighable'}
-              itemName={orderItem.item.name}
+               itemName={orderItem.item.name}
               quantity={orderItem.quantity}
               unit={orderItem.unit}
               orderItem={orderItem}
@@ -321,7 +323,8 @@ const FinalPickupScreen = () => {
           ))}
         </View>
 
-        <View style={styles.formCard}>
+        {/* dont remove we can use it in future */}
+          {/* <View style={styles.formCard}>
           <Text style={styles.sectionLabel}>Additional Items (Optional)</Text>
 
           {additionalItems.map((item, index) => (
@@ -346,6 +349,7 @@ const FinalPickupScreen = () => {
               onRemove={() => removeAdditionalItem(index)}
             />
           ))}
+
           <TouchableOpacity
             style={styles.addItemBtn}
             onPress={() =>
@@ -356,8 +360,8 @@ const FinalPickupScreen = () => {
             }
           >
             <Text style={styles.addItemText}>+ Add Items</Text>
-          </TouchableOpacity>
-        </View>
+          </TouchableOpacity> 
+        </View>*/}
 
         <View style={styles.formCard}>
           <InputBox
@@ -414,6 +418,7 @@ const FinalPickupScreen = () => {
             )}
           </View>
         </View>
+
         <View style={styles.priceCard}>
           <Text style={styles.priceLabel}>
             Total Price: ₹{(calculateTotalPrice() || 0).toFixed(2)}
@@ -422,7 +427,7 @@ const FinalPickupScreen = () => {
         {otpSent && !isVerified && (
           <View style={styles.formCard}>
             <Text style={styles.sectionLabel}>
-              Enter OTP sent to Customer Whatsapp number
+             Enter the OTP sent from the Customer App (Order Details screen)
               <Text style={{ color: Colors.secondary }}>*</Text>
             </Text>
             <OtpFields otpInput={otpInput} setOtpInput={setOtpInput} />

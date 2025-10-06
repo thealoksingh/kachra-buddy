@@ -26,11 +26,12 @@ const Cart = () => {
     return currentQuantity * item.item.pricePerUnit;
   };
   
-  const subtotal = cart?.cartItems?.reduce((sum, item) => sum + calculateItemPrice(item), 0) || 0;
-  const gstRate = 0.18; // 18% GST
-  const gstAmount = subtotal * gstRate;
-  const total = subtotal + gstAmount;
-  
+  // const subtotal = cart?.cartItems?.reduce((sum, item) => sum + calculateItemPrice(item), 0) || 0;
+  // const gstRate = 0.18; // 18% GST
+  // const gstAmount = subtotal * gstRate;
+  // const total = subtotal + gstAmount;
+   const total =cart?.cartItems?.reduce((sum, item) => sum + calculateItemPrice(item), 0) || 0;
+
   const handleQuantityChange = (itemId, newQuantity) => {
     setCartQuantities(prev => ({
       ...prev,
@@ -97,7 +98,7 @@ const Cart = () => {
             <Text style={styles.emptyTitle}>Your cart is empty</Text>
             <Text style={styles.emptySubtitle}>Add some items to get started</Text>
             <TouchableOpacity 
-              activeOpacity={0.7}
+              activeOpacity={0.9}
               style={styles.shopButton}
               onPress={() => navigation.replace('userBottomNavBar')}
             >
@@ -105,22 +106,30 @@ const Cart = () => {
             </TouchableOpacity>
           </View>
         )}
-      </ScrollView>
-
-      {/* Bottom Section - Only show when cart has items */}
+         {/* Bottom Section - Only show when cart has items */}
       {cart?.cartItems?.length > 0 && (
         <View style={styles.bottomContainer}>
           <View style={styles.calculationContainer}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Subtotal</Text>
-              <Text style={styles.value}>₹{subtotal.toFixed(2)}</Text>
+            {cart?.cartItems?.map((item, index) => {
+              const currentQuantity = cartQuantities[item.item.id] || item.quantity;
+              const itemTotal = currentQuantity * item.item.pricePerUnit;
+              return (
+                <View key={index} style={styles.itemRow}>
+                  <Text style={styles.itemName}>{item?.item?.name}</Text>
+                  <Text style={styles.calculation}>
+                    ₹{item?.item?.pricePerUnit} × {currentQuantity} = ₹{itemTotal.toFixed(2)}
+                  </Text>
+                </View>
+              );
+            })}
+            
+            <View style={[styles.row, { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#eee' }]}>
+              <Text style={styles.label}>Total Items</Text>
+              <Text style={styles.value}>{cart?.cartItems?.length}</Text>
             </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>GST (18%)</Text>
-              <Text style={styles.value}>₹{gstAmount.toFixed(2)}</Text>
-            </View>
+            
             <View style={[styles.row, { marginTop: 8 }]}>
-              <Text style={[styles.label, { fontFamily: Fonts.bold }]}>Total</Text>
+              <Text style={[styles.label, { fontFamily: Fonts.bold }]}>Amount You'll Get</Text>
               <Text style={[styles.value, { fontFamily: Fonts.bold }]}>₹{total.toFixed(2)}</Text>
             </View>
           </View>
@@ -133,6 +142,9 @@ const Cart = () => {
           />
         </View>
       )}
+      </ScrollView>
+
+     
     </View>
   );
 };
@@ -151,19 +163,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   bottomContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
+    // position: "absolute",
+    // bottom: 0,
+    // left: 0,
+    // right: 0,
     backgroundColor: Colors.whiteColor,
     padding: 16,
     borderTopWidth: 1,
     borderTopColor: "#ddd",
-    elevation: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    // elevation: 8,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: -2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 4,
   },
   calculationContainer: {
     marginBottom: 12,
@@ -180,6 +192,22 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 12,
     color: "#111",
+  },
+  itemRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 1,
+  },
+  itemName: {
+    fontSize: 11,
+    color: "#333",
+    flex: 1,
+  },
+  calculation: {
+    fontSize: 10,
+    color: "#666",
+    textAlign: "right",
   },
   emptyContainer: {
     flex: 1,

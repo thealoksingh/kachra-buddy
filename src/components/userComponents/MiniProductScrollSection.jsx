@@ -31,8 +31,8 @@ const MiniProductScrollSection = ({ products }) => {
             title={product?.name}
             price={product?.pricePerUnit}
             image={product?.imageUrl}
-            isCountable={product?.isCountable}
-          />
+            unit={product?.unit}
+            />
         ))}
       </ScrollView>
 
@@ -40,12 +40,12 @@ const MiniProductScrollSection = ({ products }) => {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {row2Products.map((product, index) => (
             <MiniProductCard
-              key={product?.id}
-              itemId={product?.id}
-              title={product?.name}
-              price={product?.pricePerUnit}
-              image={product?.imageUrl}
-              isCountable={product?.isCountable}
+            key={product?.id}
+            itemId={product?.id}
+            title={product?.name}
+            price={product?.pricePerUnit}
+            image={product?.imageUrl}
+            unit={product?.unit}
             />
           ))}
         </ScrollView>

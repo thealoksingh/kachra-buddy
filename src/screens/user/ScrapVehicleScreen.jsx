@@ -6,12 +6,14 @@ import {
   Image,
   FlatList,
   Dimensions,
-  ActivityIndicator,ScrollView
+  ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import React, { useState } from 'react';
 import {
   ButtonWithLoader,
   CommonAppBar,
+  FaddedIcon,
   InputBox,
 } from '../../components/commonComponents';
 import { useNavigation } from '@react-navigation/native';
@@ -20,7 +22,6 @@ import Video from 'react-native-video';
 import { useDispatch, useSelector } from 'react-redux';
 import { createOrder } from '../../store/thunks/userThunk';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
-
 
 const { width } = Dimensions.get('window');
 
@@ -56,44 +57,68 @@ const ScrapVehicleScreen = () => {
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
   const { loading } = useSelector(state => state.user);
-  
+
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [vehicleNumber, setVehicleNumber] = useState('');
   const [vehicleBrand, setVehicleBrand] = useState('');
   const [vehicleModel, setVehicleModel] = useState('');
   const [videoLoading, setVideoLoading] = useState(true);
 
-  const getVehicleTypeEnum = (vehicleName) => {
+  const getVehicleTypeEnum = vehicleName => {
     const vehicleMap = {
       'Two Wheeler': 'TWO_WHEELER',
-      'Three Wheeler': 'THREE_WHEELER', 
-      'Car': 'CAR',
+      'Three Wheeler': 'THREE_WHEELER',
+      Car: 'CAR',
       'Mini Cargo': 'MINI_CARGO',
-      'Truck': 'TRUCK',
-      'Bus': 'BUS'
+      Truck: 'TRUCK',
+      Bus: 'BUS',
     };
     return vehicleMap[vehicleName] || 'TWO_WHEELER';
   };
 
   const handleCreateOrder = async () => {
     if (!selectedVehicle && selectedVehicle !== 0) {
-      dispatch(showSnackbar({ message: 'Please select a vehicle type', type: 'error', time: 3000 }));
+      dispatch(
+        showSnackbar({
+          message: 'Please select a vehicle type',
+          type: 'error',
+          time: 3000,
+        }),
+      );
       return;
     }
     if (!vehicleNumber.trim()) {
-      dispatch(showSnackbar({ message: 'Please enter vehicle number', type: 'error', time: 3000 }));
+      dispatch(
+        showSnackbar({
+          message: 'Please enter vehicle number',
+          type: 'error',
+          time: 3000,
+        }),
+      );
       return;
     }
     if (!vehicleBrand.trim()) {
-      dispatch(showSnackbar({ message: 'Please enter vehicle brand', type: 'error', time: 3000 }));
+      dispatch(
+        showSnackbar({
+          message: 'Please enter vehicle brand',
+          type: 'error',
+          time: 3000,
+        }),
+      );
       return;
     }
     if (!vehicleModel.trim()) {
-      dispatch(showSnackbar({ message: 'Please enter vehicle model', type: 'error', time: 3000 }));
+      dispatch(
+        showSnackbar({
+          message: 'Please enter vehicle model',
+          type: 'error',
+          time: 3000,
+        }),
+      );
       return;
     }
 
-     const orderData = {
+    const orderData = {
       userId: user?.id || 0,
       orderType: 'VEHICLE',
       vehicleType: getVehicleTypeEnum(vehicleType[selectedVehicle].name),
@@ -103,9 +128,17 @@ const ScrapVehicleScreen = () => {
     };
     try {
       const result = await dispatch(createOrder({ orderData }));
-      navigation.navigate('checkoutScreen', { orderData: result?.payload?.data });
+      navigation.navigate('checkoutScreen', {
+        orderData: result?.payload?.data,
+      });
     } catch (error) {
-      dispatch(showSnackbar({ message: 'Failed to create order. Please try again.', type: 'error', time: 3000 }));
+      dispatch(
+        showSnackbar({
+          message: 'Failed to create order. Please try again.',
+          type: 'error',
+          time: 3000,
+        }),
+      );
     }
   };
 
@@ -142,96 +175,75 @@ const ScrapVehicleScreen = () => {
     <View style={{ flex: 1, backgroundColor: Colors.whiteColor }}>
       <CommonAppBar navigation={navigation} label="Scrap Your Old Vehicles" />
       <ScrollView>
-      <View style={styles.scrapVehicleCard}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.title}>Sell Old Vehicle</Text>
-          <Text style={styles.subtitle}>
-            Turn your old stuff into cash today.
-          </Text>
-        </View>
+        <View style={styles.scrapVehicleCard}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.title}>Sell Old Vehicle</Text>
+            <Text style={styles.subtitle}>
+              Turn your old stuff into cash today.
+            </Text>
+          </View>
 
-        <View style={styles.videoContainer}>
-          {videoLoading && (
+          <View style={styles.videoContainer}>
             <View style={styles.loaderWrapper}>
               <Image
-                source={require('../../../assets/images/scrapVehicle.png')}
+                source={require('../../../assets/images/sellVehicle.jpg')}
                 style={styles.fallbackImage}
               />
-              <ActivityIndicator
-                size="large"
-                color="#00BFA5"
-                style={styles.loader}
-              />
+             
             </View>
-          )}
-          <Video
-            source={{
-              uri: 'https://drive.google.com/uc?export=download&id=1CtKlYq9x-herZIy0x9j1Z7tviAq40fS3',
-            }}
-            style={styles.video}
-            resizeMode="cover"
-            repeat
-            muted
-            onLoadStart={() => setVideoLoading(true)}
-            onLoad={() => setVideoLoading(false)}
-            onBuffer={({ isBuffering }) => setVideoLoading(isBuffering)}
-            onError={e => {
-              console.log('Video error', e);
-              setVideoLoading(false);
-            }}
+          </View>
+        </View>
+
+        <Text style={styles.sectionTitle}>
+          Select Vehicle Type <Text style={{ color: Colors.secondary }}>*</Text>
+        </Text>
+        <View style={{ height: 130 }}>
+          <FlatList
+            data={vehicleType}
+            renderItem={renderVehicleCard}
+            keyExtractor={(item, index) => index.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 12 }}
           />
         </View>
-      </View>
 
-      <Text style={styles.sectionTitle}>
-        Select Vehicle Type <Text style={{ color: Colors.secondary }}>*</Text>
-      </Text>
-      <View style={{ height: 130 }}>
-        <FlatList
-          data={vehicleType}
-          renderItem={renderVehicleCard}
-          keyExtractor={(item, index) => index.toString()}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 12 }}
-        />
-      </View>
+        <View style={styles.formCard}>
+          <InputBox
+            value={vehicleNumber}
+            setter={setVehicleNumber}
+            placeholder={'Enter Vehicle Number'}
+            label={'Vehicle Number'}
+            optional={false}
+            type={'default'}
+          />
+          <InputBox
+            value={vehicleBrand}
+            setter={setVehicleBrand}
+            placeholder={'Enter Vehicle Brand'}
+            label={'Vehicle Brand'}
+            optional={false}
+            type={'default'}
+          />
+          <InputBox
+            value={vehicleModel}
+            setter={setVehicleModel}
+            placeholder={'Enter Vehicle Model'}
+            label={'Vehicle Model'}
+            optional={false}
+            type={'default'}
+          />
+        </View>
 
-      <View style={styles.formCard}>
-        <InputBox
-          value={vehicleNumber}
-          setter={setVehicleNumber}
-          placeholder={'Enter Vehicle Number'}
-          label={'Vehicle Number'}
-          optional={false}
-          type={'default'}
-        />
-        <InputBox
-          value={vehicleBrand}
-          setter={setVehicleBrand}
-          placeholder={'Enter Vehicle Brand'}
-          label={'Vehicle Brand'}
-          optional={false}
-          type={'default'}
-        />
-        <InputBox
-          value={vehicleModel}
-          setter={setVehicleModel}
-          placeholder={'Enter Vehicle Model'}
-          label={'Vehicle Model'}
-          optional={false}
-          type={'default'}
-        />
-      </View>
-
-      <View style={styles.bottomButton}>
-        <ButtonWithLoader
-          name="Continue"
-          loadingName="Creating Order..."
-          isLoading={loading}
-          method={handleCreateOrder}
-        />
-      </View>
+        <View style={styles.bottomButton}>
+          <ButtonWithLoader
+            name="Continue"
+            loadingName="Creating Order..."
+            isLoading={loading}
+            method={handleCreateOrder}
+          />
+        </View>
+        <FaddedIcon />
       </ScrollView>
     </View>
   );
@@ -278,8 +290,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.whiteColor,
   },
   fallbackImage: {
-    width: 120,
-    height: 120,
+    width: 150,
+    height: 150,
     resizeMode: 'contain',
     marginBottom: 10,
   },

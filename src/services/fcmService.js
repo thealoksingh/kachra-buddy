@@ -10,7 +10,7 @@ import store from '../store/store';
 export const createDefaultChannel = async () => {
   await notifee.createChannel({
     id: 'default',
-    name: 'KachraBuddy Notifications',
+    name: 'GreenRoing Notifications',
     importance: AndroidImportance.HIGH,
     sound: 'default',
   });
@@ -103,13 +103,13 @@ export const setupForegroundListener = () => {
     try {
       // Add to Redux store
       store.dispatch(addNotification({
-        title: remoteMessage.notification?.title || 'KachraBuddy',
+        title: remoteMessage.notification?.title || 'GreenRoing',
         message: remoteMessage.notification?.body || 'You have a new message',
         type: remoteMessage.data?.type || 'GENERAL'
       }));
 
       await notifee.displayNotification({
-        title: remoteMessage.notification?.title || 'KachraBuddy',
+        title: remoteMessage.notification?.title || 'GreenRoing',
         body: remoteMessage.notification?.body || 'You have a new message',
         android: {
           channelId: 'default',

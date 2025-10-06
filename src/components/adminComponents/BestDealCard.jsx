@@ -45,8 +45,7 @@ const BestDealCard = ({ product, theme }) => {
         </Text>
         <View style={styles.priceContainer}>
           <Text style={[styles.currentPrice, { color: cardTheme.border }]}>
-            ₹{product?.currentPrice}{' '}
-            {product?.type === 'countable' ? 'Per Piece' : '/Kg'}
+            ₹{product?.currentPrice}/{product?.unit}
           </Text>
         </View>
 

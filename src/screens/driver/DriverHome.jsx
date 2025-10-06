@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import {
   appFonts,
@@ -30,7 +31,7 @@ import { FaddedIcon } from '../../components/commonComponents';
 import CurvedCard from '../../screens/driver/CurvedCard';
 import {fetchAddressFromCoordinates, getUserLocation} from "../../utils/CommonMethods";
 import { useSelector, useDispatch } from 'react-redux';
-import { selectUser, selectDriverItems, selectDriverLoading, selectAdvertisementsByDisplayOrder } from '../../store/selector';
+import { selectUser, selectDriverItems, selectDriverLoading, selectAdvertisementsByDisplayOrder, selectUnreadNotifications } from '../../store/selector';
 import { fetchAllItems, fetchDriverOrders } from '../../store/thunks/driverThunk';
 import { fetchAllAdvertisements } from '../../store/thunks/adminThunk';
 import NotificationTest from '../../components/NotificationTest';
@@ -83,7 +84,8 @@ export default function DriverHome() {
   console.log("driver items", driverItems);
   const navigation = useNavigation();
   const [userAddress, setUserAddress] = useState('Getting location...');
-  
+  const [refreshing, setRefreshing] = useState(false);
+  const unreadNotifications = useSelector(selectUnreadNotifications);
   const bigSizeAdv = advertisement?.filter((ad) => ad.adSize === 'BIG') || [];
   const smallSizeAdv = advertisement?.filter((ad) => ad.adSize === 'SMALL') || [];
 
@@ -106,6 +108,22 @@ export default function DriverHome() {
       dispatch(fetchAllAdvertisements());
     }
   }, [user, dispatch]);
+
+  const fetchAllData = useCallback(async () => {
+    if (user) {
+      await Promise.all([
+        dispatch(fetchAllItems()),
+        dispatch(fetchDriverOrders()),
+        dispatch(fetchAllAdvertisements()),
+      ]);
+    }
+  }, [user, dispatch]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchAllData();
+    setRefreshing(false);
+  }, [fetchAllData]);
 
   return (
     <LinearGradient
@@ -150,27 +168,30 @@ export default function DriverHome() {
             </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity
+         <TouchableOpacity
           onPress={() => navigation.navigate('notificationScreen')}
-          style={{ position: 'relative' }}
+         
+          style={styles.notificationContainer}
         >
           <Ionicons
             name="notifications-outline"
             size={28}
             color={Colors.whiteColor}
           />
-
-          <View style={styles.badge}>
-            <Text
-              style={{ ...textStyles.extraSmall, color: Colors.whiteColor }}
-            >
-              0
+          {unreadNotifications?.length>0&&( <View style={styles.badge}>
+            <Text style={styles.badgeText}>
+              {unreadNotifications?.length || 0}
             </Text>
-          </View>
+          </View>)}
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.mainSection}>
+      <ScrollView 
+        style={styles.mainSection}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <MovingIcons icons={icons} />
         <AdSlider data={bigSizeAdv} type={"big"} />
         <View
@@ -214,7 +235,7 @@ export default function DriverHome() {
           <AdSlider data={smallSizeAdv} type={"small"}/>
         </View>
 
-        <NotificationTest />
+        {/* <NotificationTest /> */}
         <FaddedIcon />
       </ScrollView>
     </LinearGradient>
@@ -282,6 +303,10 @@ const styles = StyleSheet.create({
     minWidth: 20,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  badgeText: {
+    ...textStyles.extraSmall,
+    color: Colors.whiteColor,
   },
   scrapVehicleCard: {
     width: screenWidth - 60,

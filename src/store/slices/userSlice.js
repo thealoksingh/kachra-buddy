@@ -124,7 +124,13 @@ const userSlice = createSlice({
       })
       .addCase(updateOrder.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentOrder = action?.payload?.data || action?.payload;
+        const updatedOrder = action?.payload?.data || action?.payload;
+        state.currentOrder = updatedOrder;
+        // Update the order in orders array
+        const index = state.orders.findIndex(order => order.id === updatedOrder.id);
+        if (index !== -1) {
+          state.orders[index] = updatedOrder;
+        }
       })
       .addCase(updateOrder.rejected, (state, action) => {
         state.loading = false;

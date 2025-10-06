@@ -1,6 +1,6 @@
 {
-  "name": "kachraBuddy",
-  "version": "0.0.1",
+  "name": "GreenRoing",
+  "version": "0.0.2",
   "private": true,
   "scripts": {
     "android": "react-native run-android",

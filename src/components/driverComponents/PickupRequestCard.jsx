@@ -15,26 +15,14 @@ import { showSnackbar } from '../../store/slices/snackbarSlice';
 import Key from '../../constants/key';
 import { getStatusColor } from '../../utils/CommonMethods';
 
-const PickupRequestCard = ({ booking }) => {
+const PickupRequestCard = ({ booking ,setShowAlert,setBookingId }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const { API_BASE_URL } = Key;
-  
-  const handleOutForPickup = async () => {
-    try {
-      const result = await dispatch(outForPickup(booking?.id));
-      if (result.type.endsWith('/fulfilled')) {
-        dispatch(showSnackbar({ message: 'Order marked as out for pickup successfully', type: 'success', time: 3000 }));
-      } else {
-        dispatch(showSnackbar({ message: 'Failed to mark order as out for pickup', type: 'error', time: 3000 }));
-      }
-    } catch (error) {
-      dispatch(showSnackbar({ message: 'Failed to mark order as out for pickup', type: 'error', time: 3000 }));
-    }
-  };
 
-  
+
+
   // Extract data from order entity
   const allOrderImages = booking?.orderImages || [];
   const images = allOrderImages
@@ -42,8 +30,13 @@ const PickupRequestCard = ({ booking }) => {
     .map(image => API_BASE_URL + image?.imageUrl);
   const orderItems = booking?.orderItems || [];
   const itemCount = orderItems.length;
-  const pickupDate = booking?.pickupDate ? new Date(booking.pickupDate).toLocaleDateString() : 'N/A';
-  const address = booking?.orderPickupAddress || booking?.pickupAddress || 'Address not provided';
+  const pickupDate = booking?.pickupDate
+    ? new Date(booking.pickupDate).toLocaleDateString()
+    : 'N/A';
+  const address =
+    booking?.orderPickupAddress ||
+    booking?.pickupAddress ||
+    'Address not provided';
   const sellerName = booking?.sellerName || booking?.user?.fullName || 'N/A';
 
   const maxVisible = 3;
@@ -59,29 +52,29 @@ const PickupRequestCard = ({ booking }) => {
       );
     } else if (images.length === 1) {
       return (
-        <Image 
-          source={{ 
+        <Image
+          source={{
             uri: images[0],
             headers: {
               Authorization: `Bearer ${user?.accessToken}`,
             },
-          }} 
-          style={styles.singleImage} 
+          }}
+          style={styles.singleImage}
         />
       );
     } else if (images.length === 2) {
       return (
         <View style={styles.twoImageRow}>
           {images.map((uri, index) => (
-            <Image 
-              key={index} 
-              source={{ 
+            <Image
+              key={index}
+              source={{
                 uri,
                 headers: {
                   Authorization: `Bearer ${user?.accessToken}`,
-                }
-              }} 
-              style={styles.twoImage} 
+                },
+              }}
+              style={styles.twoImage}
             />
           ))}
         </View>
@@ -90,15 +83,15 @@ const PickupRequestCard = ({ booking }) => {
       return (
         <View style={styles.imageRow}>
           {visibleImages.map((uri, index) => (
-            <Image 
-              key={index} 
-              source={{ 
+            <Image
+              key={index}
+              source={{
                 uri,
                 headers: {
                   Authorization: `Bearer ${user?.accessToken}`,
-                }
-              }} 
-              style={styles.imageThumb} 
+                },
+              }}
+              style={styles.imageThumb}
             />
           ))}
           {extraCount > 0 && (
@@ -113,9 +106,14 @@ const PickupRequestCard = ({ booking }) => {
 
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate('pickupRequestDetail',{ orderId: booking?.id})}
-      activeOpacity={0.7}
-      style={[styles.card,{ borderLeftColor: getStatusColor(booking?.status) }]}
+      onPress={() =>
+        navigation.navigate('pickupRequestDetail', { orderId: booking?.id })
+      }
+      activeOpacity={0.8}
+      style={[
+        styles.card,
+        { borderLeftColor: getStatusColor(booking?.status) },
+      ]}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <Text style={textStyles.subHeading}>Booking</Text>
@@ -128,7 +126,7 @@ const PickupRequestCard = ({ booking }) => {
       >
         {address}
       </Text>
-      
+
       <Text
         style={[textStyles.extraSmall, { color: Colors.primary, marginTop: 2 }]}
       >
@@ -145,25 +143,20 @@ const PickupRequestCard = ({ booking }) => {
           style={[
             textStyles.small,
             {
-              color:
-                booking?.status === 'COMPLETED'
-                  ? Colors.greenColor
-                  : booking?.status === 'NEW'
-                  ? Colors.yellowColor
-                  : Colors.primary,
+              color: getStatusColor(booking?.status),
             },
           ]}
         >
           {booking?.status || 'N/A'}
         </Text>
       </View>
-      
-      <View style={commonStyles.rowSpaceBetween}>
+
+      {/* <View style={commonStyles.rowSpaceBetween}>
         <Text style={textStyles.smallBold}>Seller Contact</Text>
         <Text style={textStyles.small}>
           {booking?.sellerContactNo || booking?.user?.contactNumber || 'N/A'}
         </Text>
-      </View>
+      </View> */}
 
       <View style={commonStyles.rowSpaceBetween}>
         <Text style={textStyles.smallBold}>Pickup Date</Text>
@@ -183,7 +176,7 @@ const PickupRequestCard = ({ booking }) => {
           ₹{booking?.finalPrice || 0}
         </Text>
       </View>
-      
+
       {booking?.status === 'NEW' && (
         <TouchableOpacity
           onPress={handleOutForPickup}
@@ -192,10 +185,13 @@ const PickupRequestCard = ({ booking }) => {
           <Text style={styles.outForPickupText}>Out for Pickup</Text>
         </TouchableOpacity>
       )}
-      
+
       {booking?.status === 'ACTIVE' && (
         <TouchableOpacity
-          onPress={handleOutForPickup}
+          onPress={()=>{
+            setBookingId(booking?.id)
+            setShowAlert(true)
+          }}
           style={styles.outForPickupBtn}
         >
           <Text style={styles.outForPickupText}>Out for Pickup</Text>

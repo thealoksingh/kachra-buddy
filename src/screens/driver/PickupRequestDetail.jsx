@@ -22,6 +22,7 @@ import { openGoogleMaps, callUser } from '../../utils/CommonMethods';
 import MyStatusBar from '../../components/MyStatusBar';
 import { getOrderByIdAPI } from '../../utils/api/driverApi';
 import Key from '../../constants/key';
+import OrderStatusCard from '../../components/userComponents/OrderStatusCard';
 const { width } = Dimensions.get('window');
 const PickupRequestDetail = () => {
   const navigation = useNavigation();
@@ -74,7 +75,16 @@ const PickupRequestDetail = () => {
 
   }, [orderId]);
 
-  const images = currentOrder?.orderImages?.map(img => `${Key.API_BASE_URL}${img.imageUrl}`) || [];
+  const images =
+    currentOrder?.orderImages
+      ?.filter(img => img.postedBy === 'USER')
+      .map(img => ({
+        id: img.id,
+        uri: Key.API_BASE_URL+ img.imageUrl,
+      })) || [];
+
+
+  // const images = currentOrder?.orderImages?.map(img => `${Key.API_BASE_URL}${img.imageUrl}`) || [];
   const orderItems = currentOrder?.orderItems || [];
   const user = currentOrder?.user;
   const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -112,13 +122,13 @@ const PickupRequestDetail = () => {
               <TouchableOpacity
                 activeOpacity={0.9}
                 onPress={() => {
-                  setPreviewImage(item);
+                  setPreviewImage(item.uri);
                   setPreviewVisible(true);
                 }}
               >
                 <Image 
                   source={{ 
-                    uri: item,
+                    uri: item.uri,
                     headers: { Authorization: `Bearer ${Key.ACCESS_TOKEN}` }
                   }} 
                   style={styles.image} 
@@ -142,35 +152,39 @@ const PickupRequestDetail = () => {
             ))}
           </View>
         )}
-        {user && (
+
+         <OrderStatusCard bookingData={currentOrder}/>
+         {user && (
           <>
             <View style={styles.headingSection}>
               <Text style={styles.sectionTitle}>User Detail</Text>
             </View>
             <View style={styles.userCard}>
-              <Image
-                source={{
-                  uri: user?.avatarUrl ? `${Key.API_BASE_URL}${user?.avatarUrl}` : 'https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                  headers: user?.avatarUrl ? { Authorization: `Bearer ${user?.accessToken}` } : undefined
-                }}
-                style={styles.userImage}
-              />
+              {user?.avatarUrl ? (
+                <Image
+                  source={{
+                    uri: `${Key.API_BASE_URL}${user.avatarUrl}`,
+                    headers: { Authorization: `Bearer ${user?.accessToken}` }
+                  }}
+                  style={styles.userImage}
+                />
+              ) : (
+                <View style={[styles.userImage, styles.userIconContainer]}>
+                  <Ionicons name="person" size={30} color={Colors.grayColor} />
+                </View>
+              )}
               <View style={{ marginLeft: 12 }}>
                 <Text style={styles.userName}>{user.fullName || 'N/A'}</Text>
                 <Text style={styles.userPhone}>{user.contactNumber || 'N/A'}</Text>
               </View>
             </View>
           </>
-        )}
+          )}
         <View style={styles.headingSection}>
           <Text style={styles.sectionTitle}>Booking Details</Text>
         </View>
 
         <View style={styles.itemsSection}>
-          <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Items</Text>
-            <Text style={textStyles.small}>{totalItems}</Text>
-          </View>
           <View style={commonStyles.rowSpaceBetween}>
             <Text style={textStyles.smallBold}>Pickup Date Time</Text>
             <Text style={textStyles.small}>{formatDate(currentOrder?.pickupDate)}</Text>
@@ -179,14 +193,19 @@ const PickupRequestDetail = () => {
             <Text style={textStyles.smallBold}>Pickup Status</Text>
             <Text style={textStyles.small}>{currentOrder?.status || 'N/A'}</Text>
           </View>
-          <View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Expected Price</Text>
-            <Text style={[textStyles.small,{fontWeight:"700",color:Colors.darkBlue}]}>₹{currentOrder?.finalPrice || 0}</Text>
-          </View>
-          {currentOrder?.givenAmount&&(<View style={commonStyles.rowSpaceBetween}>
-            <Text style={textStyles.smallBold}>Given Amount</Text>
-            <Text style={[textStyles.small,{fontWeight:"700",color:Colors.primary}]}>₹{currentOrder?.givenAmount || 0}</Text>
-          </View>)}
+          {currentOrder?.orderType === 'GENERAL' && (
+            <>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Items</Text>
+                <Text style={textStyles.small}>{totalItems}</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Expected Price</Text>
+                <Text style={[textStyles.small,{fontWeight:"700",color:Colors.darkBlue}]}>₹{currentOrder?.finalPrice || 0}</Text>
+              </View>
+             
+            </>
+          )}
         </View>
         <View style={styles.headingSection}>
           <Text style={styles.sectionTitle}>Customer Detail</Text>
@@ -262,31 +281,124 @@ const PickupRequestDetail = () => {
           </View>
         </View>
 
-        <View style={styles.headingSection}>
-          <Text style={styles.sectionTitle}>Item In this Booking</Text>
-        </View>
-        <View style={styles.itemsSection}>
-          {orderItems.map(orderItem => (
-            <View key={orderItem.id} style={styles.itemCard}>
-              <Image 
-                source={{ 
-                  uri: orderItem.item.imageUrl ? `${Key.API_BASE_URL}${orderItem.item.imageUrl}` : 'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                  headers: orderItem.item.imageUrl ? { Authorization: `Bearer ${Key.ACCESS_TOKEN}` } : undefined
-                }} 
-                style={styles.itemImage} 
-              />
-              <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.itemTitle}>{orderItem.item.name}</Text>
-                <Text style={styles.itemDesc}>₹{orderItem.item.pricePerUnit} per {orderItem.item.unit}</Text>
-                <Text style={styles.itemInfo}>
-                  Qty: {orderItem.quantity} {orderItem.unit} | ₹{orderItem.price}
-                </Text>
-              </View>
+        {currentOrder?.orderType === 'VEHICLE' && (
+          <>
+            <View style={styles.headingSection}>
+              <Text style={styles.sectionTitle}>Vehicle Details</Text>
             </View>
-          ))}
-        </View>
+            <View style={styles.itemsSection}>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Vehicle Type</Text>
+                <Text style={textStyles.small}>Cargo Vehicle</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Vehicle Brand</Text>
+                <Text style={textStyles.small}>TATA</Text>
+              </View>
+              <View style={commonStyles.rowSpaceBetween}>
+                <Text style={textStyles.smallBold}>Vehicle Number</Text>
+                <Text style={textStyles.small}>MH14FE4940</Text>
+              </View>
+             
+              {currentOrder?.givenAmount && (
+                <View style={commonStyles.rowSpaceBetween}>
+                  <Text style={textStyles.smallBold}>Given Amount</Text>
+                  <Text style={[textStyles.small,{fontWeight:"700",color:Colors.primary}]}>₹{currentOrder?.givenAmount || 0}</Text>
+                </View>
+              )}
+            </View>
+          </>
+        )}
+          {currentOrder?.status === 'COMPLETED' && (
+          <>
+            <View style={styles.headingSection}>
+              <Text style={styles.sectionTitle}>Pickup Details</Text>
+            </View>
+            <View style={{ padding: 10 }}>
+              {currentOrder?.givenAmount && (
+                <View style={commonStyles.rowSpaceBetween}>
+                  <Text style={textStyles.smallBold}>Given Amount</Text>
+                  <Text style={[textStyles.small,{fontWeight:"700",color:Colors.primary}]}>₹{currentOrder?.givenAmount || 0}</Text>
+                </View>
+              )}
 
-       {currentOrder?.status !== 'COMPLETED' && <TouchableOpacity
+              {currentOrder?.remark && (
+                <Text
+                  style={[
+                    textStyles.small,
+                    { flex: 1, textAlign: 'justify', marginTop: 8 },
+                  ]}
+                >
+                  <Text style={textStyles.smallBold}>Remark By Driver : </Text>
+                  {currentOrder?.remark || 'NA'}
+                </Text>
+              )}
+              
+              {currentOrder?.orderImages?.filter(img => img.postedBy === 'DRIVER').length > 0 && (
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: 10,
+                    marginTop: 10,
+                  }}
+                >
+                  {currentOrder?.orderImages
+                    ?.filter(img => img.postedBy === 'DRIVER')
+                    .map((image, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        activeOpacity={0.8}
+                        onPress={() => {
+                          setPreviewImage(`${Key.API_BASE_URL}${image.imageUrl}`);
+                          setPreviewVisible(true);
+                        }}
+                      >
+                        <Image
+                          source={{
+                            uri: `${Key.API_BASE_URL}${image.imageUrl}`,
+                            headers: { Authorization: `Bearer ${Key.ACCESS_TOKEN}` },
+                          }}
+                          style={styles.pickupImage}
+                        />
+                      </TouchableOpacity>
+                    ))}
+                </View>
+              )}
+            </View>
+          </>
+        )}
+        {currentOrder?.orderType === 'GENERAL' && (
+          <>
+            <View style={styles.headingSection}>
+              <Text style={styles.sectionTitle}>Item In this Booking</Text>
+            </View>
+            <View style={styles.itemsSection}>
+              {orderItems.map(orderItem => (
+                <View key={orderItem.id} style={styles.itemCard}>
+                  <Image 
+                    source={{ 
+                      uri: orderItem.item.imageUrl ? `${Key.API_BASE_URL}${orderItem.item.imageUrl}` : 'https://plus.unsplash.com/premium_photo-1664283229534-194c0cb5b7da?q=80&w=1080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                      headers: orderItem.item.imageUrl ? { Authorization: `Bearer ${Key.ACCESS_TOKEN}` } : undefined
+                    }} 
+                    style={styles.itemImage} 
+                  />
+                  <View style={{ flex: 1, marginLeft: 12 }}>
+                    <Text style={styles.itemTitle}>{orderItem.item.name}</Text>
+                    <Text style={styles.itemDesc}>₹{orderItem.item.pricePerUnit} per {orderItem.item.unit}</Text>
+                    <Text style={styles.itemInfo}>
+                      Qty: {orderItem.quantity} {orderItem.unit} | ₹{orderItem.price}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
+      
+
+        {(currentOrder?.status !== 'COMPLETED' && currentOrder?.status === 'OUT_FOR_PICKUP') && <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => navigation.navigate('finalPickupScreen', { currentOrder })}
           style={[styles.outlinedBtn, { borderColor: Colors.primary }]}
@@ -475,6 +587,11 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
   },
+  userIconContainer: {
+    backgroundColor: Colors.extraLightGrayColor,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   userName: {
     fontSize: 15,
     fontWeight: '600',
@@ -482,5 +599,12 @@ const styles = StyleSheet.create({
   userPhone: {
     fontSize: 13,
     color: '#777',
+  },
+  pickupImage: {
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.extraLightGrayColor,
   },
 });

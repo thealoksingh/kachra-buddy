@@ -53,7 +53,7 @@ export const selectDriverError = (state) => state.driver.error;  // ✅ Get driv
 // Admin selectors
 const selectAdminUsersRaw = (state) => state.admin.users || [];
 const selectAdminDriversRaw = (state) => state.admin.drivers || [];
-const selectAdminItemsRaw = (state) => state.admin.items || [];
+export const selectAdminItemsRaw = (state) => state.admin.items || [];
 const selectAdminOrdersRaw = (state) => state.admin.orders || [];
 const selectAdvertisementsRaw = (state) => state.admin.advertisements || [];
 

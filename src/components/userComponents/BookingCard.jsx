@@ -15,16 +15,20 @@ import { getStatusColor } from '../../utils/CommonMethods';
 
 const BookingCard = ({ booking }) => {
   const navigation = useNavigation();
-  console.log("booking data", booking);
+  console.log('booking data', booking);
   const user = useSelector(selectUser);
   const { API_BASE_URL } = Key;
-  
+
   // Extract data from order entity
   const allOrderImages = booking?.orderImages || [];
-  const orderImages = allOrderImages.filter(image => image?.postedBy === 'USER');
+  const orderImages = allOrderImages.filter(
+    image => image?.postedBy === 'USER',
+  );
   const orderItems = booking?.orderItems || [];
   const itemCount = orderItems?.length;
-  const pickupDate = booking?.pickupDate ? new Date(booking?.pickupDate).toLocaleDateString() : 'N/A';
+  const pickupDate = booking?.pickupDate
+    ? new Date(booking?.pickupDate).toLocaleDateString()
+    : 'N/A';
   const driverName = booking?.driver?.fullName || 'Not Assigned';
 
   const maxVisible = 3;
@@ -33,20 +37,31 @@ const BookingCard = ({ booking }) => {
 
   const renderImages = () => {
     if (orderImages.length === 1) {
-      return <Image source={{ uri: API_BASE_URL + orderImages[0]?.imageUrl,
-        headers: {
-                  Authorization: `Bearer ${user?.accessToken}`,
-                }
-       }} style={styles.singleImage} />;
+      return (
+        <Image
+          source={{
+            uri: API_BASE_URL + orderImages[0]?.imageUrl,
+            headers: {
+              Authorization: `Bearer ${user?.accessToken}`,
+            },
+          }}
+          style={styles.singleImage}
+        />
+      );
     } else if (orderImages.length === 2) {
       return (
         <View style={styles.twoImageRow}>
           {orderImages.map((image, index) => (
-            <Image key={index} source={{ uri: API_BASE_URL + image?.imageUrl,
-               headers: {
+            <Image
+              key={index}
+              source={{
+                uri: API_BASE_URL + image?.imageUrl,
+                headers: {
                   Authorization: `Bearer ${user?.accessToken}`,
-                }
-             }} style={styles.twoImage} />
+                },
+              }}
+              style={styles.twoImage}
+            />
           ))}
         </View>
       );
@@ -54,11 +69,16 @@ const BookingCard = ({ booking }) => {
       return (
         <View style={styles.imageRow}>
           {visibleImages.map((image, index) => (
-            <Image key={index} source={{ uri: API_BASE_URL + image?.imageUrl,
-               headers: {
+            <Image
+              key={index}
+              source={{
+                uri: API_BASE_URL + image?.imageUrl,
+                headers: {
                   Authorization: `Bearer ${user?.accessToken}`,
-                }
-             }} style={styles.imageThumb} />
+                },
+              }}
+              style={styles.imageThumb}
+            />
           ))}
           {extraCount > 0 && (
             <View style={styles.extraImages}>
@@ -73,9 +93,14 @@ const BookingCard = ({ booking }) => {
 
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate('bookingDetailScreen',{ orderId: booking?.id })}
-      activeOpacity={0.7}
-      style={[styles.card,{ borderLeftColor: getStatusColor(booking?.status) }]}
+      onPress={() =>
+        navigation.navigate('bookingDetailScreen', { orderId: booking?.id })
+      }
+      activeOpacity={0.9}
+      style={[
+        styles.card,
+        { borderLeftColor: getStatusColor(booking?.status) },
+      ]}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <Text style={textStyles.subHeading}>Booking</Text>
@@ -83,7 +108,6 @@ const BookingCard = ({ booking }) => {
           #{booking?.id || 'N/A'}
         </Text>
       </View>
-   
 
       {renderImages()}
 
@@ -95,22 +119,17 @@ const BookingCard = ({ booking }) => {
           style={[
             textStyles.small,
             {
-              color:
-                booking?.status === 'COMPLETED'
-                  ? Colors.greenColor
-                  : booking?.status === 'NEW'
-                  ? Colors.yellowColor
-                  : Colors.primary,
+              color: getStatusColor (booking?.status),
             },
           ]}
-         >
-        {booking?.status || 'N/A'}
+        >
+          {booking?.status || 'N/A'}
         </Text>
       </View>
 
       <View style={commonStyles.rowSpaceBetween}>
         <Text style={textStyles.smallBold}>Driver</Text>
-        <Text style={[textStyles.small, { color: Colors.primary }]}>
+        <Text style={[textStyles.small, { color: Colors.blackColor }]}>
           {driverName}
         </Text>
       </View>
@@ -120,10 +139,12 @@ const BookingCard = ({ booking }) => {
         <Text style={textStyles.small}>{pickupDate}</Text>
       </View>
 
-      {booking?.type=="general"&&(<View style={commonStyles.rowSpaceBetween}>
-        <Text style={textStyles.smallBold}>Items</Text>
-        <Text style={textStyles.small}>{itemCount}</Text>
-      </View>)}
+      {booking?.type == 'general' && (
+        <View style={commonStyles.rowSpaceBetween}>
+          <Text style={textStyles.smallBold}>Items</Text>
+          <Text style={textStyles.small}>{itemCount}</Text>
+        </View>
+      )}
 
       <View
         style={[commonStyles.rowSpaceBetween, { marginTop: Sizes.fixPadding }]}

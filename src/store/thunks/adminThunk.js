@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setLoading, setUsers, setDrivers, setRequests, setAnalytics, setError } from '../slices/adminSlice';
-import { updateAdminProfileAPI, updateAdminProfilePicAPI, fetchAllItemsAPI, createItemAPI, updateItemAPI, fetchAllOrdersAPI, fetchAllUsersAPI, createUserAPI, updateUserAPI, assignDriverAPI, createAdvertisementAPI, fetchAllAdvertisementsAPI, updateAdvertisementAPI, fetchAllTicketsAPI, updateTicketAPI } from '../../utils/api/adminApi';
+import { updateAdminProfileAPI, updateAdminProfilePicAPI, fetchAllItemsAPI, createItemAPI, updateItemAPI, fetchAllOrdersAPI, fetchAllUsersAPI, createUserAPI, updateUserAPI, assignDriverAPI, createAdvertisementAPI, fetchAllAdvertisementsAPI, updateAdvertisementAPI, fetchAllTicketsAPI, updateTicketAPI, updateOrderAPI, deleteItemAPI } from '../../utils/api/adminApi';
 import { handleAxiosError } from '../../utils/handleAxiosError';
 
 
@@ -99,6 +99,17 @@ export const updateItem = createAsyncThunk(
   async ({ itemId, itemData, file }, thunkAPI) => {
     try {
       const response = await updateItemAPI(itemId, itemData, file);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+export const deleteItem = createAsyncThunk(
+  'admin/deleteItem',
+  async ({itemId}, thunkAPI) => {
+    try {
+      const response = await deleteItemAPI(itemId);
       return response?.data;
     } catch (error) {
       return handleAxiosError(error, thunkAPI);
@@ -220,6 +231,18 @@ export const updateTicket = createAsyncThunk(
   async ({ ticketId, ticketData }, thunkAPI) => {
     try {
       const response = await updateTicketAPI(ticketId, ticketData);
+      return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+
+export const updateOrder = createAsyncThunk(
+  "admin/updateOrder",
+  async (data, thunkAPI) => {
+    try {
+      const response = await updateOrderAPI(data);
       return response?.data;
     } catch (error) {
       return handleAxiosError(error, thunkAPI);

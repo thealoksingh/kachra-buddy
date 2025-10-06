@@ -11,6 +11,8 @@ import {
   InputBox,
   TextArea,
 } from '../../components/commonComponents';
+import SingleSelectDropdown from '../../components/SingleSelectDropdown';
+import MultiSelectDropdown from '../../components/MultiSelectDropdown';
 import ImagePreviewModal from '../../components/ImagePreviewModal';
 import { useImagePicker } from '../../components/useImagePicker';
 import ImagePickerSheet from '../../components/ImagePickerSheet';
@@ -24,9 +26,15 @@ const PostProductsScreen = () => {
   const [succesAlertVisible, setSuccessAlertVisible] = useState(false);
   const [name, setName] = useState('');
   const [rate, setRate] = useState('');
-  const [type, setType] = useState('countable');
-  const [tags, setTags] = useState('');
+  const [unit, setUnit] = useState('KG');
+  const [tags, setTags] = useState([]);
   const [image, setImage] = useState(null);
+  
+  const unitOptions = ['KG', 'LITRE', 'PIECE', 'BUNDLE', 'BOX', 'PACKET', 'TONNE', 'METRE'];
+  const tagOptions = [
+    'Plastic', 'Metal', 'Paper', 'Glass', 
+    'Rubber', 'E-waste', 'Best-Deals'
+  ];
   const [previewImage, setPreviewImage] = useState(null);
   const [fullImageModalVisible, setFullImageModalVisible] = useState(false);
   const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
@@ -60,9 +68,9 @@ const PostProductsScreen = () => {
   };
 
   const handleCreateItem = async () => {
-    if (!name || !rate || !image || !tags) {
+    if (!name || !rate || !unit || tags.length === 0 || !image) {
       dispatch(showSnackbar({
-        message: 'Please fill all required fields',
+        message: 'Please fill all required fields including image',
         type: 'error',
         time: 3000
       }));
@@ -74,10 +82,9 @@ const PostProductsScreen = () => {
       const itemData = {
         name,
         pricePerUnit: parseFloat(rate),
-        unit: type === 'countable' ? 'PIECE' : 'KG',
-        tags,
-        countable: type === 'countable',
-        isCountable: type === 'countable'
+        unit,
+        tags: tags.join(','),
+        isCountable: unit === 'PIECE'
       };
       
       const result = await dispatch(createItem({ itemData, file: image }));
@@ -121,61 +128,29 @@ const PostProductsScreen = () => {
             optional={false}
             type={'default'}
           />
-          <View style={styles.typeSelector}>
-            <Text style={styles.sectionLabel}>
-              Item Type
-              <Text style={{ color: Colors.secondary }}>*</Text>
-            </Text>
-            <View style={styles.typeButtons}>
-              <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  type === 'countable' && styles.selectedType,
-                ]}
-                onPress={() => setType('countable')}
-              >
-                <Text
-                  style={[
-                    styles.typeText,
-                    type === 'countable' && styles.selectedTypeText,
-                  ]}
-                >
-                  Countable
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  type === 'non-countable' && styles.selectedType,
-                ]}
-                onPress={() => setType('non-countable')}
-              >
-                <Text
-                  style={[
-                    styles.typeText,
-                    type === 'non-countable' && styles.selectedTypeText,
-                  ]}
-                >
-                  Non-Countable
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <SingleSelectDropdown
+            label="Unit"
+            placeholder="Select unit for this item"
+            options={unitOptions}
+            selectedValue={unit}
+            onSelectionChange={setUnit}
+            optional={false}
+          />
           <InputBox
             value={rate}
             setter={setRate}
-            placeholder={type === 'countable' ? 'Enter Rate per piece' : 'Enter Rate per kg'}
-            label={type === 'countable' ? 'Rate per piece' : 'Rate per kg'}
+            placeholder={`Enter Rate per ${unit?.toLowerCase() || 'unit'}`}
+            label={`Rate per ${unit?.toLowerCase() || 'unit'}`}
             optional={false}
             type={'phone-pad'}
           />
-          <InputBox
-            value={tags}
-            setter={setTags}
-            placeholder={'Enter tags (e.g., plastic, metal)'}
-            label={'Tags'}
+          <MultiSelectDropdown
+            label="Tags"
+            placeholder="Select tags for this item"
+            options={tagOptions}
+            selectedValues={tags}
+            onSelectionChange={setTags}
             optional={false}
-            type={'default'}
           />
           <Text style={styles.sectionLabel}>
             Upload Image{' '}
@@ -331,33 +306,5 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: 'bold',
   },
-  typeSelector: {
-    marginBottom: 16,
-  },
-  typeButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  typeButton: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.lightGrayColor,
-    backgroundColor: Colors.whiteColor,
-    alignItems: 'center',
-  },
-  selectedType: {
-    backgroundColor: Colors.lightPrimary,
-    borderColor: Colors.primary,
-  },
-  typeText: {
-    fontSize: 12,
-    color: Colors.grayColor,
-  },
-  selectedTypeText: {
-    color: Colors.primary,
-    fontWeight: '500',
-  },
+
 });

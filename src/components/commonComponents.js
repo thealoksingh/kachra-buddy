@@ -64,7 +64,7 @@ export function ButtonWithLoader({
     </View>
   ) : (
     <TouchableOpacity
-      activeOpacity={0.7}
+      activeOpacity={0.9}
       style={{ ...commonStyles.button, backgroundColor: color }}
       onPress={method}
     >
@@ -76,11 +76,11 @@ export function OtpFields({ otpInput, setOtpInput }) {
   return (
     <OTPTextView
       containerStyle={{
-        margin: Sizes.fixPadding * 2.0,
+        // margin: Sizes.fixPadding * 2.0,
         marginVertical: Sizes.fixPadding * 2.0,
       }}
       handleTextChange={setOtpInput}
-      inputCount={4}
+      inputCount={6}
       keyboardType="numeric"
       tintColor={Colors.primary}
       offTintColor={Colors.extraLightGrayColor}
@@ -93,7 +93,7 @@ export function CommonAppBar({ label, navigation }) {
   return (
     <View style={styles.appBar}>
       <TouchableOpacity
-        activeOpacity={0.7}
+        activeOpacity={0.9}
         onPress={() => navigation?.goBack()}
       >
         <Ionicons name="arrow-back" size={24} color="black" />
@@ -129,7 +129,10 @@ export function InputBox({
     <>
       {commonLabel(label, optional)}
       <TextInput
-        style={[styles.boxInput,{backgroundColor: editable?'#f5f5f5':'#ffdfdfff'}]}
+        style={[
+          styles.boxInput,
+          { backgroundColor: editable ? '#f5f5f5' : '#ffdfdfff' },
+        ]}
         placeholder={placeholder}
         placeholderTextColor="gray"
         value={value}
@@ -157,6 +160,7 @@ export function TextArea({ value, setter, placeholder, label, optional }) {
     </>
   );
 }
+
 export function FaddedIcon({}) {
   return (
     <View
@@ -177,6 +181,24 @@ export function FaddedIcon({}) {
           opacity: 0.2,
         }}
       />
+    </View>
+  );
+}
+
+export function EmptyList({ message }) {
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 200,
+      }}
+    >
+      <FaddedIcon />
+      <Text style={{ marginTop: 5, color: Colors.grayColor }}>
+        {message||"No Data Found"}
+      </Text>
     </View>
   );
 }
@@ -237,7 +259,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 12,
-   
+
     marginBottom: 15,
     height: 45,
   },

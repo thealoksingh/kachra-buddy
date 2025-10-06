@@ -108,6 +108,7 @@ export const commonStyles = {
   },
   button: {
     backgroundColor: Colors.primary,
+    // flex:1,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 8,

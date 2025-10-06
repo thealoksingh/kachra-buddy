@@ -34,7 +34,7 @@ export default function SwipableTabs({ titles = [], components = [] }) {
       <View style={style.tabHeader}>
         {titles.map((title, index) => (
           <TouchableOpacity
-           activeOpacity={0.7}
+           activeOpacity={0.9}
             key={index}
             style={[
               style.tabButton,

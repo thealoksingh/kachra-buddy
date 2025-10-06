@@ -1,21 +1,20 @@
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { Colors, screenWidth, textStyles } from '../../styles/commonStyles';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const EditableOrderCard = ({ price, type, itemName, quantity: initialQuantity, unit, orderItem, onQuantityChange }) => {
+const EditableOrderCard = ({ price, itemName, quantity: initialQuantity, unit, orderItem, onQuantityChange }) => {
   const [quantity, setQuantity] = useState(initialQuantity?.toString() || '');
-  const [weight, setWeight] = useState(initialQuantity?.toString() || '');
+  // const [weight, setWeight] = useState(initialQuantity?.toString() || '');
 
   const handleQuantityChange = (value) => {
     setQuantity(value);
     onQuantityChange?.(value);
   };
 
-  const handleWeightChange = (value) => {
-    setWeight(value);
-    onQuantityChange?.(value);
-  };
+  // const handleWeightChange = (value) => {
+  //   setWeight(value);
+  //   onQuantityChange?.(value);
+  // };
 
   return (
     <View style={styles.card}>
@@ -35,11 +34,10 @@ const EditableOrderCard = ({ price, type, itemName, quantity: initialQuantity, u
         </Text>
       
         <Text style={styles.rate}>
-          Rate: ₹{orderItem?.item?.pricePerUnit || price}  {type === 'countable' ? 'per piece' : `per ${orderItem?.item?.unit || 'kg'}`}
+          Rate: ₹{orderItem?.item?.pricePerUnit || price}/{orderItem?.item?.unit || unit}
         </Text>
 
         {/* Conditional Input */}
-        {type === 'countable' ? (
           <View style={styles.inputRow}>
             <Text style={styles.label}>Qty:</Text>
             <TextInput
@@ -50,18 +48,7 @@ const EditableOrderCard = ({ price, type, itemName, quantity: initialQuantity, u
               style={styles.input}
             />
           </View>
-        ) : (
-          <View style={styles.inputRow}>
-            <Text style={styles.label}>W(Kg)</Text>
-            <TextInput
-              value={weight}
-              onChangeText={handleWeightChange}
-              keyboardType="numeric"
-              placeholder="0"
-              style={styles.input}
-            />
-          </View>
-        )}
+       
       </View>
     </View>
   );

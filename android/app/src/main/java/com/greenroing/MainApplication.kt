@@ -1,4 +1,4 @@
-package com.kachrabuddy
+package com.greenroing
 
 import android.app.Application
 import com.facebook.react.PackageList

@@ -90,7 +90,7 @@ function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [pendingAlertVisible, setPendingAlertVisible] = useState(true);
   const unreadNotifications = useSelector(selectUnreadNotifications);
-
+  console.log("User data in HomeScreen:", user);
   // Memoized computed values to prevent unnecessary re-calculations
   const pendingOrders = useMemo(() => 
     orders?.filter(order => order.status === 'INCOMPLETE') || [], 
@@ -111,6 +111,7 @@ function HomeScreen() {
     getUserLocation(
       locationData => {
         setUserAddress(locationData.address);
+          console.log("User data in HomeScreen:", user);
         console.log('Address:', locationData.address);
       },
       error => {
@@ -189,7 +190,7 @@ function HomeScreen() {
             </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity
+       <TouchableOpacity
           onPress={navigateToNotifications}
           style={styles.notificationContainer}
         >
@@ -198,11 +199,11 @@ function HomeScreen() {
             size={28}
             color={Colors.whiteColor}
           />
-          <View style={styles.badge}>
+          {unreadNotifications?.length>0&&( <View style={styles.badge}>
             <Text style={styles.badgeText}>
               {unreadNotifications?.length || 0}
             </Text>
-          </View>
+          </View>)}
         </TouchableOpacity>
       </View>
 
@@ -232,6 +233,7 @@ function HomeScreen() {
             Best Deals
           </Text>
           <TouchableOpacity onPress={navigateToSearch}>
+            
             <Text style={styles.seeAllText}>
               See All
             </Text>
@@ -255,7 +257,7 @@ function HomeScreen() {
             </Text>
             <TouchableOpacity
               onPress={navigateToScrapVehicle}
-              activeOpacity={0.7}
+              activeOpacity={0.9}
               style={styles.sellnowButton}
             >
               <Text style={styles.sellnowButtonText}>
@@ -291,7 +293,7 @@ function HomeScreen() {
             color={Colors.grayColor}
           />
         </TouchableOpacity>
-        <NotificationTest />
+        {/* <NotificationTest /> */}
         <FaddedIcon />
       </ScrollView>
       <PendingOrderAlert

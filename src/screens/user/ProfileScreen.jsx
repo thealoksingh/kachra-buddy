@@ -27,18 +27,18 @@ import { performLogout } from '../../store/thunks/logoutThunk';
 const ProfileScreen = () => {
   const { API_BASE_URL } = Key;
   const user = useSelector(selectUser);
+ 
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [isEditingName, setIsEditingName] = useState(false);
   const [userName, setUserName] = useState(user?.fullName || 'N/A');
-  const [userImage, setUserImage] = useState(user?.avatarUrl || null);
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [pickerSheetVisible, setPickerSheetVisible] = useState(false);
   const { openCamera, openGallery } = useImagePicker();
-
+  // console.log("User data in ProfileScreen:", user);
   const pickImage = async source => {
     try {
       let result = null;
@@ -55,6 +55,7 @@ const ProfileScreen = () => {
       console.log('Error picking image:', error);
     } finally {
       setPickerSheetVisible(false);
+      
     }
   };
 
@@ -79,7 +80,6 @@ const ProfileScreen = () => {
             time: 3000,
           }),
         );
-        setUserImage(response.payload?.avatarUrl);
       } else {
         dispatch(
           showSnackbar({
@@ -177,7 +177,6 @@ const handleLogout = async () => {
         }),
       );
       setPickerSheetVisible(false);
-      setUserImage(null);
     } catch (error) {
       setPickerSheetVisible(false);
       dispatch(
@@ -234,16 +233,16 @@ const handleLogout = async () => {
           <View style={styles.profileImageContainer}>
             <TouchableOpacity
               onPress={() => {
-                if (userImage) {
-                  setPreviewImage(API_BASE_URL + userImage);
+                if (user?.avatarUrl) {
+                  setPreviewImage(API_BASE_URL + user?.avatarUrl);
                   setImageModalVisible(true);
                 }
               }}
             >
-              {userImage ? (
+              {user?.avatarUrl ? (
                 <Image
                   source={{
-                    uri: API_BASE_URL + userImage,
+                    uri: API_BASE_URL + user?.avatarUrl,
                     headers: { Authorization: `Bearer ${user?.accessToken}` },
                   }}
                   style={styles.profileImage}
@@ -402,7 +401,7 @@ const handleLogout = async () => {
         onClose={() => setPickerSheetVisible(false)}
         onCamera={() => pickImage('camera')}
         onGallery={() => pickImage('gallery')}
-        onRemove={userImage ? onRemoveImage : null}
+        onRemove={user?.avatarUrl ? onRemoveImage : null}
       />
 
       <ImagePreviewModal
