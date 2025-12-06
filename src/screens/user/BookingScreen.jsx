@@ -29,7 +29,7 @@ const ClosedBookings = ({
   onRefresh,
   refreshing,
 }) => {
-  const completedFilters = ['all', 'completed', 'cancelled'];
+  const completedFilters = ['All', 'Completed', 'Cancelled'];
 
   const getCompletedOrders = () => {
     const baseOrders =
@@ -42,10 +42,10 @@ const ClosedBookings = ({
           order?.status.includes('CANCELLED'),
       ) || [];
 
-    if (completedFilter === 'all') return baseOrders;
-    if (completedFilter === 'completed')
+    if (completedFilter === 'All') return baseOrders;
+    if (completedFilter === 'Completed')
       return baseOrders.filter(order => order?.status === 'COMPLETED');
-    if (completedFilter === 'cancelled')
+    if (completedFilter === 'Cancelled')
       return baseOrders.filter(
         order =>
           order?.status === 'CANCELLED_BY_USER' ||
@@ -118,7 +118,7 @@ const OngoingBookings = ({
   onRefresh,
   refreshing,
 }) => {
-  const ongoingFilters = ['all', 'active', 'incomplete', 'out for pickup'];
+  const ongoingFilters = ['All', 'Active', 'Incomplete', 'Out for pickup'];
 
   const getOngoingOrders = () => {
     const baseOrders =
@@ -130,12 +130,12 @@ const OngoingBookings = ({
           order?.status === 'OUT_FOR_PICKUP',
       ) || [];
 
-    if (ongoingFilter === 'all') return baseOrders;
-    if (ongoingFilter === 'active')
+    if (ongoingFilter === 'All') return baseOrders;
+    if (ongoingFilter === 'Active')
       return baseOrders.filter(order => order?.status === 'ACTIVE');
-    if (ongoingFilter === 'incomplete')
+    if (ongoingFilter === 'Incomplete')
       return baseOrders.filter(order => order?.status === 'INCOMPLETE');
-    if (ongoingFilter === 'out for pickup')
+    if (ongoingFilter === 'Out for pickup')
       return baseOrders.filter(order => order?.status === 'OUT_FOR_PICKUP');
     return baseOrders;
   };

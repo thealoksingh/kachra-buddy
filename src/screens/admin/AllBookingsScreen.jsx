@@ -27,8 +27,8 @@ const AllBookingsScreen = () => {
   const orders = useSelector(selectAdminOrders);
   const [refreshing, setRefreshing] = useState(false);
 
-  const ongoingFilters = ['all', 'active', 'incomplete', 'out for pickup'];
-  const completedFilters = ['all', 'completed', 'cancelled'];
+  const ongoingFilters = ['All', 'Active', 'Incomplete', 'Out for pickup'];
+  const completedFilters = ['All', 'Completed', 'Cancelled'];
   console.log('orders in all bookings screen', orders);
 
   useEffect(() => {
@@ -58,14 +58,14 @@ const AllBookingsScreen = () => {
         order.status === 'OUT_FOR_PICKUP',
     );
 
-    if (ongoingFilter === 'all') return baseOrders;
-    if (ongoingFilter === 'active')
+    if (ongoingFilter === 'All') return baseOrders;
+    if (ongoingFilter === 'Active')
       return baseOrders.filter(
         order => order.status === 'ACTIVE',
       );
-    if (ongoingFilter === 'incomplete')
+    if (ongoingFilter === 'Incomplete')
       return baseOrders.filter(order => order.status === 'INCOMPLETE');
-    if (ongoingFilter === 'out for pickup')
+    if (ongoingFilter === 'Out for pickup')
       return baseOrders.filter(order => order.status === 'OUT_FOR_PICKUP');
     return baseOrders;
   };
@@ -80,10 +80,10 @@ const AllBookingsScreen = () => {
         order?.status.includes('CANCELLED'),
     );
 
-    if (completedFilter === 'all') return baseOrders;
-    if (completedFilter === 'completed')
+    if (completedFilter === 'All') return baseOrders;
+    if (completedFilter === 'Completed')
       return baseOrders.filter(order => order.status === 'COMPLETED');
-    if (completedFilter === 'cancelled')
+    if (completedFilter === 'Cancelled')
       return baseOrders.filter(
         order =>
           order.status === 'CANCELLED_BY_USER' ||

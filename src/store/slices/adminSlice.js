@@ -15,6 +15,7 @@ import {
   fetchAllTickets,
   updateTicket,
   updateOrder,
+  deleteAdvertisementById,
 } from '../thunks/adminThunk';
 
 const initialState = {
@@ -227,6 +228,20 @@ const adminSlice = createSlice({
         }
       })
       .addCase(updateAdvertisement.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message;
+      })
+       .addCase(deleteAdvertisementById.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteAdvertisementById.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log('Advertisement deleted with id:', action.payload?.id);
+        const deletedAdId = action.payload?.id;
+        state.advertisements = state.advertisements.filter(ad => ad.id !== deletedAdId);
+      })
+      .addCase(deleteAdvertisementById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message;
       })

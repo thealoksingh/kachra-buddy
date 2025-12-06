@@ -201,6 +201,13 @@ export const updateAdvertisementAPI = async (advertisementId, advertisementData,
   });
 };
 
+export const deleteAdvertisementByIdAPI = async (data) => {
+  const accessToken = await AsyncStorage.getItem("access_token");
+  return apiDeleteRequest({
+    apiUrl: `${API_BASE_URL}/api/advertisements/${data.id}`,
+    accessToken,
+  });
+};
 
 export const fetchAllTicketsAPI = async () => {
   const accessToken = await AsyncStorage.getItem("access_token");

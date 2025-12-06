@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setLoading, setUsers, setDrivers, setRequests, setAnalytics, setError } from '../slices/adminSlice';
-import { updateAdminProfileAPI, updateAdminProfilePicAPI, fetchAllItemsAPI, createItemAPI, updateItemAPI, fetchAllOrdersAPI, fetchAllUsersAPI, createUserAPI, updateUserAPI, assignDriverAPI, createAdvertisementAPI, fetchAllAdvertisementsAPI, updateAdvertisementAPI, fetchAllTicketsAPI, updateTicketAPI, updateOrderAPI, deleteItemAPI } from '../../utils/api/adminApi';
+import { updateAdminProfileAPI, updateAdminProfilePicAPI, fetchAllItemsAPI, createItemAPI, updateItemAPI, fetchAllOrdersAPI, fetchAllUsersAPI, createUserAPI, updateUserAPI, assignDriverAPI, createAdvertisementAPI, fetchAllAdvertisementsAPI, updateAdvertisementAPI, deleteAdvertisementByIdAPI, fetchAllTicketsAPI, updateTicketAPI, updateOrderAPI, deleteItemAPI } from '../../utils/api/adminApi';
 import { handleAxiosError } from '../../utils/handleAxiosError';
 
 
@@ -195,6 +195,17 @@ export const fetchAllAdvertisements = createAsyncThunk(
     try {
       const response = await fetchAllAdvertisementsAPI();
       return response?.data;
+    } catch (error) {
+      return handleAxiosError(error, thunkAPI);
+    }
+  }
+);
+export const deleteAdvertisementById = createAsyncThunk(
+  'admin/deleteAdvertisements',
+  async (data, thunkAPI) => {
+    try {
+      const response = await deleteAdvertisementByIdAPI(data);
+      return data;
     } catch (error) {
       return handleAxiosError(error, thunkAPI);
     }

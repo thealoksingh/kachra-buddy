@@ -2,12 +2,15 @@
   "name": "GreenRoing",
   "version": "0.0.2",
   "private": true,
-  "scripts": {
+ "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "logs": "react-native log-android",
+    "bundle-android": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/",
+    "bundle-ios": "react-native bundle --platform ios --dev false --entry-file index.js --bundle-output ios/main.jsbundle --assets-dest ios"
   },
   "dependencies": {
     "@notifee/react-native": "^7.9.0",
@@ -43,7 +46,7 @@
     "react-native-screens": "^4.14.1",
     "react-native-vector-icons": "^10.3.0",
     "react-native-video": "^6.16.1",
-    "react-native-worklets": "^0.4.1",
+    "react-native-worklets": "^0.5.0",
     "react-redux": "^9.2.0"
   },
   "devDependencies": {

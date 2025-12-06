@@ -28,7 +28,13 @@ export const useImagePicker = () => {
 
         result = await launchCamera({ mediaType: 'photo', quality });
       } else {
-        result = await launchImageLibrary({ mediaType: 'photo', quality });
+        // Use Android Photo Picker (no permission needed)
+        result = await launchImageLibrary({ 
+          mediaType: 'photo', 
+          quality,
+          selectionLimit: 1,
+          presentationStyle: 'pageSheet' // Uses system photo picker
+        });
       }
 
       if (result.didCancel) return null;
