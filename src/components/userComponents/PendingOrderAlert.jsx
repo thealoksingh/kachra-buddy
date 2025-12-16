@@ -72,8 +72,8 @@ export const PendingOrderAlert = ({ title, message, visible, onClose }) => {
           </Text>
 
           <TouchableOpacity
-            onPress={()=>navigation.navigate("bookingScreen")}
-            style={{
+            onPress={()=>navigation.navigate("bookingDetailScreen",{orderId:29})}
+             style={{
               alignSelf: "flex-start",
               backgroundColor: Colors.secondary,
               paddingVertical: 6,
