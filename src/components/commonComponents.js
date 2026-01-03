@@ -89,7 +89,7 @@ export function OtpFields({ otpInput, setOtpInput }) {
   );
 }
 
-export function CommonAppBar({ label, navigation }) {
+export function CommonAppBar({ label, navigation, rightIcon, onRightPress }) {
   return (
     <View style={styles.appBar}>
       <TouchableOpacity
@@ -99,7 +99,13 @@ export function CommonAppBar({ label, navigation }) {
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
       <Text style={styles.title}>{label}</Text>
-      <View style={{ width: 20 }} />
+      {rightIcon ? (
+        <TouchableOpacity activeOpacity={0.9} onPress={onRightPress}>
+          <Ionicons name={rightIcon} size={24} color="red" />
+        </TouchableOpacity>
+      ) : (
+        <View style={{ width: 24 }} />
+      )}
     </View>
   );
 }

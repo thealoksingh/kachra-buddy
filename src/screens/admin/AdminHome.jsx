@@ -37,6 +37,7 @@ import {
   selectUser,
   selectAdvertisementsByDisplayOrder,
   selectUnreadNotifications,
+  selectActiveAdvertisementsByDisplayOrder,
 } from '../../store/selector';
 import { getUserById } from '../../store/thunks/userThunk';
 import {
@@ -151,7 +152,7 @@ export default function AdminHome() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
-  const advertisement = useSelector(selectAdvertisementsByDisplayOrder);
+  const advertisement = useSelector(selectActiveAdvertisementsByDisplayOrder);
   const unreadNotifications = useSelector(selectUnreadNotifications);
   const userId = user?.id;
   const { API_BASE_URL } = Key;

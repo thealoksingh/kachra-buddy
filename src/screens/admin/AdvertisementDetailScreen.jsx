@@ -19,12 +19,13 @@ import {
   ButtonWithLoader,
 } from '../../components/commonComponents';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { updateAdvertisement } from '../../store/thunks/adminThunk';
+import { updateAdvertisement, deleteAdvertisementById } from '../../store/thunks/adminThunk';
 import { showSnackbar } from '../../store/slices/snackbarSlice';
 import { useImagePicker } from '../../components/useImagePicker';
 import ImagePickerSheet from '../../components/ImagePickerSheet';
 import Key from '../../constants/key';
 import { DottedBlackLoader } from '../../components/lottie/loaderView';
+import { WarningWithButton } from '../../components/lottie/WarningWithButton';
 
 const AdvertisementDetailScreen = () => {
   const navigation = useNavigation();
@@ -33,6 +34,8 @@ const AdvertisementDetailScreen = () => {
   const { API_BASE_URL } = Key;
   const advertisement = route.params?.advertisement || {};
 
+
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState(advertisement.title || '');
@@ -68,6 +71,44 @@ const AdvertisementDetailScreen = () => {
       console.log('Error picking image:', error);
     } finally {
       setPickerSheetVisible(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      const result = await dispatch(
+        deleteAdvertisementById({ id: advertisement.id })
+      );
+
+      if (deleteAdvertisementById.fulfilled.match(result)) {
+        dispatch(
+          showSnackbar({
+            message: 'Advertisement deleted successfully',
+            type: 'success',
+            time: 3000,
+          })
+        );
+        navigation.goBack();
+      } else {
+        dispatch(
+          showSnackbar({
+            message: 'Failed to delete advertisement',
+            type: 'error',
+            time: 3000,
+          })
+        );
+      }
+    } catch (error) {
+      dispatch(
+        showSnackbar({
+          message: 'Failed to delete advertisement',
+          type: 'error',
+          time: 3000,
+        })
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -149,6 +190,8 @@ const AdvertisementDetailScreen = () => {
       <CommonAppBar
         navigation={navigation}
         label={isEditing ? 'Edit Advertisement' : 'Advertisement Details'}
+        rightIcon={!isEditing ? 'trash' : null}
+        onRightPress={!isEditing ? ()=>setShowDeleteAlert(true) : null}
       />
 
       <ScrollView
@@ -415,6 +458,14 @@ const AdvertisementDetailScreen = () => {
       {loading?(
         <DottedBlackLoader/>
       ):null}
+      {showDeleteAlert && (
+              <WarningWithButton
+                onYes={handleDelete}
+                message="Are you sure you want to Delete This Ad?"
+                buttonText="Delete"
+                onClose={() => setShowDeleteAlert(false)}
+              />
+            )}
     </KeyboardAvoidingView>
   );
 };

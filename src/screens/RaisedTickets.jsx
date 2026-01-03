@@ -1,10 +1,11 @@
-// ViewAllUserPage.js
+
 import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
+  RefreshControl,
 } from "react-native";
 import {
   Colors,
@@ -25,6 +26,7 @@ import { selectSupportTickets, selectUser, selectAuthLoader } from '../store/sel
 const RaisedTickets = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const [refreshing, setRefreshing] = useState(false);
   const user = useSelector(selectUser);
   const supportTickets = useSelector(selectSupportTickets);
   const isLoading = useSelector(selectAuthLoader);
@@ -34,6 +36,13 @@ const RaisedTickets = () => {
       dispatch(getAllSupportTickets(user.id));
     }
   }, [dispatch, user?.id]);
+
+  const onRefresh = () => {
+    if (user?.id) {
+      setRefreshing(true);
+      dispatch(getAllSupportTickets(user.id)).finally(() => setRefreshing(false));
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -49,6 +58,9 @@ const RaisedTickets = () => {
         contentContainerStyle={styles.listContainer}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <MaterialIcons name="confirmation-number" size={60} color={Colors.extraLightGrayColor} />

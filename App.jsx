@@ -1,6 +1,9 @@
 import * as React from 'react';
 import { StyleSheet, Alert, Platform } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  getStateFromPath,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider } from 'react-redux';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,6 +15,7 @@ import { DriverStack } from './src/roleStack/DriverStack';
 import { AdminStack } from './src/roleStack/AdminStack';
 import { Colors } from './src/styles/commonStyles';
 import store from './src/store/store';
+import { Linking } from 'react-native';
 import { Snackbar } from './src/components/Snackbar';
 import { LottieAlert } from './src/components/lottie/LottieAlert';
 import RoleBasedNavigator from './src/components/RoleBasedNavigator';
@@ -59,7 +63,6 @@ function RootStack() {
           </>
         )}
       </Stack.Screen>
-     
     </Stack.Navigator>
   );
 }
@@ -91,12 +94,45 @@ export default function App() {
       }
     };
   }, []);
+  const linking = {
+    prefixes: ['https://greenroing.aigreenfoundation.com', 'greenroing://'],
+    config: {
+      screens: {
+        splash: 'splash',
+        auth: 'auth',
+        user: {
+          path: 'user',
+          screens: {
+            cart: 'cart',
+            bookingDetailScreen: 'bookingDetailScreen/:orderId',
+            bookingScreen: 'bookingScreen',
+          },
+        },
+        driver: {
+          path: 'driver',
+          screens: {},
+        },
+        admin: {
+          path: 'admin',
+          screens: {},
+        },
+        NotFound: '*',
+      },
+    },
+    getStateFromPath(path, options) {
+      const state = getStateFromPath(path, options);
+      if (!state) {
+        return { routes: [{ name: 'splash' }] }; // fallback to splash
+      }
+      return state;
+    },
+  };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>
         <SafeAreaView style={styles.safeArea}>
-          <NavigationContainer>
+          <NavigationContainer linking={linking}>
             <Snackbar />
             <LottieAlert />
             {isConnected ? (

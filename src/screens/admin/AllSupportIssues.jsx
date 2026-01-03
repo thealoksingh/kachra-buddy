@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import { Colors } from '../../styles/commonStyles';
 import MyStatusBar from '../../components/MyStatusBar';
@@ -26,6 +27,7 @@ const AllSupportIssues = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const allTickets = useSelector(selectAllTickets);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('both');
@@ -58,6 +60,11 @@ const AllSupportIssues = () => {
 
     return matchesSearch && matchesRole && matchesTicketStatus;
   });
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    dispatch(fetchAllTickets()).finally(() => setRefreshing(false));
+  };
 
   const handleCardPress = ticket => {
     navigation.navigate('supportIssueDetail', { ticket });
@@ -376,6 +383,9 @@ function TicketCard({ ticket }) {
         keyExtractor={item => item?.id?.toString()}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
              

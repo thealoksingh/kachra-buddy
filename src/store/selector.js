@@ -110,6 +110,13 @@ export const selectAdvertisementsByDisplayOrder = createSelector(
   (advertisements) => [...advertisements].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
 );
 
+export const selectActiveAdvertisementsByDisplayOrder = createSelector(
+  [selectAdvertisementsRaw],
+  (advertisements) => [...advertisements]
+    .filter(ad => ad.status === 'ACTIVE')
+    .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+);
+
 // Support tickets selectors
 const selectSupportTicketsRaw = (state) => state.auth.supportTickets || [];
 
